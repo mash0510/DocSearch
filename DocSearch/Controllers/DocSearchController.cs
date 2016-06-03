@@ -149,7 +149,12 @@ namespace DocSearch.Controllers
 
             foreach (string keyword in keywords)
             {
-                BestWord[] bestwords = distance.Search(keyword);
+                if (keyword == string.Empty || keyword == " " || keyword == "　")
+                    continue;
+
+                string trimedKeyword = keyword.Trim();
+
+                BestWord[] bestwords = distance.Search(trimedKeyword);
                 SortedList<float, string> relatedWordList = new SortedList<float, string>(new DescComparer<float>());
 
                 foreach (BestWord bestword in bestwords)
@@ -163,7 +168,7 @@ namespace DocSearch.Controllers
                     relatedWordList.Add(bestword.Distance, bestword.Word);
                 }
 
-                retval.Add(keyword, relatedWordList);
+                retval.Add(trimedKeyword, relatedWordList);
             }
 
             return retval;

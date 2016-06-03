@@ -25,7 +25,7 @@
         <ul>
             @foreach (var relatedWord in Model.RelatedWordList(10))
             {
-                <li onclick="wordSelect(this.innerHTML)">@relatedWord</li>
+                <li><label><input type="checkbox" value="@relatedWord" onclick="wordSelect(this)" />@relatedWord</label></li>
             }
         </ul>
     }
@@ -42,11 +42,10 @@
     {
         var keywords = $('#keywordTextBox').val();
 
-        // 検索キーワードテキストボックスに既に存在する関連語は追加しない。
-        if (keywords.indexOf(selectedWord) != -1)
-            return;
-
-        keywords = keywords + " " + selectedWord;
+        if (selectedWord.checked)
+            keywords = keywords + " " + selectedWord.value;
+        else
+            keywords = keywords.replace(" " + selectedWord.value, "");
 
         // 検索キーワードテキストボックスへの選択した関連語の追加
         $('#keywordTextBox').val(keywords);

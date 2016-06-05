@@ -24,11 +24,15 @@ textarea {
     max-width: 280px;
 }
 
-.ds-relatedwords {
-    width: 200px;
-    margin-left: auto;
-}
-
 .ds-relatedwords li {
     list-style: none;
+}
+
+.ds-updateddate {
+    font-size: 11px;
+}
+
+.ds-docsummary {
+    padding-top: 5px;
+    padding-bottom: 5px;
 }

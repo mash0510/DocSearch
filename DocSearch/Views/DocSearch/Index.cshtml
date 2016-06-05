@@ -10,30 +10,48 @@
 @using (Html.BeginForm("Index", "DocSearch", FormMethod.Get))
 {
     <div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.InputKeywords, new { @class = "col-md-2 control-label" })
-            @Html.TextBoxFor(m => m.InputKeywords, new { id = "keywordTextBox" }) <input type="submit" value="検索" />
+        <div class="form-group input-group">
+            @Html.TextBoxFor(m => m.InputKeywords, new { id = "keywordTextBox", @class="form-control" })
+            <span class="input-group-btn">
+                <button class="btn btn-default" type="submit">検索</button>
+            </span>
         </div>
     </div>
 }
 
-<!-- キーワードに関連する単語を表示する部分 -->
-<div class="ds-relatedwords">
-    @if (Model != null)
-    {
-        <h4>関連語</h4>
-        <ul>
-            @foreach (var relatedWord in Model.RelatedWordList(10))
-            {
-                <li><label><input type="checkbox" value="@relatedWord" onclick="wordSelect(this)" />@relatedWord</label></li>
-            }
-        </ul>
-    }
-</div>
+<div class="row">
+    <!-- 検索結果表示部分 -->
+    <div class="col-md-8">
+        @if (Model != null)
+        {
+            <ul>
+                @foreach(var result in Model.SearchedDocument)
+                {
+                    <li>
+                        <a href="@result.FileFullPath" target="_blank">@result.FileName</a>
+                        <div class="ds-updateddate">更新日 : @result.UpdatedDate</div>
+                        <p class="ds-docsummary">
+                            @result.DocSummary
+                        </p>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
 
-<!-- 検索結果表示部分 -->
-<div>
-
+    <!-- 関連語表示 -->
+    <div class="col-md-2  ds-relatedwords">
+        @if (Model != null)
+        {
+            <h4>関連語</h4>
+            <ul>
+                @foreach (var relatedWord in Model.RelatedWordList(10))
+                {
+                    <li><label><input type="checkbox" value="@relatedWord" onclick="wordSelect(this)" />@relatedWord</label></li>
+                }
+            </ul>
+        }
+    </div>
 </div>
 
 <script type="text/javascript">

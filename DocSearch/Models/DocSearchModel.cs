@@ -12,6 +12,8 @@ namespace DocSearch.Models
     /// </summary>
     public class DocData
     {
+        private string _fileFullPath = string.Empty;
+
         /// <summary>
         /// ファイル名
         /// </summary>
@@ -23,7 +25,24 @@ namespace DocSearch.Models
         /// <summary>
         /// ファイルのフルパス
         /// </summary>
-        public string FileFullPath { get; set; }
+        public string FileFullPath
+        {
+            get
+            {
+                return this._fileFullPath;
+            }
+            set
+            {
+                if (!value.StartsWith(@"file:"))
+                {
+                    this._fileFullPath = (@"file:" + value).Replace(@"\", "/");
+                }
+                else
+                {
+                    this._fileFullPath = value.Replace(@"\", "/");
+                }
+            }
+        }
         /// <summary>
         /// 拡張子
         /// </summary>

@@ -4,18 +4,14 @@
     ViewBag.Title = "Document Search";
 }
 
-<!-- <h2>Document Search</h2> -->
-
 <!-- 検索キーワード入力部分 -->
 @using (Html.BeginForm("Index", "DocSearch", FormMethod.Get))
 {
-    <div>
-        <div class="form-group input-group">
-            @Html.TextBoxFor(m => m.InputKeywords, new { id = "keywordTextBox", @class="form-control" })
-            <span class="input-group-btn">
-                <button class="btn btn-default" type="submit">検索</button>
-            </span>
-        </div>
+    <div class="form-group input-group">
+        @Html.TextBoxFor(m => m.InputKeywords, new { id = "keywordTextBox", @class="form-control", placeholder = "キーワード" })
+        <span class="input-group-btn">
+            <button class="btn btn-default" type="submit">検索</button>
+        </span>
     </div>
 }
 
@@ -44,12 +40,16 @@
         @if (Model != null)
         {
             <h4>関連語</h4>
-            <ul>
-                @foreach (var relatedWord in Model.RelatedWordList(10))
-                {
-                    <li><label><input type="checkbox" value="@relatedWord" onclick="wordSelect(this)" />@relatedWord</label></li>
-                }
-            </ul>
+            foreach (var keyword in Model.InputKeywordList)
+            {
+                <h5>@keyword</h5>
+                <ul>
+                        @foreach (var relatedWord in Model.RelatedWordList(keyword, 10))
+                        {
+                            <li><label><input type="checkbox" value="@relatedWord" onclick="wordSelect(this)" />@relatedWord</label></li>
+                        }
+                </ul>
+            }
         }
     </div>
 </div>

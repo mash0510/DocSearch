@@ -50,10 +50,19 @@ namespace DocSearch.Controllers
             string[] keywords = docSearchModel.InputKeywords.Split(delimiter);
             docSearchModel.RelatedWords = GetRelatedWords(keywords);
 
+            // 入力されたキーワードをListに保持する
+            foreach (string keyword in docSearchModel.RelatedWords.Keys)
+            {
+                if (docSearchModel.InputKeywordList == null)
+                    docSearchModel.InputKeywordList = new List<string>();
+                
+                docSearchModel.InputKeywordList.Add(keyword);
+            }
+
             SearchEngineConnection.InitConnectClient();
             ElasticClient client = SearchEngineConnection.Client;
 
-            //【TODO】ページ処理は後で帰る必要がある。
+            //【TODO】ページ処理を実装する必要がある。
             // OR検索などは優先度低で良いか。
             var response = client.Search<DocumentInfo>(s => s
                 .From(0)

@@ -71,6 +71,11 @@ namespace DocSearch.Models
         public string InputKeywords { get; set; }
 
         /// <summary>
+        /// 検索キーワードリスト
+        /// </summary>
+        public List<string> InputKeywordList { get; set; }
+
+        /// <summary>
         /// 検索キーワードの関連語（Key : 入力されたキーワード, Value : word2vecが返した、そのキーワードの関連語一覧）
         /// </summary>
         public Dictionary<string, SortedList<float, string>> RelatedWords { get; set; }
@@ -78,26 +83,23 @@ namespace DocSearch.Models
         /// <summary>
         /// 検索キーワードの情報の一覧の取得
         /// </summary>
-        public List<string> RelatedWordList(int num)
+        /// <param name="keyword">指定したキーワードの関連語を取得</param>
+        /// <param name="num">取得する関連語の数</param>
+        public List<string> RelatedWordList(string keyword, int num)
         {
             List<string> retval = new List<string>();
 
+            SortedList<float, string> relatedWords = RelatedWords[keyword];
+
             int i = 0;
 
-            foreach(SortedList<float, string> relatedWords in RelatedWords.Values)
+            foreach (string relatedWord in relatedWords.Values)
             {
-                foreach(string word in relatedWords.Values)
-                {
-                    retval.Add(word);
+                retval.Add(relatedWord);
 
-                    i++;
-                    if (i >= num)
-                        break;
-                }
-
+                i++;
                 if (i >= num)
                     break;
-
             }
 
             return retval;

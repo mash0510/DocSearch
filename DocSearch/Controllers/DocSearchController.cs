@@ -76,13 +76,13 @@ namespace DocSearch.Controllers
         /// <param name="docSearchModel"></param>
         private void ListConvert(DocSearchModel docSearchModel)
         {
+            if (docSearchModel.InputKeywordList == null)
+                docSearchModel.InputKeywordList = new List<string>();
+            else
+                docSearchModel.InputKeywordList.Clear();
+
             foreach (string keyword in docSearchModel.RelatedWords.Keys)
             {
-                if (docSearchModel.InputKeywordList == null)
-                    docSearchModel.InputKeywordList = new List<string>();
-                else
-                    docSearchModel.InputKeywordList.Clear();
-
                 docSearchModel.InputKeywordList.Add(keyword);
             }
         }

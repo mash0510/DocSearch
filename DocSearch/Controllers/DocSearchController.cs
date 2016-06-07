@@ -24,6 +24,9 @@ namespace DocSearch.Controllers
         /// </summary>
         Word2Vec.Net.Distance distance = null;
 
+        /// <summary>
+        /// サマリー表示の文字数。入力されたキーワードの前後何文字を検索画面中に表示するか。
+        /// </summary>
         private const int LETTERS_AROUND_KEYWORD = 50;
 
         // GET: DocSearch
@@ -49,15 +52,7 @@ namespace DocSearch.Controllers
         {
             string[] keywords = docSearchModel.InputKeywords.Split(delimiter);
             docSearchModel.RelatedWords = GetRelatedWords(keywords);
-
-            // 入力されたキーワードをListに保持する
-            foreach (string keyword in docSearchModel.RelatedWords.Keys)
-            {
-                if (docSearchModel.InputKeywordList == null)
-                    docSearchModel.InputKeywordList = new List<string>();
-                
-                docSearchModel.InputKeywordList.Add(keyword);
-            }
+            ListConvert(docSearchModel);
 
             SearchEngineConnection.InitConnectClient();
             ElasticClient client = SearchEngineConnection.Client;
@@ -66,11 +61,30 @@ namespace DocSearch.Controllers
             // OR検索などは優先度低で良いか。
             var response = client.Search<DocumentInfo>(s => s
                 .From(0)
-                .Size(10)
+                .Size(30)
                 .Query(q => q.Match(ma => ma.Field(fld => fld.DocContent).Query(docSearchModel.InputKeywords).Operator(Operator.And)))
             );
 
+            docSearchModel.Total = response.Total;
+
             ConvertToDocSearchModel(response.Documents, docSearchModel, keywords);
+        }
+
+        /// <summary>
+        /// 入力されたキーワードをList化する。
+        /// </summary>
+        /// <param name="docSearchModel"></param>
+        private void ListConvert(DocSearchModel docSearchModel)
+        {
+            foreach (string keyword in docSearchModel.RelatedWords.Keys)
+            {
+                if (docSearchModel.InputKeywordList == null)
+                    docSearchModel.InputKeywordList = new List<string>();
+                else
+                    docSearchModel.InputKeywordList.Clear();
+
+                docSearchModel.InputKeywordList.Add(keyword);
+            }
         }
 
         /// <summary>
@@ -83,13 +97,9 @@ namespace DocSearch.Controllers
         private void ConvertToDocSearchModel(IEnumerable<DocumentInfo> documents, DocSearchModel docSearchModel, string[] keywords)
         {
             if (docSearchModel.SearchedDocument == null)
-            {
                 docSearchModel.SearchedDocument = new List<DocData>();
-            }
             else
-            {
                 docSearchModel.SearchedDocument.Clear();
-            }
 
             foreach(DocumentInfo docInfo in documents)
             {

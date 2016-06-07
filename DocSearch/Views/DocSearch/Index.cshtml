@@ -5,15 +5,25 @@
 }
 
 <!-- 検索キーワード入力部分 -->
-@using (Html.BeginForm("Index", "DocSearch", FormMethod.Get))
-{
-    <div class="form-group input-group">
-        @Html.TextBoxFor(m => m.InputKeywords, new { id = "keywordTextBox", @class="form-control", placeholder = "キーワード" })
-        <span class="input-group-btn">
-            <button class="btn btn-default" type="submit">検索</button>
-        </span>
+<div class="row">
+    <div class="col-md-9">
+        @using (Html.BeginForm("Index", "DocSearch", FormMethod.Get))
+        {
+            <div class="form-group input-group">
+                @Html.TextBoxFor(m => m.InputKeywords, new { id = "keywordTextBox", @class="form-control", placeholder = "キーワード" })
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="submit">検索</button>
+                </span>
+            </div>
+        }
     </div>
-}
+    <div class="col-md-3">
+        @if (Model != null)
+        {
+            <label>@Model.Total 件ヒット</label>
+        }
+    </div>
+</div>
 
 <div class="row">
     <!-- 検索結果表示部分 -->

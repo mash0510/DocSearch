@@ -59,6 +59,11 @@ namespace DocSearch.Models
     public class DocSearchModel
     {
         /// <summary>
+        /// 検索されたデータの総件数
+        /// </summary>
+        public long Total { get; set; }
+
+        /// <summary>
         /// 検索された文書データのリスト
         /// </summary>
         public List<DocData> SearchedDocument { get; set; }

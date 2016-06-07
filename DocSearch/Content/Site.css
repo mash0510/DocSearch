@@ -21,7 +21,7 @@
 input,
 select,
 textarea {
-    max-width: 999px;
+    max-width: 9999px;
 }
 
 .ds-relatedwords li {

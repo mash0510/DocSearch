@@ -11,6 +11,7 @@
         {
             <div class="form-group input-group">
                 @Html.TextBoxFor(m => m.InputKeywords, new { id = "keywordTextBox", @class="form-control", placeholder = "キーワード" })
+                @Html.HiddenFor(m => m.Page, new { @Value = "1" })
                 <span class="input-group-btn">
                     <button class="btn btn-default" type="submit">検索</button>
                 </span>
@@ -27,7 +28,7 @@
 
 <div class="row">
     <!-- 検索結果表示部分 -->
-    <div class="col-md-8">
+    <div class="col-md-9">
         @if (Model != null)
         {
             <ul>
@@ -46,7 +47,7 @@
     </div>
 
     <!-- 関連語表示 -->
-    <div class="col-md-2  ds-relatedwords">
+    <div class="col-md-3  ds-relatedwords">
         @if (Model != null)
         {
             <h4>関連語</h4>
@@ -60,6 +61,27 @@
                         }
                 </ul>
             }
+        }
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-10 col-md-offset-1">
+        @if (Model != null)
+        {
+            <ul class="pagination">
+                @foreach (var pageNo in Model.PageList)
+                {
+                    if (pageNo == Model.Page)
+                    {
+                        <li class="active">@Html.ActionLink(pageNo.ToString(), "Index", "DocSearch", new { InputKeywords = @Model.InputKeywords, page = pageNo.ToString() }, null)</li>
+                    }
+                    else
+                    {
+                        <li>@Html.ActionLink(pageNo.ToString(), "Index", "DocSearch", new { InputKeywords = @Model.InputKeywords, page = pageNo.ToString() }, null)</li>
+                    }
+                }
+            </ul>
         }
     </div>
 </div>

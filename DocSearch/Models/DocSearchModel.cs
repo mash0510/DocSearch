@@ -61,7 +61,24 @@ namespace DocSearch.Models
         /// <summary>
         /// 検索されたデータの総件数
         /// </summary>
-        public long Total { get; set; }
+        public int Total { get; set; }
+
+        #region ページ表示
+        /// <summary>
+        /// 表示しているページ番号
+        /// </summary>
+        public int Page { get; set; }
+
+        /// <summary>
+        /// 1ページあたりのデータ件数
+        /// </summary>
+        public int PageSize { get; set; }
+
+        /// <summary>
+        /// ページ番号リスト
+        /// </summary>
+        public List<int> PageList { get; set; }
+        #endregion
 
         /// <summary>
         /// 検索された文書データのリスト

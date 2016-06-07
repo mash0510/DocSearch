@@ -9,6 +9,7 @@ using Nest;
 using FolderCrawler;
 using Word2Vec.Net;
 using System.Text;
+using DocSearch.CommonLogic;
 
 namespace DocSearch.Controllers
 {
@@ -25,20 +26,30 @@ namespace DocSearch.Controllers
         Word2Vec.Net.Distance distance = null;
 
         /// <summary>
+        /// ページ表示
+        /// </summary>
+        private Pagination _pagination = new Pagination();
+
+        /// <summary>
         /// サマリー表示の文字数。入力されたキーワードの前後何文字を検索画面中に表示するか。
         /// </summary>
         private const int LETTERS_AROUND_KEYWORD = 50;
 
+        private const int PAGESIZE = 10;
+
         // GET: DocSearch
         [HttpGet]
-        public ActionResult Index(DocSearchModel docSearchModel)
+        public ActionResult Index(DocSearchModel docSearchModel, int? page)
         {
             // 検索キーワードが何も入力されていなかったら、検索処理はしない。
             if (docSearchModel.InputKeywords == null ||
                 docSearchModel.InputKeywords == string.Empty)
                 return View();
 
-            Search(docSearchModel);
+            int pageNo = page ?? 1;
+            if (pageNo <= 0) pageNo = 1;
+
+            Search(docSearchModel, pageNo);
 
             return View(docSearchModel);
         }
@@ -48,7 +59,7 @@ namespace DocSearch.Controllers
         /// </summary>
         /// <param name="docSearchModel"></param>
         /// <returns></returns>
-        private void Search(DocSearchModel docSearchModel)
+        private void Search(DocSearchModel docSearchModel, int page)
         {
             string[] keywords = docSearchModel.InputKeywords.Split(delimiter);
             docSearchModel.RelatedWords = GetRelatedWords(keywords);
@@ -57,15 +68,20 @@ namespace DocSearch.Controllers
             SearchEngineConnection.InitConnectClient();
             ElasticClient client = SearchEngineConnection.Client;
 
-            //【TODO】ページ処理を実装する必要がある。
-            // OR検索などは優先度低で良いか。
+            _pagination.PageSize = PAGESIZE;
+            Pagination.DataRange dataRange = _pagination.GetDataRange(page);
+
             var response = client.Search<DocumentInfo>(s => s
-                .From(0)
-                .Size(30)
+                .From((int)dataRange.Start)
+                .Size((int)PAGESIZE)
                 .Query(q => q.Match(ma => ma.Field(fld => fld.DocContent).Query(docSearchModel.InputKeywords).Operator(Operator.And)))
             );
 
-            docSearchModel.Total = response.Total;
+            _pagination.TotalDataNum = (int)response.Total - 1; // 1つ大きい値が入るので -1 する。
+
+            docSearchModel.Total = _pagination.TotalDataNum;
+            docSearchModel.PageList = _pagination.GetPageList();
+            docSearchModel.Page = page;
 
             ConvertToDocSearchModel(response.Documents, docSearchModel, keywords);
         }

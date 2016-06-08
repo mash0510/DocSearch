@@ -9,11 +9,10 @@ namespace DocSearch.Controllers
 {
     public class SetupController : Controller
     {
-        // POST: Setup
+        // Get: Setup
         [HttpGet]
         public ActionResult Setup(SetupModel setupModel)
         {
-
             return View();
         }
 

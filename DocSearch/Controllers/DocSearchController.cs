@@ -35,8 +35,6 @@ namespace DocSearch.Controllers
         /// </summary>
         private const int LETTERS_AROUND_KEYWORD = 50;
 
-        private const int PAGESIZE = 10;
-
         // GET: DocSearch
         [HttpGet]
         public ActionResult Index(DocSearchModel docSearchModel, int? page)
@@ -68,12 +66,12 @@ namespace DocSearch.Controllers
             SearchEngineConnection.InitConnectClient();
             ElasticClient client = SearchEngineConnection.Client;
 
-            _pagination.PageSize = PAGESIZE;
+            _pagination.PageSize = docSearchModel.PageSize;
             Pagination.DataRange dataRange = _pagination.GetDataRange(page);
 
             var response = client.Search<DocumentInfo>(s => s
-                .From((int)dataRange.Start)
-                .Size((int)PAGESIZE)
+                .From(dataRange.Start)
+                .Size(_pagination.PageSize)
                 .Query(q => q.Match(ma => ma.Field(fld => fld.DocContent).Query(docSearchModel.InputKeywords).Operator(Operator.And)))
             );
 

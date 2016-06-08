@@ -69,10 +69,16 @@ namespace DocSearch.Models
         /// </summary>
         public int Page { get; set; }
 
+
+        private int _pageSize = 10;
         /// <summary>
         /// 1ページあたりのデータ件数
         /// </summary>
-        public int PageSize { get; set; }
+        public int PageSize
+        {
+            get { return this._pageSize; }
+            set { this._pageSize = value; }
+        }
 
         /// <summary>
         /// ページ番号リスト

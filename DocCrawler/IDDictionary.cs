@@ -17,6 +17,16 @@ namespace FolderCrawler
         /// </summary>
         private Dictionary<string, string> _docID = new Dictionary<string, string>();
 
+        private bool _idLoaded = false;
+
+        /// <summary>
+        /// IDのロードが完了しているかどうかの取得
+        /// </summary>
+        public bool IDLoaded
+        {
+            get { return this._idLoaded; }
+        }
+
         /// <summary>
         /// 読み書きバッファサイズ
         /// </summary>
@@ -46,13 +56,16 @@ namespace FolderCrawler
         /// </summary>
         /// <param name="id"></param>
         /// <param name="fileFullPath"></param>
-        public void AddID(string fileFullPath, string id)
+        /// <param name="save"></param>
+        public void AddID(string fileFullPath, string id, bool save)
         {
             if (this._docID.ContainsKey(fileFullPath))
                 return;
 
             this._docID.Add(fileFullPath, id);
-            SaveData(fileFullPath, id);
+
+            if (save)
+                SaveData(fileFullPath, id);
         }
 
         /// <summary>
@@ -81,7 +94,7 @@ namespace FolderCrawler
             await Task.Run(() =>
             {
                 string saveFile = CommonParameters.DicFileNameFullPath;
-                StreamWriter sw = new StreamWriter(saveFile, true);
+                StreamWriter sw = new StreamWriter(saveFile, true, Encoding.UTF8);
 
                 string writeData = fileFullPath + "\t" + id;
 
@@ -113,7 +126,7 @@ namespace FolderCrawler
                 string saveFile = CommonParameters.DicFileNameFullPath;
 
                 FileStream fs = new FileStream(saveFile, FileMode.Create);
-                StreamWriter sw = new StreamWriter(fs, Encoding.Unicode, BUFFER);
+                StreamWriter sw = new StreamWriter(fs, Encoding.UTF8, BUFFER);
 
                 int i = 0;
 
@@ -146,43 +159,61 @@ namespace FolderCrawler
         }
 
         /// <summary>
-        /// ID管理Dictionaryファイルの読み込み
+        /// ID管理Dictionaryファイルの読み込み（非同期実行）
         /// </summary>
-        public async void Load()
+        public async void LoadAsync()
         {
             await Task.Run(() =>
             {
-                string readFile = CommonParameters.DicFileNameFullPath;
-                char[] delimiter = { '\t' };
-
-                FileStream fs = new FileStream(readFile, FileMode.OpenOrCreate);
-                StreamReader sr = new StreamReader(fs, Encoding.Unicode, true, BUFFER);
-
-                try
-                {
-                    while (sr.Peek() >= 0)
-                    {
-                        string record = sr.ReadLine();
-                        string[] data = record.Split(delimiter);
-
-                        if (data.Length >= 2)
-                        {
-                            AddID(data[0], data[1]);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // 後ほどログ出力ロジックを入れる
-                }
-                finally
-                {
-                    sr.Close();
-                    fs.Close();
-                }
+                Load();
             });
 
             LoadFinished?.Invoke(this, new EventArgs());
+        }
+
+        /// <summary>
+        /// ID管理Dictionaryファイルの読み込み
+        /// </summary>
+        public void Load()
+        {
+            string readFile = CommonParameters.DicFileNameFullPath;
+            char[] delimiter = { '\t' };
+
+            FileStream fs = new FileStream(readFile, FileMode.OpenOrCreate);
+            StreamReader sr = new StreamReader(fs, Encoding.UTF8, true);
+
+            try
+            {
+                while (sr.Peek() >= 0)
+                {
+                    string record = sr.ReadLine();
+                    string[] data = record.Split(delimiter);
+
+                    if (data.Length >= 2)
+                    {
+                        AddID(data[0], data[1], false);
+                    }
+                }
+
+                LoadFinish();
+            }
+            catch (Exception ex)
+            {
+                // 後ほどログ出力ロジックを入れる
+            }
+            finally
+            {
+                sr.Close();
+                fs.Close();
+            }
+        }
+
+        /// <summary>
+        /// ロード完了フラグを立てる
+        /// </summary>
+        private void LoadFinish()
+        {
+            this._idLoaded = true;
         }
     }
 }

@@ -133,6 +133,12 @@ namespace FolderCrawler
         /// <param name="di"></param>
         private void CrawlRecursive(DirectoryInfo di)
         {
+            if (!IDDictionary.GetInstanse().IDLoaded)
+            {
+                // 文書IDのロードが完了していない場合は、IDの読み込みを行う。
+                IDDictionary.GetInstanse().Load();
+            }
+
             try
             {
                 if (di.GetDirectories().Count() > 0)

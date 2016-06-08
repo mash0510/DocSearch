@@ -144,7 +144,7 @@ namespace FolderCrawler
 
                 var response = SearchEngineConnection.Client.Index(docInfo, idx => idx.Index(SearchEngineConnection.IndexName).Id(id));
 
-                IDDictionary.GetInstanse().AddID(docInfo.FileFullPath, id);
+                IDDictionary.GetInstanse().AddID(docInfo.FileFullPath, id, true);
 
                 // 訓練データ作成ロジックに、ドキュメントデータを渡す。
                 QueueManager.GetInstance().DocInfoQueue.Enqueue(docInfo);

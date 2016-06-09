@@ -8,12 +8,18 @@ using System.Web.Mvc;
 
 namespace DocSearch.Controllers
 {
-    public class SetupController : Controller
+    public class SetupController : AsyncController
     {
         /// <summary>
         /// 区切り文字
         /// </summary>
         private char[] delimiter = { ',' };
+
+        /// <summary>
+        /// 「機械学習をする」を示す値
+        /// </summary>
+        private const int EXEC_MACHINE_LEARNING = 1;
+
 
         // Get: Setup
         [HttpGet]
@@ -57,15 +63,35 @@ namespace DocSearch.Controllers
         }
 
         /// <summary>
-        /// 
+        /// クロール開始
         /// </summary>
         /// <param name="setupModel"></param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult StartCrawl(SetupModel setupModel)
+        public void StartCrawlAsync(SetupModel setupModel)
         {
+            AsyncManager.OutstandingOperations.Increment();
 
-            return RedirectToAction("Setup", "Setup", setupModel);
+            System.Threading.Tasks.Task.Run(() =>
+            {
+                System.Threading.Thread.Sleep(5000);
+
+                AsyncManager.Parameters.Add("result", setupModel); // keyの名前を"result"にする
+
+                AsyncManager.OutstandingOperations.Decrement();
+            });
         }
+
+        /// <summary>
+        /// クロール完了
+        /// </summary>
+        /// <param name="setupModel"></param>
+        /// <returns></returns>
+        public ActionResult StartCrawlCompleted(SetupModel result) // AsyncManager.Parameters.Add()で指定したkeyの名称を引数名に指定すると、値を受け取れる。
+        {
+            result.Message = "クロールが完了しました。";
+
+            return RedirectToAction("Setup", "Setup", result);
+       }
     }
 }

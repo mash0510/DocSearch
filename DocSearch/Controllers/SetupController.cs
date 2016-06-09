@@ -62,6 +62,7 @@ namespace DocSearch.Controllers
             return RedirectToAction("Setup", "Setup", setupModel);
         }
 
+
         /// <summary>
         /// クロール開始
         /// </summary>
@@ -92,6 +93,38 @@ namespace DocSearch.Controllers
             result.Message = "クロールが完了しました。";
 
             return RedirectToAction("Setup", "Setup", result);
-       }
+        }
+
+
+        /// <summary>
+        /// 機械学習の実行開始
+        /// </summary>
+        /// <param name="setupModel"></param>
+        [HttpPost]
+        public void StartMachineLearningAsync(SetupModel setupModel)
+        {
+            AsyncManager.OutstandingOperations.Increment();
+
+            System.Threading.Tasks.Task.Run(() =>
+            {
+                System.Threading.Thread.Sleep(5000);
+
+                AsyncManager.Parameters.Add("result", setupModel); // keyの名前を"result"にする
+
+                AsyncManager.OutstandingOperations.Decrement();
+            });
+        }
+
+        /// <summary>
+        /// 機械学習の完了
+        /// </summary>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public ActionResult StartMachineLearningCompleted(SetupModel result)
+        {
+            result.Message = "関連語学習が完了しました。";
+
+            return RedirectToAction("Setup", "Setup", result);
+        }
     }
 }

@@ -11,16 +11,34 @@ namespace FolderCrawler
     /// </summary>
     public static class CommonParameters
     {
-        private static string _homeDirectory = @"C:\DocSearch";
-
         /// <summary>
         /// クローラープログラムのホームディレクトリ。
         /// </summary>
         public static string HomeDirectory
         {
-            get { return _homeDirectory; }
-            set { _homeDirectory = value; }
+            get { return Settings.GetInstance().HomeDirectory; }
+            set {  Settings.GetInstance().HomeDirectory = value; }
         }
+
+        /// <summary>
+        /// 設定データの格納先フォルダ
+        /// </summary>
+        private static string _settingDataFolder = HomeDirectory + @"\settings";
+        /// <summary>
+        /// 設定ファイル名
+        /// </summary>
+        private static string _settingFileName = "setting.xml";
+        /// <summary>
+        /// 設定ファイルのフルパス取得
+        /// </summary>
+        public static string SettingFileFullPath
+        {
+            get
+            {
+                return _settingDataFolder + "\\" + _settingFileName;
+            }
+        }
+
 
         /// <summary>
         /// データファイルの格納先フォルダ

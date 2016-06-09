@@ -9,6 +9,9 @@ namespace DocSearch
     {
         public void Configuration(IAppBuilder app)
         {
+            // 設定ファイルのロード
+            Settings.GetInstance().LoadSettings();
+
             // 文書IDのロード
             IDDictionary.GetInstanse().LoadAsync();
         }

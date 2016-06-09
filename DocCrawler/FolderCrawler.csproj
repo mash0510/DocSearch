@@ -69,6 +69,7 @@
     <Compile Include="IDDictionary.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SearchEnginConnection.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="TextDataExtract\ExtractWithToxy.cs" />
     <Compile Include="TextDataExtract\ExtractWithXdoc2Txt.cs" />
     <Compile Include="TextDataExtract\ITextExtract.cs" />

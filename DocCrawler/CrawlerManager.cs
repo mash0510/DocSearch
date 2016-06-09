@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace FolderCrawler
@@ -19,11 +17,6 @@ namespace FolderCrawler
         /// クローラーインスタンスのリスト
         /// </summary>
         private static List<DocCrawler> _crawlList = new List<DocCrawler>();
-        /// <summary>
-        /// クロール先のルートフォルダのリスト
-        /// </summary>
-        private List<string> _crawlFolderList = new List<string>();
-
 
         private bool _isAllCrawlFinished = true;
         /// <summary>
@@ -39,14 +32,8 @@ namespace FolderCrawler
         /// </summary>
         public string HomeDirectory
         {
-            set
-            {
-                CommonParameters.HomeDirectory = value;
-            }
-            get
-            {
-                return CommonParameters.HomeDirectory;
-            }
+            set { CommonParameters.HomeDirectory = value; }
+            get { return CommonParameters.HomeDirectory;  }
         }
 
         /// <summary>
@@ -54,8 +41,8 @@ namespace FolderCrawler
         /// </summary>
         public List<string> CrawlFolderList
         {
-            get { return this._crawlFolderList; }
-            set { this._crawlFolderList = value; }
+            get { return Settings.GetInstance().CrawlFolders; }
+            set { Settings.GetInstance().CrawlFolders = value; }
         }
 
         /// <summary>

@@ -148,7 +148,7 @@ namespace FolderCrawler
         /// <summary>
         /// 訓練スタート
         /// </summary>
-        public async void StartTraining()
+        public void StartTraining()
         {
             Process mecabProgram = new Process();
             Process word2vecProc = new Process();

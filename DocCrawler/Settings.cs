@@ -32,6 +32,7 @@ namespace FolderCrawler
 
         }
 
+        #region 設定ファイルの保存と読み込み
         /// <summary>
         /// 読み込んだ設定を復元
         /// </summary>
@@ -39,6 +40,8 @@ namespace FolderCrawler
         public void RestoreSettings(Settings parameters)
         {
             HomeDirectory = parameters.HomeDirectory;
+
+            CrawlFolders.Clear();
             CrawlFolders = parameters.CrawlFolders;
         }
 
@@ -96,9 +99,9 @@ namespace FolderCrawler
                 sr.Close();
             }
         }
+        #endregion
 
         #region 設定パラメータ（ファイル保存されるもの）
-
         /// <summary>
         /// ホームディレクトリのデフォルト値
         /// </summary>
@@ -131,8 +134,10 @@ namespace FolderCrawler
             }
         }
 
+        /// <summary>
+        /// クロール先のフォルダリスト
+        /// </summary>
         private List<string> _crawlFolders = new List<string>();
-
         /// <summary>
         /// クロール先のフォルダリスト
         /// </summary>

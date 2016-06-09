@@ -38,12 +38,20 @@ namespace DocSearch.Controllers
             string pathes = setupModel.CrawlFolders.Replace(Environment.NewLine, ",");
             string[] pathesArray = pathes.Split(delimiter);
 
+            Settings.GetInstance().CrawlFolders.Clear();
+
             foreach(string path in pathesArray)
             {
-                Settings.GetInstance().CrawlFolders.Add(path);
+                string pathTrimed = path.Trim();
+                if (pathTrimed == string.Empty)
+                    continue;
+
+                Settings.GetInstance().CrawlFolders.Add(pathTrimed);
             }
 
             Settings.GetInstance().SaveSettings();
+
+            setupModel.Message = "保存が完了しました。";
 
             return RedirectToAction("Setup", "Setup", setupModel);
         }

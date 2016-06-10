@@ -118,7 +118,8 @@ namespace FolderCrawler
             {
                 if (QueueManager.GetInstance().FileInfoQueue.Count == 0)
                 {
-                    _timeElapse.TimerStart(CommonParameters.WorkerThreadStopDuration);
+                    if (!_timeElapse.IsTimerStarted)
+                        _timeElapse.TimerStart(CommonParameters.WorkerThreadStopDuration);
 
                     if (this._stop)
                         break;

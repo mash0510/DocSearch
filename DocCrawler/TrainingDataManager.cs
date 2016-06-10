@@ -84,36 +84,38 @@ namespace FolderCrawler
             _timeElapse.TimerStop();
         }
 
+        public event EventHandler TrainingDataGenerateFinished;
+
         /// <summary>
-        /// 訓練データ生成スレッドの実行
+        /// 訓練データ生成処理
         /// </summary>
-        public async void StartTrainingDataGenerate()
+        public void StartTrainingDataGenerate()
         {
             this._stop = false;
 
-            await Task.Run(() =>
+            while (!CheckMaxSize())
             {
-                while (!CheckMaxSize())
+                if (QueueManager.GetInstance().DocInfoQueue.Count == 0)
                 {
-                    if (QueueManager.GetInstance().DocInfoQueue.Count == 0)
-                    {
+                    if (!_timeElapse.IsTimerStarted)
                         _timeElapse.TimerStart(CommonParameters.WorkerThreadStopDuration);
 
-                        if (this._stop)
-                            break;
-                        else
-                            continue;
-                    }
-
-                    _timeElapse.TimerStop();
-
-                    DocumentInfo docInfo = QueueManager.GetInstance().DocInfoQueue.Dequeue() as DocumentInfo;
-                    if (docInfo == null)
+                    if (this._stop)
+                        break;
+                    else
                         continue;
-
-                    GenerateTrainingData(docInfo);
                 }
-            });
+
+                _timeElapse.TimerStop();
+
+                DocumentInfo docInfo = QueueManager.GetInstance().DocInfoQueue.Dequeue() as DocumentInfo;
+                if (docInfo == null)
+                    continue;
+
+                GenerateTrainingData(docInfo);
+            }
+
+            TrainingDataGenerateFinished?.Invoke(this, new EventArgs());
         }
 
         /// <summary>
@@ -170,6 +172,8 @@ namespace FolderCrawler
             word2vecProc.StartInfo.FileName = CommonParameters.Word2VecProgram;
             word2vecProc.StartInfo.Arguments = "-train " + CommonParameters.MeCabOutputFileName + " -output " + CommonParameters.VectorFileNameFullPath + " -cbow 0 -size 200 -window 10 -negative 0 -hs 1 -sample 1e-3 -threads 12 -binary 1";
             word2vecProc.Start();
+
+            word2vecProc.WaitForExit();
 
             word2vecProc.Close();
             word2vecProc.Dispose();

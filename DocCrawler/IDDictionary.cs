@@ -89,28 +89,25 @@ namespace FolderCrawler
         /// <param name="fileFullPath"></param>
         /// <param name="id"></param>
         /// <returns></returns>
-        private async void SaveData(string fileFullPath, string id)
+        private void SaveData(string fileFullPath, string id)
         {
-            await Task.Run(() =>
+            string saveFile = CommonParameters.DicFileNameFullPath;
+            StreamWriter sw = new StreamWriter(saveFile, true, Encoding.UTF8);
+
+            string writeData = fileFullPath + "\t" + id;
+
+            try
             {
-                string saveFile = CommonParameters.DicFileNameFullPath;
-                StreamWriter sw = new StreamWriter(saveFile, true, Encoding.UTF8);
-
-                string writeData = fileFullPath + "\t" + id;
-
-                try
-                {
-                    sw.WriteLine(writeData);
-                }
-                catch (Exception ex)
-                {
-                    // 後ほどログ出力ロジックを入れる
-                }
-                finally
-                {
-                    sw.Close();
-                }
-            });
+                sw.WriteLine(writeData);
+            }
+            catch (Exception ex)
+            {
+                // 後ほどログ出力ロジックを入れる
+            }
+            finally
+            {
+                sw.Close();
+            }
         }
 
         public event System.EventHandler SaveFinished;
@@ -119,7 +116,7 @@ namespace FolderCrawler
         /// <summary>
         /// ID管理Dictionaryファイルの保存。普段は使わないが、Dictionaryの内容を一気に保存したい場合に明示的に呼び出す。
         /// </summary>
-        public async void Save()
+        public async void SaveAsync()
         {
             await Task.Run(() =>
             {

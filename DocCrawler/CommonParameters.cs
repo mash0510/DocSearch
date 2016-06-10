@@ -157,7 +157,7 @@ namespace FolderCrawler
             }
         }
 
-        private static int _workerThreadStopDuration = 10 * 1000;
+        private static int _workerThreadStopDuration = 30 * 1000;
         /// <summary>
         /// ワーカースレッドが処理するデータが無くなって、止まるまでの秒数の取得
         /// </summary>

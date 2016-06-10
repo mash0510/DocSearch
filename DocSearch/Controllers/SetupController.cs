@@ -3,6 +3,7 @@ using FolderCrawler;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 
@@ -33,6 +34,7 @@ namespace DocSearch.Controllers
             return View(setupModel);
         }
 
+        #region クロール先フォルダの指定
         /// <summary>
         /// クロール先のフォルダ指定
         /// </summary>
@@ -61,25 +63,46 @@ namespace DocSearch.Controllers
 
             return RedirectToAction("Setup", "Setup", setupModel);
         }
+        #endregion
 
+        /// <summary>
+        /// 非同期処理完了メソッドに渡すパラメータを追加する
+        /// </summary>
+        /// <param name="keyName"></param>
+        /// <param name="value"></param>
+        private void AddValue(string keyName, SetupModel value)
+        {
+            if (AsyncManager.Parameters.ContainsKey(keyName))
+                AsyncManager.Parameters[keyName] = value;
+            else
+                AsyncManager.Parameters.Add(keyName, value);
+        }
 
+        #region クロール処理実行
         /// <summary>
         /// クロール開始
         /// </summary>
         /// <param name="setupModel"></param>
         /// <returns></returns>
         [HttpPost]
+        [AsyncTimeout(21600000)]
         public void StartCrawlAsync(SetupModel setupModel)
         {
             AsyncManager.OutstandingOperations.Increment();
 
-            System.Threading.Tasks.Task.Run(() =>
+            TrainingDataManager.GetInstance().TrainingDataGenerateFinished += (sender, e) =>
             {
-                System.Threading.Thread.Sleep(5000);
+                if (setupModel.ExecMachineLearning == EXEC_MACHINE_LEARNING)
+                    TrainingDataManager.GetInstance().StartTraining();
 
-                AsyncManager.Parameters.Add("result", setupModel); // keyの名前を"result"にする
+                AddValue("result", setupModel);  // ① keyを"result"にすると... → ②へ
 
                 AsyncManager.OutstandingOperations.Decrement();
+            };
+
+            Task.Run(() =>
+            {
+                CrawlerManager.GetInstance().Start();
             });
         }
 
@@ -88,28 +111,31 @@ namespace DocSearch.Controllers
         /// </summary>
         /// <param name="setupModel"></param>
         /// <returns></returns>
-        public ActionResult StartCrawlCompleted(SetupModel result) // AsyncManager.Parameters.Add()で指定したkeyの名称を引数名に指定すると、値を受け取れる。
+        public ActionResult StartCrawlCompleted(SetupModel result) // ② AsyncManager.Parameters.Add()で指定したkeyの名称を引数名に指定すると、値を受け取れる。
         {
             result.Message = "クロールが完了しました。";
 
             return RedirectToAction("Setup", "Setup", result);
         }
+        #endregion
 
 
+        #region 機械学習処理実行
         /// <summary>
         /// 機械学習の実行開始
         /// </summary>
         /// <param name="setupModel"></param>
         [HttpPost]
+        [AsyncTimeout(21600000)]
         public void StartMachineLearningAsync(SetupModel setupModel)
         {
             AsyncManager.OutstandingOperations.Increment();
 
-            System.Threading.Tasks.Task.Run(() =>
+            Task.Run(() =>
             {
-                System.Threading.Thread.Sleep(5000);
+                TrainingDataManager.GetInstance().StartTraining();
 
-                AsyncManager.Parameters.Add("result", setupModel); // keyの名前を"result"にする
+                AddValue("result", setupModel);  // ① keyを"result"にすると... → ②へ
 
                 AsyncManager.OutstandingOperations.Decrement();
             });
@@ -120,11 +146,12 @@ namespace DocSearch.Controllers
         /// </summary>
         /// <param name="result"></param>
         /// <returns></returns>
-        public ActionResult StartMachineLearningCompleted(SetupModel result)
+        public ActionResult StartMachineLearningCompleted(SetupModel result) // ② AsyncManager.Parameters.Add()で指定したkeyの名称を引数名に指定すると、値を受け取れる。
         {
             result.Message = "関連語学習が完了しました。";
 
             return RedirectToAction("Setup", "Setup", result);
         }
+        #endregion
     }
 }

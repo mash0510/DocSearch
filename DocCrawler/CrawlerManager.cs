@@ -45,10 +45,21 @@ namespace FolderCrawler
             set { Settings.GetInstance().CrawlFolders = value; }
         }
 
+        private static CrawlerManager _self = new CrawlerManager();
+
+        /// <summary>
+        /// インスタンスの取得
+        /// </summary>
+        /// <returns></returns>
+        public static CrawlerManager GetInstance()
+        {
+            return _self;
+        }
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public CrawlerManager()
+        private CrawlerManager()
         {
         }
 
@@ -95,7 +106,8 @@ namespace FolderCrawler
 
             this._isAllCrawlFinished = allFinished;
 
-            AllCrawlFinished?.Invoke(this, new EventArgs());
+            if (allFinished)
+                AllCrawlFinished?.Invoke(this, new EventArgs());
         }
 
         /// <summary>

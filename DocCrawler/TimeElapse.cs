@@ -18,11 +18,16 @@ namespace FolderCrawler
         private Timer _timer = null;
 
         /// <summary>
+        /// タイマー実行中かどうか
+        /// </summary>
+        public bool IsTimerStarted { get; set; }
+
+        /// <summary>
         /// コンストラクタ
         /// </summary>
         public TimeElapse()
         {
-
+            IsTimerStarted = false;
         }
 
         /// <summary>
@@ -31,7 +36,19 @@ namespace FolderCrawler
         /// <param name="duration"></param>
         public void TimerStart(int duration)
         {
-            _timer = new Timer(new TimerCallback(ThreadingTimerCallback), null, duration, duration);
+            if (_timer == null)
+            {
+                _timer = new Timer(new TimerCallback(ThreadingTimerCallback), null, duration, duration);
+                IsTimerStarted = true;
+
+                return;
+            }
+
+            if (!IsTimerStarted)
+            {
+                _timer.Change(duration, duration);
+                IsTimerStarted = true;
+            }
         }
 
         /// <summary>
@@ -39,7 +56,15 @@ namespace FolderCrawler
         /// </summary>
         public void TimerStop()
         {
+            if (_timer == null)
+            {
+                IsTimerStarted = false;
+                return;
+            }
+
             _timer.Change(Timeout.Infinite, Timeout.Infinite);
+
+            IsTimerStarted = false;
         }
 
         /// <summary>

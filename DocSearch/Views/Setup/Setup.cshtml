@@ -1,0 +1,77 @@
+﻿@model DocSearch.Models.SetupModel
+
+@{
+    ViewBag.Title = "Setup";
+}
+
+<h2 style="margin-bottom: 30px">設定画面</h2>
+
+<!-- クロール先フォルダの指定 -->
+<div class="ds-container">
+    <h4>クロール先のフォルダの指定</h4>
+    @using (Html.BeginForm("SetupCrawlFolder", "Setup", FormMethod.Post))
+    {
+        <div class="form-group">
+            <label class="control-label">クロール先のフォルダを指定して下さい。改行で複数して出来ます。</label>
+            @Html.TextAreaFor(m => m.CrawlFolders, new { @class = "form-control", rows = "5" })
+        </div>
+        <button type="submit" class="btn btn-default right">適用</button>
+    }
+</div>
+
+<!-- クロール開始 -->
+<div class="ds-container">
+    <h4>クロール処理の開始</h4>
+    @using (Html.BeginForm("StartCrawl", "Setup", FormMethod.Post))
+    {
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-3">
+                    <label class="control-label">クロール後の関連語学習</label>
+                </div>
+                <div class="col-md-2">
+                   @Html.DropDownListFor(m => m.ExecMachineLearning,
+                     new SelectListItem[] {
+                        new SelectListItem() { Value="0", Text="しない" },
+                        new SelectListItem() { Value="1", Text="する" }
+                     },
+                     new { @class="form-control", id="execMachineLearningOption" })
+                </div>
+            </div>
+            <button type="submit" class="btn btn-default" onclick="ShowProcessingMessage('processingMessage1', '処理中です...')">開始</button>&nbsp;&nbsp;<span id="processingMessage1"></span>
+       </div>
+    }
+</div>
+
+<div class="ds-container">
+    <h4>関連語学習の開始</h4>
+    @using (Html.BeginForm("StartMachineLearning", "Setup", FormMethod.Post))
+    {
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-5">
+                    <label class="control-label">関連語を表示する人工知能の学習の実行</label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-default" onclick="ShowProcessingMessage('processingMessage2', '処理中です...')">開始</button>&nbsp;&nbsp;<span id="processingMessage2"></span>
+        </div>
+    }
+</div>
+
+<script type="text/javascript">
+    function ShowProcessingMessage(id, message)
+    {
+        message += "&nbsp;<img src='/Content/Pictures/ajax-loader.gif'></img>";
+        $('#' + id).html(message);
+    }
+</script>
+
+<!-- 応答メッセージ -->
+@{
+    if (Model.ProcessFinished)
+    {
+        <script type="text/javascript">
+            alert('@Model.Message');
+        </script>
+        }
+}

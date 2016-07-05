@@ -23,7 +23,6 @@
             <div class="nav navbar-nav navbar-right">
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("管理", "Setup", "Setup")</li>
-                    <li>@Html.ActionLink("その他", "About", "Home")</li>
                 </ul>
             </div>
         </div>
@@ -39,5 +38,7 @@
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
+    @Scripts.Render("~/bundles/jqueryui")
+
 </body>
 </html>

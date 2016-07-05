@@ -6,7 +6,7 @@
 
 <!-- 検索キーワード入力部分 -->
 <div class="row">
-    <div class="col-md-9">
+    <div class="col-md-7">
         @using (Html.BeginForm("Index", "DocSearch", FormMethod.Get))
         {
             <div class="form-group input-group">
@@ -17,6 +17,9 @@
                 </span>
             </div>
         }
+    </div>
+    <div class="col-md-2">
+        <input class="btn btn-default" type="button" value="フォルダ" onclick="openDialog()"/>
     </div>
     <div class="col-md-3">
         @if (Model != null)
@@ -86,10 +89,22 @@
     </div>
 </div>
 
-<script type="text/javascript">
-    // 関連語の選択時の処理
-    function wordSelect(selectedWord)
+@{
+    if (Model != null && Model.FileTreeViewModel != null)
     {
+        Html.RenderPartial("~/Views/DocSearch/GetFiles.cshtml", Model.FileTreeViewModel);
+    }
+}
+
+<div id="dialog-form" title="Folder Select">
+    <div id="container_id"></div>
+</div>
+
+<script type="text/javascript">
+    var dialog;
+
+    // 関連語の選択時の処理
+    function wordSelect(selectedWord) {
         var keywords = $('#keywordTextBox').val();
 
         if (selectedWord.checked)
@@ -100,4 +115,38 @@
         // 検索キーワードテキストボックスへの選択した関連語の追加
         $('#keywordTextBox').val(keywords);
     }
+
+    function openDialog() {
+        dialog.dialog("open");
+    }
+
+    function folderSelect() { }
+
+    window.onload = function () {
+        dialog = $("#dialog-form").dialog({
+            autoOpen: false,
+            height: 300,
+            width: 350,
+            modal: true,
+            buttons: {
+                "Select": folderSelect,
+                Cancel: function () {
+                    dialog.dialog("close");
+                }
+            },
+            close: function () {
+            }
+        });
+
+        $('#container_id').fileTree({
+            root: 'C:\\Work\\DocSearch',
+            script: '/DocSearch/GetFiles',
+            expandSpeed: 1000,
+            collapseSpeed: 1000,
+            multiFolder: false
+        },
+        function (file) {
+                alert(file);
+        });
+    };
 </script>

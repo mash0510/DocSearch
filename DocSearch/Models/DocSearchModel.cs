@@ -33,9 +33,9 @@ namespace DocSearch.Models
             }
             set
             {
-                if (!value.StartsWith(@"file:"))
+                if (!value.StartsWith(@"file:///"))
                 {
-                    this._fileFullPath = (@"file:" + value).Replace(@"\", "/");
+                    this._fileFullPath = (@"file:///" + value).Replace(@"\", "/");
                 }
                 else
                 {
@@ -133,5 +133,7 @@ namespace DocSearch.Models
             return retval;
         }
         #endregion
+
+        public FileTreeViewModel FileTreeViewModel { get; set; }
     }
 }

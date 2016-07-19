@@ -134,6 +134,9 @@ namespace DocSearch.Models
         }
         #endregion
 
+        /// <summary>
+        /// フォルダツリービューのモデル
+        /// </summary>
         public FileTreeViewModel FileTreeViewModel { get; set; }
     }
 }

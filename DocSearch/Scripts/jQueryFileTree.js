@@ -36,7 +36,8 @@ var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); 
         multiSelect: false,
         onlyFolders: false,
         onlyFiles: false,
-        preventLinkAction: false
+        preventLinkAction: false,
+        traditional: false
       };
       this.jqft = {
         container: $el
@@ -70,6 +71,7 @@ var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); 
         event.preventDefault();
       }
       if ($ev.parent().hasClass('directory')) {
+          typeof callback === "function" ? callback($ev.attr('rel'), true) : void 0;
         if ($ev.parent().hasClass('collapsed')) {
           if (!options.multiFolder) {
             $ev.parent().parent().find('UL').slideUp({
@@ -112,7 +114,7 @@ var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); 
           }
         }
         _this._trigger('filetreeclicked', _this.data);
-        return typeof callback === "function" ? callback($ev.attr('rel')) : void 0;
+        return typeof callback === "function" ? callback($ev.attr('rel'), false) : void 0;
       }
     };
 
@@ -127,7 +129,8 @@ var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); 
         dir: dir,
         onlyFolders: options.onlyFolders,
         onlyFiles: options.onlyFiles,
-        multiSelect: options.multiSelect
+        multiSelect: options.multiSelect,
+        rootFolders: options.root
       };
       handleResult = function(result) {
         var li;
@@ -173,6 +176,7 @@ var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); 
       } else {
         return $.ajax({
           url: options.script,
+          traditional: options.traditional,
           type: 'POST',
           dataType: 'HTML',
           data: data

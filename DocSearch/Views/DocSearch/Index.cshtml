@@ -122,6 +122,7 @@
 
     function folderSelect() { }
 
+    // フォルダ選択ダイアログの表示
     window.onload = function () {
         dialog = $("#dialog-form").dialog({
             autoOpen: false,
@@ -139,14 +140,16 @@
         });
 
         $('#container_id').fileTree({
-            root: 'C:\\Work\\DocSearch',
+            root: ['C:\\Work\\DocSearch', 'C:\\Users\\Manabu Shibuya\\Documents'],
             script: '/DocSearch/GetFiles',
-            expandSpeed: 1000,
-            collapseSpeed: 1000,
-            multiFolder: false
+            expandSpeed: 100,
+            collapseSpeed: 100,
+            multiFolder: false,
+            onlyFolders: true,
+            traditional: true
         },
-        function (file) {
-                alert(file);
+        function (file, isFolder) {
+            
         });
     };
 </script>

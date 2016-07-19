@@ -19,12 +19,17 @@ namespace DocSearch.Controllers
         /// <summary>
         /// 複数の検索キーワードの区切り文字
         /// </summary>
-        private char[] delimiter = { ' ', '　' };
+        private char[] _keywordDelimiter = { ' ', '　' };
+
+        /// <summary>
+        /// ツリー表示のフォルダの区切り文字
+        /// </summary>
+        private char[] _folderDelimiter = { ',' };
 
         /// <summary>
         /// 単語間の類似性を保持するインスタンス
         /// </summary>
-        Word2Vec.Net.Distance distance = null;
+        Word2Vec.Net.Distance _distance = null;
 
         /// <summary>
         /// ページ表示
@@ -60,7 +65,7 @@ namespace DocSearch.Controllers
         /// <returns></returns>
         private void Search(DocSearchModel docSearchModel, int page)
         {
-            string[] keywords = docSearchModel.InputKeywords.Split(delimiter);
+            string[] keywords = docSearchModel.InputKeywords.Split(_keywordDelimiter);
             docSearchModel.RelatedWords = GetRelatedWords(keywords);
             ListConvert(docSearchModel);
 
@@ -178,8 +183,8 @@ namespace DocSearch.Controllers
         {
             Dictionary<string, SortedList<float, string>> retval = new Dictionary<string, SortedList<float, string>>();
 
-            if (distance == null)
-                distance = new Word2Vec.Net.Distance(CommonParameters.VectorFileNameFullPath);
+            if (_distance == null)
+                _distance = new Word2Vec.Net.Distance(CommonParameters.VectorFileNameFullPath);
 
             foreach (string keyword in keywords)
             {
@@ -188,7 +193,7 @@ namespace DocSearch.Controllers
 
                 string trimedKeyword = keyword.Trim();
 
-                BestWord[] bestwords = distance.Search(trimedKeyword);
+                BestWord[] bestwords = _distance.Search(trimedKeyword);
                 SortedList<float, string> relatedWordList = new SortedList<float, string>(new DescComparer<float>());
 
                 foreach (BestWord bestword in bestwords)
@@ -208,37 +213,57 @@ namespace DocSearch.Controllers
             return retval;
         }
 
+
+        /// <summary>
+        /// ルートフォルダ
+        /// </summary>
+        private List<string> rootList = new List<string>();
+        /// <summary>
+        /// 区切り文字
+        /// </summary>
+        char[] delimiter = new char[] { ',' };
+
+        /// <summary>
+        /// フォルダのツリー表示画面で表示させるフォルダとファイルの一覧の取得
+        /// </summary>
+        /// <param name="dir"></param>
+        /// <returns></returns>
         [HttpPost]
-        public virtual ActionResult GetFiles(string dir)
+        public virtual ActionResult GetFiles(string dir, bool onlyFolders, bool onlyFiles, string[] rootFolders)
         {
-
-            //const string baseDir = @"/App_Data/userfiles/";
-
-            dir = Server.UrlDecode(dir);
-            string realDir = dir.Replace("/", "\\");
-
-
-            //string realDir = Server.MapPath(baseDir + dir);
-
-            ////validate to not go above basedir
-            //if (!realDir.StartsWith(Server.MapPath(baseDir)))
-            //{
-            //    realDir = Server.MapPath(baseDir);
-            //    dir = "/";
-            //}
-
             List<FileTreeViewModel> files = new List<FileTreeViewModel>();
 
-            DirectoryInfo di = new DirectoryInfo(realDir);
+            List<string> rootList = rootFolders.Select(folder => Server.UrlDecode(folder).Replace("/", "\\")).ToList<string>();
 
-            foreach (DirectoryInfo dc in di.GetDirectories())
-            {
-                files.Add(new FileTreeViewModel() { Name = dc.Name, Path = String.Format("{0}\\{1}\\", dir, dc.Name), IsDirectory = true });
-            }
+            dir = Server.UrlDecode(dir);
+            List<string> dirList = dir.Replace("/", "\\").Split(delimiter).ToList<string>();
 
-            foreach (FileInfo fi in di.GetFiles())
+            foreach (string realDir in dirList)
             {
-                files.Add(new FileTreeViewModel() { Name = fi.Name, Ext = fi.Extension.Substring(1).ToLower(), Path = dir + fi.Name, IsDirectory = false });
+                DirectoryInfo di = new DirectoryInfo(realDir);
+
+                // ルートノードと同じフォルダに対する操作に対しては、そのフォルダ配下の情報は返さないようにする。
+                if (rootList.Contains(realDir))
+                {
+                    files.Add(new FileTreeViewModel() { Name = di.Name, Path = String.Format("{0}\\", realDir), IsDirectory = true });
+                    continue;
+                }
+
+                if (!onlyFiles)
+                {
+                    foreach (DirectoryInfo dc in di.GetDirectories())
+                    {
+                        files.Add(new FileTreeViewModel() { Name = dc.Name, Path = String.Format("{0}\\{1}\\", realDir, dc.Name), IsDirectory = true });
+                    }
+                }
+
+                if (!onlyFolders)
+                {
+                    foreach (FileInfo fi in di.GetFiles())
+                    {
+                        files.Add(new FileTreeViewModel() { Name = fi.Name, Ext = fi.Extension.Substring(1).ToLower(), Path = realDir + fi.Name, IsDirectory = false });
+                    }
+                }
             }
 
             return PartialView(files);

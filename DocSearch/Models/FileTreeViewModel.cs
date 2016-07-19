@@ -1,13 +1,19 @@
-public class FileTreeViewModel
+namespace DocSearch.Models
 {
-    public string Name { get; set; }
-    public string Ext { get; set; }
-    public string Path { get; set; }
-    public bool IsDirectory { get; set; }
+    /// <summary>
+    /// フォルダのツリービューのモデル
+    /// </summary>
+    public class FileTreeViewModel
+    {
+        public string Name { get; set; }
+        public string Ext { get; set; }
+        public string Path { get; set; }
+        public bool IsDirectory { get; set; }
 
-    public string PathAltSeparator()
-    { 
-        return Path.Replace("\\", "/");
+        public string PathAltSeparator()
+        {
+            return Path.Replace("\\", "/");
+        }
+
     }
-
 }

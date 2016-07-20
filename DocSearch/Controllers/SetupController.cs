@@ -28,7 +28,7 @@ namespace DocSearch.Controllers
         {
             foreach(string crawlFolder in Settings.GetInstance().CrawlFolders)
             {
-                setupModel.CrawlFolders += crawlFolder + Environment.NewLine;
+                setupModel.CrawlFolders += crawlFolder.Replace(@"\\", @"\") + Environment.NewLine;
             }
 
             return View(setupModel);

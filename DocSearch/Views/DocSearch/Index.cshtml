@@ -102,6 +102,7 @@
 
 <script type="text/javascript">
     var dialog;
+    var selectedFolder = "";
 
     // 関連語の選択時の処理
     function wordSelect(selectedWord) {
@@ -116,11 +117,23 @@
         $('#keywordTextBox').val(keywords);
     }
 
+    // フォルダ選択ダイアログを開く
     function openDialog() {
         dialog.dialog("open");
     }
 
-    function folderSelect() { }
+    // フォルダ選択ダイアログの選択ボタンクリック
+    function folderSelect() {
+        $.ajax({
+            url: '/DocSearch/SetSearchFolder',
+            traditional: true,
+            type: 'POST',
+            dataType: 'HTML',
+            data: { selectedFolder: selectedFolder}
+        }).done(function (result) {
+            dialog.dialog("close");
+        });
+    }
 
     // フォルダ選択ダイアログの表示
     window.onload = function () {
@@ -148,8 +161,10 @@
             onlyFolders: true,
             traditional: true
         },
-        function (file, isFolder) {
-            
+        function (path, isFolder) {
+            if (isFolder) {
+                selectedFolder = path;
+            }
         });
     };
 </script>

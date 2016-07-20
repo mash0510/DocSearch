@@ -74,6 +74,11 @@ namespace DocSearch.Models
         public List<DocData> SearchedDocument { get; set; }
 
         /// <summary>
+        /// 検索対象フォルダ
+        /// </summary>
+        public string SearchFolder { get; set; }
+
+        /// <summary>
         /// 検索先ルートフォルダ
         /// </summary>
         public string SearchRootFolders

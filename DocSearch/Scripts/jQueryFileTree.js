@@ -72,6 +72,8 @@ var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); 
       }
       if ($ev.parent().hasClass('directory')) {
           typeof callback === "function" ? callback($ev.attr('rel'), true) : void 0;
+          jqft.container.find('li').removeClass('selected');
+          $ev.parent().addClass('selected');
         if ($ev.parent().hasClass('collapsed')) {
           if (!options.multiFolder) {
             $ev.parent().parent().find('UL').slideUp({

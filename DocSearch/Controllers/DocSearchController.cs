@@ -41,6 +41,8 @@ namespace DocSearch.Controllers
         /// </summary>
         private const int LETTERS_AROUND_KEYWORD = 50;
 
+        private string _searchFolder = string.Empty;
+
         // GET: DocSearch
         [HttpGet]
         public ActionResult Index(DocSearchModel docSearchModel, int? page)
@@ -61,6 +63,16 @@ namespace DocSearch.Controllers
             Search(docSearchModel, pageNo);
 
             return View(docSearchModel);
+        }
+
+        /// <summary>
+        /// 検索先のフォルダの設定
+        /// </summary>
+        /// <param name="selectedFolder"></param>
+        [HttpPost]
+        public void SetSearchFolder(string selectedFolder)
+        {
+            this._searchFolder = Server.UrlDecode(selectedFolder).Replace("//", "/").Replace("/", "\\");
         }
 
         /// <summary>

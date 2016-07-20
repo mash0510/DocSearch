@@ -48,7 +48,12 @@ namespace DocSearch.Controllers
             // 検索キーワードが何も入力されていなかったら、検索処理はしない。
             if (docSearchModel.InputKeywords == null ||
                 docSearchModel.InputKeywords == string.Empty)
-                return View();
+            {
+                docSearchModel.SearchExecuted = false;
+                return View(docSearchModel);
+            }
+
+            docSearchModel.SearchExecuted = true;
 
             int pageNo = page ?? 1;
             if (pageNo <= 0) pageNo = 1;
@@ -211,17 +216,7 @@ namespace DocSearch.Controllers
             }
 
             return retval;
-        }
-
-
-        /// <summary>
-        /// ルートフォルダ
-        /// </summary>
-        private List<string> rootList = new List<string>();
-        /// <summary>
-        /// 区切り文字
-        /// </summary>
-        char[] delimiter = new char[] { ',' };
+        }        
 
         /// <summary>
         /// フォルダのツリー表示画面で表示させるフォルダとファイルの一覧の取得
@@ -232,6 +227,8 @@ namespace DocSearch.Controllers
         public virtual ActionResult GetFiles(string dir, bool onlyFolders, bool onlyFiles, string[] rootFolders)
         {
             List<FileTreeViewModel> files = new List<FileTreeViewModel>();
+
+            char[] delimiter = new char[] { ',' };
 
             List<string> rootList = rootFolders.Select(folder => Server.UrlDecode(folder).Replace("/", "\\")).ToList<string>();
 

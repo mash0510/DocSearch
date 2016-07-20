@@ -54,14 +54,44 @@ namespace DocSearch.Models
     }
 
     /// <summary>
-    /// 検索された文書データのモデル
+    /// 検索画面のモデル
     /// </summary>
     public class DocSearchModel
     {
         /// <summary>
+        /// 検索が実行されたかどうか
+        /// </summary>
+        public bool SearchExecuted { get; set; }
+
+        /// <summary>
         /// 検索されたデータの総件数
         /// </summary>
         public int Total { get; set; }
+
+        /// <summary>
+        /// 検索された文書データのリスト
+        /// </summary>
+        public List<DocData> SearchedDocument { get; set; }
+
+        /// <summary>
+        /// 検索先ルートフォルダ
+        /// </summary>
+        public string SearchRootFolders
+        {
+            get
+            {
+                string retval = string.Empty;
+
+                foreach(string folder in Settings.GetInstance().CrawlFolders)
+                {
+                    retval = retval + "'" + folder.Replace(@"\", @"\\") + "',";
+                }
+
+                retval = retval.TrimEnd(new char[] { ',' });
+
+                return retval;
+            }
+        }
 
         #region ページ表示
         /// <summary>
@@ -85,11 +115,6 @@ namespace DocSearch.Models
         /// </summary>
         public List<int> PageList { get; set; }
         #endregion
-
-        /// <summary>
-        /// 検索された文書データのリスト
-        /// </summary>
-        public List<DocData> SearchedDocument { get; set; }
 
         #region 検索キーワード
         /// <summary>

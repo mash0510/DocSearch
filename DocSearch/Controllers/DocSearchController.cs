@@ -37,11 +37,14 @@ namespace DocSearch.Controllers
         private Pagination _pagination = new Pagination();
 
         /// <summary>
+        /// 検索先フォルダのセッションキー
+        /// </summary>
+        private const string SESSION_SEARCH_FOLDER = "searchFolder";
+
+        /// <summary>
         /// サマリー表示の文字数。入力されたキーワードの前後何文字を検索画面中に表示するか。
         /// </summary>
         private const int LETTERS_AROUND_KEYWORD = 50;
-
-        private string _searchFolder = string.Empty;
 
         // GET: DocSearch
         [HttpGet]
@@ -72,7 +75,9 @@ namespace DocSearch.Controllers
         [HttpPost]
         public void SetSearchFolder(string selectedFolder)
         {
-            this._searchFolder = Server.UrlDecode(selectedFolder).Replace("//", "/").Replace("/", "\\");
+            string searchFolder = Server.UrlDecode(selectedFolder).Replace("//", "/").Replace("/", "\\").TrimEnd(new char[] { '\\' });
+
+            Session[SESSION_SEARCH_FOLDER] = Settings.GetInstance().CrawlFolders.Contains(searchFolder) ? string.Empty : searchFolder;
         }
 
         /// <summary>
@@ -138,7 +143,13 @@ namespace DocSearch.Controllers
             else
                 docSearchModel.SearchedDocument.Clear();
 
-            foreach(DocumentInfo docInfo in documents)
+            string folder = Session[SESSION_SEARCH_FOLDER].ToString();
+
+            IEnumerable<DocumentInfo> docInfoCollection = documents;
+            if (folder != string.Empty)
+                docInfoCollection = documents.Where(s => s.FolderPath == folder);
+
+            foreach (DocumentInfo docInfo in docInfoCollection)
             {
                 DocData dispData = new DocData();
                 dispData.FileName = docInfo.FileName;

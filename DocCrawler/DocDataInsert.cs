@@ -73,6 +73,7 @@ namespace FolderCrawler
             docInfo.Extention = fi.Extension;
             docInfo.UpdatedDate = fi.LastAccessTime;
             docInfo.FileFullPath = fi.FullName;
+            docInfo.FolderPath = Path.GetDirectoryName(fi.FullName);
 
             try
             {

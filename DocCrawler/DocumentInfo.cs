@@ -20,6 +20,10 @@ namespace FolderCrawler
         /// </summary>
         public DateTime UpdatedDate { get; set; }
         /// <summary>
+        /// フォルダパス
+        /// </summary>
+        public string FolderPath { get; set; }
+        /// <summary>
         /// ファイルのフルパス
         /// </summary>
         public string FileFullPath { get; set; }

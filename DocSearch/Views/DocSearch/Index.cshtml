@@ -34,10 +34,24 @@
 
 <div class="row">
     <div class="col-md-2">
-      <label id="searchFolderLabel"></label>  
+        @if (Model.SearchFolder != null && Model.SearchFolder != string.Empty)
+        {
+          <label id="searchFolderLabel">検索先フォルダ</label>
+        }
+        else
+        {
+          <label id="searchFolderLabel"></label>
+        }
     </div>
     <div class="col-md-10">
-        <span id="searchFolder"></span>
+        @if (Model.SearchFolder != null && Model.SearchFolder != string.Empty)
+        {
+            <span id="searchFolder">@Model.SearchFolder</span>
+        }
+        else
+        {
+            <span id="searchFolder"></span>
+        }
     </div>
 </div>
 

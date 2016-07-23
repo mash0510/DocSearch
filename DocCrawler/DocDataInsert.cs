@@ -115,6 +115,8 @@ namespace FolderCrawler
         {
             this._stop = false;
 
+            bool first = true;
+
             while(true)
             {
                 if (QueueManager.GetInstance().FileInfoQueue.Count == 0)
@@ -143,6 +145,24 @@ namespace FolderCrawler
 
                 if (id == null)
                     id = GetID();
+
+                if (first)
+                {
+                    var result = SearchEngineConnection.Client.Count<DocumentInfo>(c => c
+                        .Index(SearchEngineConnection.IndexName)
+                    );
+
+                    if (result.Count == 0)
+                    {
+                        // データが1件も入っていない場合は、Indexのmapping定義がなされていないので、mapping定義を実行する。
+                        SearchEngineConnection.Client.CreateIndex(SearchEngineConnection.IndexName, c => c
+                            .Mappings(ms => ms
+                                .Map<DocumentInfo>(m => m.AutoMap()))
+                        );
+                    }
+
+                    first = false;
+                }
 
                 var response = SearchEngineConnection.Client.Index(docInfo, idx => idx.Index(SearchEngineConnection.IndexName).Id(id));
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Nest;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,7 @@ namespace FolderCrawler
         /// <summary>
         /// ファイル名
         /// </summary>
+        [String(Index = FieldIndexOption.NotAnalyzed)]
         public string FileName { get; set; }
         /// <summary>
         /// 最終更新日
@@ -22,14 +24,17 @@ namespace FolderCrawler
         /// <summary>
         /// フォルダパス
         /// </summary>
+        [String(Index = FieldIndexOption.NotAnalyzed)]
         public string FolderPath { get; set; }
         /// <summary>
         /// ファイルのフルパス
         /// </summary>
+        [String(Index = FieldIndexOption.NotAnalyzed)]
         public string FileFullPath { get; set; }
         /// <summary>
         /// 拡張子
         /// </summary>
+        [String(Index = FieldIndexOption.NotAnalyzed)]
         public string Extention { get; set; }
         /// <summary>
         /// ドキュメント文書内容。テキスト抽出したドキュメントの全文をここに入れる。

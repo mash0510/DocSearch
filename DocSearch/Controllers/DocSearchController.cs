@@ -85,6 +85,8 @@ namespace DocSearch.Controllers
 
             Search(docSearchModel, pageNo);
 
+            docSearchModel.SearchFolder = SearchFolder;
+
             return View(docSearchModel);
         }
 

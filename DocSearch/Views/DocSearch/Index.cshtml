@@ -18,14 +18,26 @@
             </div>
         }
     </div>
-    <div class="col-md-2">
+    <div class="col-md-1">
         <input class="btn btn-default" type="button" value="フォルダ" onclick="openDialog()"/>
+    </div>
+    <div class="col-md-1">
+        <input class="btn btn-default" type="button" value="選択クリア" onclick="folderClear()" />
     </div>
     <div class="col-md-3">
         @if (Model.SearchExecuted)
         {
             <label>@Model.Total 件ヒット</label>
         }
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-2">
+      <label id="searchFolderLabel"></label>  
+    </div>
+    <div class="col-md-10">
+        <span id="searchFolder"></span>
     </div>
 </div>
 
@@ -117,6 +129,24 @@
         $('#keywordTextBox').val(keywords);
     }
 
+    // 選択した検索先フォルダ情報を消去する（= 全フォルダが検索対象になる）
+    function folderClear() {
+        selectedFolder = "";
+        folderSelect();
+    }
+
+    // 選択した検索先フォルダの表示
+    function dispSelectedFolder(folder) {
+        if (folder != "") {
+            $('#searchFolderLabel').html("検索先フォルダ");
+            $('#searchFolder').html(folder);
+        }
+        else {
+            $('#searchFolderLabel').html("");
+            $('#searchFolder').html("");
+        }
+    }
+
     // フォルダ選択ダイアログを開く
     function openDialog() {
         dialog.dialog("open");
@@ -131,6 +161,7 @@
             dataType: 'HTML',
             data: { selectedFolder: selectedFolder}
         }).done(function (result) {
+            dispSelectedFolder(selectedFolder);
             dialog.dialog("close");
         });
     }

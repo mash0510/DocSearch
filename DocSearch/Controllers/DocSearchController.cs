@@ -40,6 +40,26 @@ namespace DocSearch.Controllers
         /// 検索先フォルダのセッションキー
         /// </summary>
         private const string SESSION_SEARCH_FOLDER = "searchFolder";
+        /// <summary>
+        /// 検索フォルダの設定と取得
+        /// </summary>
+        public string SearchFolder
+        {
+            set
+            {
+                Session[SESSION_SEARCH_FOLDER] = value;
+            }
+            get
+            {
+                if (Session == null || Session[SESSION_SEARCH_FOLDER] == null)
+                    return string.Empty;
+
+                string folder = Session[SESSION_SEARCH_FOLDER].ToString();
+
+                return folder;
+            }
+        }
+
 
         /// <summary>
         /// サマリー表示の文字数。入力されたキーワードの前後何文字を検索画面中に表示するか。
@@ -77,7 +97,7 @@ namespace DocSearch.Controllers
         {
             string searchFolder = Server.UrlDecode(selectedFolder).Replace("//", "/").Replace("/", "\\").TrimEnd(new char[] { '\\' });
 
-            Session[SESSION_SEARCH_FOLDER] = Settings.GetInstance().CrawlFolders.Contains(searchFolder) ? string.Empty : searchFolder;
+            SearchFolder = searchFolder;
         }
 
         /// <summary>
@@ -97,11 +117,29 @@ namespace DocSearch.Controllers
             _pagination.PageSize = docSearchModel.PageSize;
             Pagination.DataRange dataRange = _pagination.GetDataRange(page);
 
-            var response = client.Search<DocumentInfo>(s => s
-                .From(dataRange.Start)
-                .Size(_pagination.PageSize)
-                .Query(q => q.Match(ma => ma.Field(fld => fld.DocContent).Query(docSearchModel.InputKeywords).Operator(Operator.And)))
-            );
+            ISearchResponse<DocumentInfo> response = null;
+            string searchFolder = SearchFolder;
+
+            if (searchFolder != string.Empty)
+            {
+                response = client.Search<DocumentInfo>(s => s
+                    .From(dataRange.Start)
+                    .Size(_pagination.PageSize)
+                    .Query(q => q
+                        .Bool(b => b
+                            .Must(must => must.Match(match => match.Field(fld => fld.DocContent).Query(docSearchModel.InputKeywords).Operator(Operator.And)))
+                            .Filter(Filter => Filter.Prefix(pre => pre.Field(fld => fld.FolderPath).Value(searchFolder)))))
+                );
+            }
+            else
+            {
+                response = client.Search<DocumentInfo>(s => s
+                    .From(dataRange.Start)
+                    .Size(_pagination.PageSize)
+                    .Query(q => q.Match(ma => ma.Field(fld => fld.DocContent).Query(docSearchModel.InputKeywords).Operator(Operator.And)))
+                );
+            }
+
 
             _pagination.TotalDataNum = (int)response.Total - 1; // 1つ大きい値が入るので -1 する。
 
@@ -143,13 +181,7 @@ namespace DocSearch.Controllers
             else
                 docSearchModel.SearchedDocument.Clear();
 
-            string folder = Session[SESSION_SEARCH_FOLDER].ToString();
-
-            IEnumerable<DocumentInfo> docInfoCollection = documents;
-            if (folder != string.Empty)
-                docInfoCollection = documents.Where(s => s.FolderPath == folder);
-
-            foreach (DocumentInfo docInfo in docInfoCollection)
+            foreach (DocumentInfo docInfo in documents)
             {
                 DocData dispData = new DocData();
                 dispData.FileName = docInfo.FileName;

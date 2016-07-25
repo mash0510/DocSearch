@@ -48,6 +48,10 @@ namespace FolderCrawler
         /// 訓練データファイル名
         /// </summary>
         private static string _trainingDataFileName = "training.dat";
+        /// <summary>
+        /// 訓練データのバックアップ
+        /// </summary>
+        private static string _trainingDataFileBackup = "training.bak";
 
         /// <summary>
         /// 訓練データファイルのフルパスの取得
@@ -57,6 +61,17 @@ namespace FolderCrawler
             get
             {
                 return _trainingDataFolder + "\\" + _trainingDataFileName;
+            }
+        }
+
+        /// <summary>
+        /// 訓練データバックアップファイルのフルパスの取得
+        /// </summary>
+        public static string TrainingDataFileBackupFullPath
+        {
+            get
+            {
+                return _trainingDataFolder + "\\" + _trainingDataFileBackup;
             }
         }
 
@@ -93,9 +108,13 @@ namespace FolderCrawler
         }
 
         /// <summary>
-        /// 単語のベクトルデータファイル
+        /// 単語のベクトルデータファイル名
         /// </summary>
         private static string _vectorFileName = "vectors.dat";
+        /// <summary>
+        /// 利用中の単語ベクトルデータファイル名
+        /// </summary>
+        private static string _vectorFileNameInUse = "vectors_inuse.dat";
 
         /// <summary>
         /// 単語ベクトルデータファイルのフルパスの取得
@@ -105,6 +124,17 @@ namespace FolderCrawler
             get
             {
                 return _trainingDataFolder + "\\" + _vectorFileName;
+            }
+        }
+
+        /// <summary>
+        /// 利用中の単語ベクトルデータファイル名の取得
+        /// </summary>
+        public static string VectorFileNameInUseFullPath
+        {
+            get
+            {
+                return _trainingDataFolder + "\\" + _vectorFileNameInUse;
             }
         }
 
@@ -145,7 +175,7 @@ namespace FolderCrawler
             }
         }
 
-        private static long _defaultMaxTrainingFileSize = 100 * 1024 * 1024;
+        private static long _defaultMaxTrainingFileSize = 100L * 1024 * 1024 * 1024;
         /// <summary>
         /// word2vecに機械学習させる文書データの最大サイズのデフォルト値の取得
         /// </summary>

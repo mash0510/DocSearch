@@ -100,10 +100,7 @@ namespace DocSearch.Controllers
                 AsyncManager.OutstandingOperations.Decrement();
             };
 
-            Task.Run(() =>
-            {
-                CrawlerManager.GetInstance().Start();
-            });
+            CrawlerManager.GetInstance().Start();
         }
 
         /// <summary>

@@ -246,7 +246,7 @@ namespace DocSearch.Controllers
             Dictionary<string, SortedList<float, string>> retval = new Dictionary<string, SortedList<float, string>>();
 
             if (_distance == null)
-                _distance = new Word2Vec.Net.Distance(CommonParameters.VectorFileNameFullPath);
+                _distance = new Word2Vec.Net.Distance(CommonParameters.VectorFileNameInUseFullPath);
 
             foreach (string keyword in keywords)
             {

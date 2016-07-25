@@ -91,9 +91,12 @@ namespace FolderCrawler
         /// </summary>
         public void StartTrainingDataGenerate()
         {
+            // 既存の訓練データの削除
+            DeleteTrainingDataFile();
+
             this._stop = false;
 
-            while (!CheckMaxSize())
+            while (true)
             {
                 if (QueueManager.GetInstance().DocInfoQueue.Count == 0)
                 {
@@ -114,6 +117,9 @@ namespace FolderCrawler
 
                 GenerateTrainingData(docInfo);
             }
+
+            // 一時退避用に保持していたバックアップファイルを削除
+            File.Delete(CommonParameters.TrainingDataFileBackupFullPath);
 
             TrainingDataGenerateFinished?.Invoke(this, new EventArgs());
         }
@@ -148,10 +154,58 @@ namespace FolderCrawler
         }
 
         /// <summary>
+        /// ファイルのバックアップを取る
+        /// </summary>
+        /// <param name="sourceFile"></param>
+        /// <param name="backupFile"></param>
+        private void FileBackup(string sourceFile, string backupFile)
+        {
+            // 既に取られたバックアップファイルがある場合は削除。
+            if (File.Exists(backupFile))
+            {
+                File.Delete(backupFile);
+            }
+
+            // 既存のバックアップファイルを削除した後に、一時バックアップファイル名を正式なバックアップファイル名にリネームする
+            File.Move(sourceFile, backupFile);
+        }
+
+        /// <summary>
+        /// 訓練データの削除
+        /// </summary>
+        public void DeleteTrainingDataFile()
+        {
+            string outputFile = CommonParameters.TrainingDataFileFullPath;
+            string backupFile = CommonParameters.TrainingDataFileBackupFullPath;
+
+            if (File.Exists(outputFile))
+            {
+                FileBackup(outputFile, backupFile);
+            }
+        }
+
+        /// <summary>
+        /// word2vecにより生成された単語ベクトルファイルを、実際に使用するファイル名に変更
+        /// </summary>
+        public void ChangeVectorFileNameInUse()
+        {
+            string outputFile = CommonParameters.VectorFileNameFullPath;
+            string newFileName = CommonParameters.VectorFileNameInUseFullPath;
+
+            if (File.Exists(newFileName))
+            {
+                FileBackup(outputFile, newFileName);
+            }
+        }
+
+        /// <summary>
         /// 訓練スタート
         /// </summary>
         public void StartTraining()
         {
+            if (File.Exists(CommonParameters.VectorFileNameFullPath))
+                File.Delete(CommonParameters.VectorFileNameFullPath);
+
             Process mecabProgram = new Process();
             Process word2vecProc = new Process();
 
@@ -177,6 +231,8 @@ namespace FolderCrawler
 
             word2vecProc.Close();
             word2vecProc.Dispose();
+
+            ChangeVectorFileNameInUse();
         }
 
         /// <summary>
@@ -208,6 +264,10 @@ namespace FolderCrawler
         private bool CheckMaxSize()
         {
             long fileSize = GetTrainingDataFileSize();
+
+            // 0が設定されていたら、上限なし。
+            if (fileSize == 0)
+                return false;
 
             if (fileSize > _maxFileSize)
                 return true;

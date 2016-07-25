@@ -33,26 +33,24 @@
 </div>
 
 <div class="row">
-    <div class="col-md-2">
-        @if (Model.SearchFolder != null && Model.SearchFolder != string.Empty)
-        {
-          <label id="searchFolderLabel">検索先フォルダ</label>
-        }
-        else
-        {
-          <label id="searchFolderLabel"></label>
-        }
-    </div>
-    <div class="col-md-10">
-        @if (Model.SearchFolder != null && Model.SearchFolder != string.Empty)
-        {
+    @if (Model.SearchFolder != null && Model.SearchFolder != string.Empty)
+    {
+        <div class="col-md-1">
+            <label id="searchFolderLabel">検索先</label>
+        </div>
+        <div class="col-md-11">
             <span id="searchFolder">@Model.SearchFolder</span>
-        }
-        else
-        {
+        </div>
+    }
+    else
+    {
+        <div class="col-md-1">
+            <label id="searchFolderLabel"></label>
+        </div>
+        <div class="col-md-11">
             <span id="searchFolder"></span>
-        }
-    </div>
+        </div>
+    }
 </div>
 
 <div class="row">
@@ -152,7 +150,7 @@
     // 選択した検索先フォルダの表示
     function dispSelectedFolder(folder) {
         if (folder != "") {
-            $('#searchFolderLabel').html("検索先フォルダ");
+            $('#searchFolderLabel').html("検索先");
             $('#searchFolder').html(folder);
         }
         else {

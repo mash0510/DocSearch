@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace FolderCrawler
@@ -45,6 +46,15 @@ namespace FolderCrawler
             set { Settings.GetInstance().CrawlFolders = value; }
         }
 
+        /// <summary>
+        /// クロールした文書ファイルの数
+        /// </summary>
+        public decimal TotalDocuments
+        {
+            get;
+            private set;
+        }
+
         private static CrawlerManager _self = new CrawlerManager();
 
         /// <summary>
@@ -68,6 +78,7 @@ namespace FolderCrawler
         /// </summary>
         private void InitCrawlInstances()
         {
+            TotalDocuments = 0;
             _crawlList.Clear();
 
             foreach (string crawlRoot in CrawlFolderList)
@@ -93,6 +104,8 @@ namespace FolderCrawler
         {
             // 全クロールインスタンスのクロール処理が終わったかどうかを検出する。
 
+            TotalDocuments += crawledFileCount;
+
             bool allFinished = true;
 
             foreach (DocCrawler crawlInstance in _crawlList)
@@ -107,7 +120,31 @@ namespace FolderCrawler
             this._isAllCrawlFinished = allFinished;
 
             if (allFinished)
+            {
+                SaveTotalDocuments();
                 AllCrawlFinished?.Invoke(this, new EventArgs());
+            }
+        }
+
+        /// <summary>
+        /// クロールした文書ファイル数の保存
+        /// </summary>
+        private void SaveTotalDocuments()
+        {
+            StreamWriter sw = new StreamWriter(CommonParameters.TotalDocumentsFile, false);
+
+            try
+            {
+                sw.WriteLine(TotalDocuments.ToString());
+            }
+            catch
+            {
+                // 後ほどログ出力
+            }
+            finally
+            {
+                sw.Close();
+            }
         }
 
         /// <summary>

@@ -175,6 +175,21 @@ namespace FolderCrawler
             }
         }
 
+        /// <summary>
+        /// 直近クロールした時の文書ファイル数を保存したファイル
+        /// </summary>
+        private static string _totalDocumentsFile = "totalDocuments.dat";
+        /// <summary>
+        /// 直近クロールした時の文書ファイル数を保存したファイルのフルパス取得
+        /// </summary>
+        public static string TotalDocumentsFile
+        {
+            get
+            {
+                return _trainingDataFolder + "\\" + _totalDocumentsFile;
+            }
+        }
+
         private static long _defaultMaxTrainingFileSize = 100L * 1024 * 1024 * 1024;
         /// <summary>
         /// word2vecに機械学習させる文書データの最大サイズのデフォルト値の取得

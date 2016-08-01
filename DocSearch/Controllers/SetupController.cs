@@ -2,12 +2,9 @@
 using DocSearch.hubs;
 using FolderCrawler;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
+using DocSearch.CommonLogic;
 
 namespace DocSearch.Controllers
 {
@@ -23,22 +20,24 @@ namespace DocSearch.Controllers
         /// </summary>
         private const int EXEC_MACHINE_LEARNING = 1;
 
-        /// <summary>
-        /// 進捗率取得のインターバル時間（ms）
-        /// </summary>
-        private const int PROGRESS_INTERVAL = 500;
+        SendProgressRate _crawlProgress = new SendProgressRate();
 
         /// <summary>
-        /// 進捗率取得タイマー
+        /// クロール中のメッセージ
         /// </summary>
-        TimeElapse _progressRateCrawl = new TimeElapse();
+        private string MESSAGE_CRAWLING = "クロール中です...";
+        /// <summary>
+        /// クロール完了時のメッセージ
+        /// </summary>
+        private string MESSAGE_CRAWL_FINISHED = "クロールが完了しました。";
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         public SetupController()
         {
-            _progressRateCrawl.Elapsed += _progressRateCrawl_Elapsed;
+            // 処理中にブラウザに送るメッセージ
+            _crawlProgress.Message = "クロール中です...";
         }
 
         // Get: Setup
@@ -120,7 +119,7 @@ namespace DocSearch.Controllers
             };
 
             CrawlerManager.GetInstance().Start();
-            _progressRateCrawl.TimerStart(PROGRESS_INTERVAL);
+            _crawlProgress.Start();
         }
 
         /// <summary>
@@ -130,26 +129,11 @@ namespace DocSearch.Controllers
         /// <returns></returns>
         public ActionResult StartCrawlCompleted(SetupModel result) // ② AsyncManager.Parameters.Add()で指定したkeyの名称を引数名に指定すると、値を受け取れる。
         {
-            _progressRateCrawl.TimerStop();
+            _crawlProgress.ProcessFinished(MESSAGE_CRAWL_FINISHED);
 
-            ProgressHub.SendMessage("クロール完了", 100);
-
-            result.Message = "クロールが完了しました。";
+            result.Message = MESSAGE_CRAWL_FINISHED;
 
             return RedirectToAction("Setup", "Setup", result);
-        }
-
-        /// <summary>
-        /// クロール進捗率の取得
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void _progressRateCrawl_Elapsed(object sender, EventArgs e)
-        {
-            int rate = CrawlerManager.GetInstance().InsertProgressRate;
-
-            // ブラウザ側に進捗率を通知する
-            ProgressHub.SendMessage("クロール中...", rate);
         }
         #endregion
 

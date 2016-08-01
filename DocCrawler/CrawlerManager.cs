@@ -303,5 +303,20 @@ namespace FolderCrawler
                 });
             }
         }
+
+        /// <summary>
+        /// クロール処理の停止
+        /// </summary>
+        public void Stop()
+        {
+            _indexing.Stop = true;
+
+            TrainingDataManager.GetInstance().Stop = true;
+
+            foreach (DocCrawler crwl in _crawlList)
+            {
+                crwl.Stop = true;
+            }
+        }
     }
 }

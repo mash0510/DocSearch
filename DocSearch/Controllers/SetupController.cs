@@ -37,7 +37,21 @@ namespace DocSearch.Controllers
         public SetupController()
         {
             // 処理中にブラウザに送るメッセージ
-            _crawlProgress.Message = "クロール中です...";
+            _crawlProgress.Message = MESSAGE_CRAWLING;
+            ProgressHub.CatchBrowserMessage += ProgressHub_CatchBrowserMessage;
+        }
+        
+        /// <summary>
+        /// ブラウザからのメッセージ受信
+        /// </summary>
+        /// <param name="msg"></param>
+        private void ProgressHub_CatchBrowserMessage(string msg)
+        {
+            if (msg == "CancelCrawl")
+            {
+                CrawlerManager.GetInstance().Stop();
+                AsyncManager.OutstandingOperations.Decrement();
+            }
         }
 
         // Get: Setup

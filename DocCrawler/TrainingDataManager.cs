@@ -27,7 +27,11 @@ namespace FolderCrawler
         /// <summary>
         /// 訓練データ作成スレッドの停止
         /// </summary>
-        private bool _stop = false;
+        public bool Stop
+        {
+            set;
+            get;
+        }
 
         /// <summary>
         /// 機械学習用データの最大サイズの設定と取得
@@ -66,21 +70,13 @@ namespace FolderCrawler
         }
 
         /// <summary>
-        /// 訓練データ生成スレッドの停止
-        /// </summary>
-        public void Stop()
-        {
-            this._stop = true;
-        }
-
-        /// <summary>
         /// ワーカースレッドの未処理時間経過後、ワーカースレッドを止める
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void _timeElapse_Elapsed(object sender, EventArgs e)
         {
-            this._stop = true;
+            Stop = true;
             _timeElapse.TimerStop();
         }
 
@@ -94,7 +90,7 @@ namespace FolderCrawler
             // 既存の訓練データの削除
             DeleteTrainingDataFile();
 
-            this._stop = false;
+            Stop = false;
 
             while (true)
             {
@@ -103,13 +99,19 @@ namespace FolderCrawler
                     if (!_timeElapse.IsTimerStarted)
                         _timeElapse.TimerStart(CommonParameters.WorkerThreadStopDuration);
 
-                    if (this._stop)
+                    if (Stop)
                         break;
                     else
                         continue;
                 }
 
                 _timeElapse.TimerStop();
+
+                if (Stop)
+                {
+                    // ユーザーがキャンセル操作を実行したら、ループを停止する。
+                    break;
+                }
 
                 DocumentInfo docInfo = QueueManager.GetInstance().DocInfoQueue.Dequeue() as DocumentInfo;
                 if (docInfo == null)

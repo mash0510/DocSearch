@@ -9,6 +9,9 @@ namespace DocSearch.hubs
 {
     public class ProgressHub : Hub
     {
+        public delegate void BrowserMessage(string msg);
+        public static event BrowserMessage CatchBrowserMessage;
+
         /// <summary>
         /// ブラウザへのデータ送信
         /// </summary>
@@ -26,7 +29,7 @@ namespace DocSearch.hubs
         /// <param name="msg"></param>
         public void GetMessage(string msg)
         {
-            // 今現在は未使用。
+            CatchBrowserMessage?.Invoke(msg);
         }
     }
 }

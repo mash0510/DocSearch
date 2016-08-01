@@ -30,6 +30,15 @@ namespace FolderCrawler
         private decimal _crawledDocCount = 0;
 
         /// <summary>
+        /// クロール処理の途中停止
+        /// </summary>
+        public bool Stop
+        {
+            set;
+            get;
+        }
+
+        /// <summary>
         /// クロールが完了したかどうか
         /// </summary>
         public bool IsFinished
@@ -158,8 +167,18 @@ namespace FolderCrawler
                     }
                 }
 
+                if (Stop)
+                {
+                    return;
+                }
+
                 foreach (FileInfo fi in di.GetFiles())
                 {
+                    if (Stop)
+                    {
+                        return;
+                    }
+
                     if (!TargetFileExt.Contains(fi.Extension))
                         continue;
 

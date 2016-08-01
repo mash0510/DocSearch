@@ -315,6 +315,7 @@
     <Content Include="Views\DocSearch\Index.cshtml" />
     <Content Include="Views\Setup\Setup.cshtml" />
     <Content Include="Views\DocSearch\GetFiles.cshtml" />
+    <Content Include="Views\Setup\ProgressBar.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -324,7 +325,6 @@
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
     <Content Include="packages.config" />
-    <None Include="Project_Readme.html" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
   </ItemGroup>
   <ItemGroup>

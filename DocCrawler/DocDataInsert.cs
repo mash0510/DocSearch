@@ -25,7 +25,11 @@ namespace FolderCrawler
         /// <summary>
         /// 検索エンジンへのデータ投入をストップ
         /// </summary>
-        private bool _stop = false;
+        public bool Stop
+        {
+            set;
+            get;
+        }
 
         /// <summary>
         /// 経過時間測定インスタンス
@@ -109,21 +113,13 @@ namespace FolderCrawler
         }
 
         /// <summary>
-        /// 検索エンジンへのデータ投入をストップ
-        /// </summary>
-        public void Stop()
-        {
-            this._stop = true;
-        }
-
-        /// <summary>
         /// ワーカースレッドの未処理時間経過後、ワーカースレッドを止める
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void _timeElapse_Elapsed(object sender, EventArgs e)
         {
-            this._stop = true;
+            Stop = true;
             _timeElapse.TimerStop();
         }
 
@@ -132,7 +128,7 @@ namespace FolderCrawler
         /// </summary>
         public void DocDataInsertProc()
         {
-            this._stop = false;
+            Stop = false;
             bool first = true;
             CumurativeInsertedDocuments = 0;
 
@@ -143,13 +139,19 @@ namespace FolderCrawler
                     if (!_timeElapse.IsTimerStarted)
                         _timeElapse.TimerStart(CommonParameters.WorkerThreadStopDuration);
 
-                    if (this._stop)
+                    if (Stop)
                         break;
                     else
                         continue;
                 }
 
                 _timeElapse.TimerStop();
+
+                if (Stop)
+                {
+                    // ユーザーがキャンセル操作を実行したら、ループを停止する。
+                    break;
+                }
 
                 FileInfo fi = QueueManager.GetInstance().FileInfoQueue.Dequeue() as FileInfo;
 

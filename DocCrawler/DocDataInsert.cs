@@ -33,6 +33,25 @@ namespace FolderCrawler
         private TimeElapse _timeElapse = new TimeElapse();
 
         /// <summary>
+        /// クロール処理実行中にElasticSearchに挿入した文書データの数
+        /// </summary>
+        public decimal CumurativeInsertedDocuments
+        {
+            get;
+            private set;
+        }
+
+        public delegate void DocInsertedDelegate(object sender, decimal docCount);
+        /// <summary>
+        /// クロール処理実行中にElasticSearchに1ファイルIndexingされると発生するイベント
+        /// </summary>
+        public event DocInsertedDelegate SingleDocInserted;
+        /// <summary>
+        /// ElasticSearchへのIndexing完了時のイベント
+        /// </summary>
+        public event DocInsertedDelegate DocInsertFinished;
+
+        /// <summary>
         /// コンストラクタ
         /// </summary>
         public DocDataInsert()
@@ -114,10 +133,10 @@ namespace FolderCrawler
         public void DocDataInsertProc()
         {
             this._stop = false;
-
             bool first = true;
+            CumurativeInsertedDocuments = 0;
 
-            while(true)
+            while (true)
             {
                 if (QueueManager.GetInstance().FileInfoQueue.Count == 0)
                 {
@@ -168,9 +187,14 @@ namespace FolderCrawler
 
                 IDDictionary.GetInstanse().AddID(docInfo.FileFullPath, id, true);
 
+                CumurativeInsertedDocuments++;
+                SingleDocInserted?.Invoke(this, CumurativeInsertedDocuments);
+
                 // 訓練データ作成ロジックに、ドキュメントデータを渡す。
                 QueueManager.GetInstance().DocInfoQueue.Enqueue(docInfo);
             }
+
+            DocInsertFinished?.Invoke(this, CumurativeInsertedDocuments);
         }
     }
 }

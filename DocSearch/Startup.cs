@@ -12,6 +12,8 @@ namespace DocSearch
             // 設定ファイルのロード
             Settings.GetInstance().LoadSettings();
 
+            app.MapSignalR();
+
             // 文書IDのロード
             IDDictionary.GetInstanse().LoadAsync();
         }

@@ -12,7 +12,7 @@
     @using (Html.BeginForm("SetupCrawlFolder", "Setup", FormMethod.Post))
     {
         <div class="form-group">
-            <label class="control-label">クロール先のフォルダを指定して下さい。改行で複数して出来ます。</label>
+            <label class="control-label">クロール先のフォルダを指定して下さい。改行で複数のフォルダを指定出来ます。</label>
             @Html.TextAreaFor(m => m.CrawlFolders, new { @class = "form-control", rows = "5" })
         </div>
         <button type="submit" class="btn btn-default right">適用</button>
@@ -39,6 +39,10 @@
                 </div>
             </div>
             <button type="submit" class="btn btn-default" onclick="ShowProcessingMessage('processingMessage1', '処理中です...')">開始</button>&nbsp;&nbsp;<span id="processingMessage1"></span>
+            <div>
+                <label id="progressMessage"></label>
+                <label id="progressRate"></label>
+            </div>
        </div>
     }
 </div>
@@ -61,8 +65,29 @@
 <script type="text/javascript">
     function ShowProcessingMessage(id, message)
     {
+        StartInvoicing();
+
         message += "&nbsp;<img src='/Content/images/ajax-loader.gif'></img>";
         $('#' + id).html(message);
+    }
+
+    function StartInvoicing() {
+        var progressNotifier = $.connection.progressHub;
+
+        // サーバー側からのメッセージを受信する部分
+        progressNotifier.client.sendMessage = function (message, count) {
+            UpdateProgress(message, count);
+        };
+
+        // サーバー側にメッセージを送る部分
+        $.connection.hub.start().done(function () {
+            progressNotifier.server.getMessage("");
+        });
+    }
+
+    function UpdateProgress(message, count) {
+        $("#progressMessage").html(message);
+        $("#progressRate").html(count);
     }
 </script>
 

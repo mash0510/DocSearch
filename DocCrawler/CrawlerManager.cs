@@ -55,6 +55,73 @@ namespace FolderCrawler
             private set;
         }
 
+        /// <summary>
+        /// 前回のクロール処理にてクロールしたファイルの数
+        /// </summary>
+        public decimal PrevTotalDocuments
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// クロール処理実行中に、クロールが完了したファイルの数を取得できるプロパティ
+        /// </summary>
+        public decimal CumulativeCrawlDocuments
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// クロールの進捗率の取得
+        /// </summary>
+        public int CrawlProgressRate
+        {
+            get
+            {
+                double docNum = (double)CumulativeCrawlDocuments;
+                double totalNum = (double)PrevTotalDocuments;
+                int retval = (int)Math.Ceiling((docNum / totalNum) * 100);
+
+                return retval;
+            }
+        }
+
+        /// <summary>
+        /// クロール処理実行中に、ElasticSearchへのIndexingが完了したファイルの数を取得できるプロパティ
+        /// </summary>
+        public decimal CumulativeInsertedDocuments
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// ElasticSearchへのIndexingの進捗率
+        /// </summary>
+        public int InsertProgressRate
+        {
+            get
+            {
+                double docNum = (double)CumulativeInsertedDocuments;
+                double totalNum = (double)PrevTotalDocuments;
+                int retval = (int)Math.Ceiling((docNum / totalNum) * 100);
+
+                return retval;
+            }
+        }
+
+        public delegate void DocCrawlDelegate(object sender, decimal totalFiles);
+        /// <summary>
+        /// 全てのクロールが完了したときに発生するイベント
+        /// </summary>
+        public event DocCrawlDelegate AllCrawlFinished;
+        /// <summary>
+        /// 全てのElastisSearchへのIndexingが完了したときに発生するイベント
+        /// </summary>
+        public event DocCrawlDelegate AllDocInsertFinished;
+
         private static CrawlerManager _self = new CrawlerManager();
 
         /// <summary>
@@ -71,6 +138,7 @@ namespace FolderCrawler
         /// </summary>
         private CrawlerManager()
         {
+            LoadTotalDocuments();
         }
 
         /// <summary>
@@ -86,14 +154,39 @@ namespace FolderCrawler
                 DocCrawler crawlInstance = new DocCrawler(crawlRoot);
                 _crawlList.Add(crawlInstance);
 
+                crawlInstance.SingleDocCrawled -= CrawlInstance_SingleDocCrawled;
+                crawlInstance.CrawlFinished -= CrawlInstance_CrawlFinished;
+
+                crawlInstance.SingleDocCrawled += CrawlInstance_SingleDocCrawled;
                 crawlInstance.CrawlFinished += CrawlInstance_CrawlFinished;
             }
+
+            _indexing.SingleDocInserted -= _indexing_SingleDocInserted;
+            _indexing.SingleDocInserted += _indexing_SingleDocInserted;
+
+            _indexing.DocInsertFinished -= _indexing_DocInsertFinished;
+            _indexing.DocInsertFinished += _indexing_DocInsertFinished;
         }
 
         /// <summary>
-        /// 全てのクロールが完了したときに発生するイベント
+        /// 1ファイルクロールする毎に実行されるイベントハンドラ
         /// </summary>
-        public event System.EventHandler AllCrawlFinished;
+        /// <param name="sender"></param>
+        /// <param name="cumulativeFileCount"></param>
+        private void CrawlInstance_SingleDocCrawled(object sender, decimal cumulativeFileCount)
+        {
+            CumulativeCrawlDocuments = cumulativeFileCount;
+        }
+
+        /// <summary>
+        /// ElasticSearchに1ファイルIndexingされる毎に実行されるイベントハンドラ
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="cumulativeDocCount"></param>
+        private void _indexing_SingleDocInserted(object sender, decimal cumulativeDocCount)
+        {
+            CumulativeInsertedDocuments++;
+        }
 
         /// <summary>
         /// クロール完了時の処理
@@ -121,9 +214,20 @@ namespace FolderCrawler
 
             if (allFinished)
             {
+                PrevTotalDocuments = TotalDocuments;
                 SaveTotalDocuments();
-                AllCrawlFinished?.Invoke(this, new EventArgs());
+                AllCrawlFinished?.Invoke(this, TotalDocuments);
             }
+        }
+
+        /// <summary>
+        /// 全てのElastisSearchへのIndexingが完了
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="totalDocCount"></param>
+        private void _indexing_DocInsertFinished(object sender, decimal totalDocCount)
+        {
+            AllDocInsertFinished?.Invoke(this, totalDocCount);
         }
 
         /// <summary>
@@ -145,6 +249,33 @@ namespace FolderCrawler
             {
                 sw.Close();
             }
+        }
+
+        /// <summary>
+        /// 前回クロールした文書ファイルの数の読み込み
+        /// </summary>
+        private void LoadTotalDocuments()
+        {
+            StreamReader sr = new StreamReader(CommonParameters.TotalDocumentsFile);
+
+            try
+            {
+                string prevTotalDocuments = sr.ReadLine();
+
+                decimal total;
+                decimal.TryParse(prevTotalDocuments, out total);
+
+                PrevTotalDocuments = total;
+            }
+            catch
+            {
+                // 後ほどログ出力
+            }
+            finally
+            {
+                sr.Close();
+            }
+
         }
 
         /// <summary>

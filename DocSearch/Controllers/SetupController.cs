@@ -1,8 +1,10 @@
 ﻿using DocSearch.Models;
+using DocSearch.hubs;
 using FolderCrawler;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -21,6 +23,23 @@ namespace DocSearch.Controllers
         /// </summary>
         private const int EXEC_MACHINE_LEARNING = 1;
 
+        /// <summary>
+        /// 進捗率取得のインターバル時間（ms）
+        /// </summary>
+        private const int PROGRESS_INTERVAL = 500;
+
+        /// <summary>
+        /// 進捗率取得タイマー
+        /// </summary>
+        TimeElapse _progressRateCrawl = new TimeElapse();
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        public SetupController()
+        {
+            _progressRateCrawl.Elapsed += _progressRateCrawl_Elapsed;
+        }
 
         // Get: Setup
         [HttpGet]
@@ -101,6 +120,7 @@ namespace DocSearch.Controllers
             };
 
             CrawlerManager.GetInstance().Start();
+            _progressRateCrawl.TimerStart(PROGRESS_INTERVAL);
         }
 
         /// <summary>
@@ -110,9 +130,26 @@ namespace DocSearch.Controllers
         /// <returns></returns>
         public ActionResult StartCrawlCompleted(SetupModel result) // ② AsyncManager.Parameters.Add()で指定したkeyの名称を引数名に指定すると、値を受け取れる。
         {
+            _progressRateCrawl.TimerStop();
+
+            ProgressHub.SendMessage("クロール完了", 100);
+
             result.Message = "クロールが完了しました。";
 
             return RedirectToAction("Setup", "Setup", result);
+        }
+
+        /// <summary>
+        /// クロール進捗率の取得
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void _progressRateCrawl_Elapsed(object sender, EventArgs e)
+        {
+            int rate = CrawlerManager.GetInstance().InsertProgressRate;
+
+            // ブラウザ側に進捗率を通知する
+            ProgressHub.SendMessage("クロール中...", rate);
         }
         #endregion
 

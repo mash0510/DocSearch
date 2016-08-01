@@ -37,6 +37,18 @@ namespace FolderCrawler
             get; set;
         }
 
+        public delegate void CrawlFinishedDelegate(object sender, decimal crawledFileCount, string crawlRootFolder);
+        /// <summary>
+        /// クロールの完了を通知するイベント
+        /// </summary>
+        public event CrawlFinishedDelegate CrawlFinished;
+
+        public delegate void DocCrawled(object sender, decimal cumulativeFileCount);
+        /// <summary>
+        /// ファイルが1件クロールされると発生するイベント
+        /// </summary>
+        public event DocCrawled SingleDocCrawled;
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -108,9 +120,6 @@ namespace FolderCrawler
             list.Add(data);
         }
 
-        public delegate void CrawlFinishedDelegate(object sender, decimal crawledFileCount, string crawlRootFolder);
-        public event CrawlFinishedDelegate CrawlFinished;
-
         /// <summary>
         /// クロール実行
         /// </summary>
@@ -159,6 +168,7 @@ namespace FolderCrawler
                     QueueManager.GetInstance().FileInfoQueue.Enqueue(fi);
 
                     _crawledDocCount++;
+                    SingleDocCrawled?.Invoke(this, _crawledDocCount);
                 }
             }
             catch(Exception ex)

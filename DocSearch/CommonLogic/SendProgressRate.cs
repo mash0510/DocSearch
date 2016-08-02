@@ -18,6 +18,11 @@ namespace DocSearch.CommonLogic
         private const int PROGRESS_INTERVAL = 500;
 
         /// <summary>
+        /// 完了時の進捗率
+        /// </summary>
+        public const int PROGRESS_COMPLETED = 100;
+
+        /// <summary>
         /// 進捗率取得タイマー
         /// </summary>
         TimeElapse _progressRateTimer = new TimeElapse();
@@ -31,6 +36,33 @@ namespace DocSearch.CommonLogic
         /// 進捗率と共にブラウザ側に送るメッセージの設定と取得
         /// </summary>
         public string Message
+        {
+            set;
+            get;
+        }
+
+        /// <summary>
+        /// 全体のドキュメント数が取得できない状態で、進捗率を算出できないときにブラウザに表示するメッセージ
+        /// </summary>
+        public string MessageNoProgressRate
+        {
+            set;
+            get;
+        }
+
+        /// <summary>
+        /// 完了時にブラウザに表示するメッセージ
+        /// </summary>
+        public string MessageFinished
+        {
+            set;
+            get;
+        }
+
+        /// <summary>
+        /// 進捗率更新先のプログレスバーID
+        /// </summary>
+        public string ProgressBarID
         {
             set;
             get;
@@ -66,7 +98,7 @@ namespace DocSearch.CommonLogic
         /// <param name="message">ブラウザ側に送るメッセージ</param>
         public void ProcessFinished(string message)
         {
-            ProgressHub.SendMessage(message, 100);
+            ProgressHub.SendMessage(message, 100, ProgressBarID);
         }
 
         /// <summary>
@@ -82,8 +114,18 @@ namespace DocSearch.CommonLogic
             if (_prevRate == rate)
                 return;
 
+            string mes = Message;
+            if (rate == (int)CommonParameters.NO_TOTAL_DOCUMENTS)
+            {
+                mes = MessageNoProgressRate;
+            }
+            else if (rate == PROGRESS_COMPLETED)
+            {
+                mes = MessageFinished;
+            }
+
             // ブラウザ側に進捗率を通知する
-            ProgressHub.SendMessage(Message, rate);
+            ProgressHub.SendMessage(mes, rate, ProgressBarID);
         }
     }
 }

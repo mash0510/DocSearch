@@ -18,7 +18,7 @@ namespace DocSearch.Controllers
         /// <summary>
         /// 「機械学習をする」を示す値
         /// </summary>
-        private const int EXEC_MACHINE_LEARNING = 1;
+        private const string EXEC_MACHINE_LEARNING = "1";
 
         SendProgressRate _crawlProgress = new SendProgressRate();
 
@@ -38,6 +38,10 @@ namespace DocSearch.Controllers
         {
             // 処理中にブラウザに送るメッセージ
             _crawlProgress.Message = MESSAGE_CRAWLING;
+            _crawlProgress.MessageNoProgressRate = MESSAGE_CRAWLING;
+            _crawlProgress.MessageFinished = MESSAGE_CRAWL_FINISHED;
+
+            ProgressHub.CatchBrowserMessage -= ProgressHub_CatchBrowserMessage;
             ProgressHub.CatchBrowserMessage += ProgressHub_CatchBrowserMessage;
         }
         
@@ -45,12 +49,18 @@ namespace DocSearch.Controllers
         /// ブラウザからのメッセージ受信
         /// </summary>
         /// <param name="msg"></param>
-        private void ProgressHub_CatchBrowserMessage(string msg)
+        /// <param name="arg2"></param>
+        /// <param name="arg1"></param>
+        private void ProgressHub_CatchBrowserMessage(string msg, string arg1, string arg2)
         {
-            if (msg == "CancelCrawl")
+            switch (msg)
             {
-                CrawlerManager.GetInstance().Stop();
-                AsyncManager.OutstandingOperations.Decrement();
+                case "CancelCrawl":
+                    CrawlerManager.GetInstance().Stop();
+                    break;
+                case "StartCrawl":
+                    StartCrawl(arg1, arg2);
+                    break;
             }
         }
 
@@ -114,41 +124,25 @@ namespace DocSearch.Controllers
         /// <summary>
         /// クロール開始
         /// </summary>
-        /// <param name="setupModel"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [AsyncTimeout(21600000)]
-        public void StartCrawlAsync(SetupModel setupModel)
+        /// <param name="execMachineLearning"></param>
+        /// <param name="progressBarID"></param>
+        private void StartCrawl(string execMachineLearning, string progressBarID)
         {
-            AsyncManager.OutstandingOperations.Increment();
-
-            TrainingDataManager.GetInstance().TrainingDataGenerateFinished += (sender, e) =>
+            EventHandler handler = (sender, e) =>
             {
-                if (setupModel.ExecMachineLearning == EXEC_MACHINE_LEARNING)
+                if (execMachineLearning == EXEC_MACHINE_LEARNING)
                     TrainingDataManager.GetInstance().StartTraining();
 
-                AddValue("result", setupModel);  // ① keyを"result"にすると... → ②へ
-
-                AsyncManager.OutstandingOperations.Decrement();
+                _crawlProgress.ProcessFinished(MESSAGE_CRAWL_FINISHED);
             };
 
+            TrainingDataManager.GetInstance().TrainingDataGenerateFinished -= handler;
+            TrainingDataManager.GetInstance().TrainingDataGenerateFinished += handler;
+
             CrawlerManager.GetInstance().Start();
+
+            _crawlProgress.ProgressBarID = progressBarID;
             _crawlProgress.Start();
-        }
-
-        /// <summary>
-        /// クロール完了
-        /// </summary>
-        /// <param name="setupModel"></param>
-        /// <returns></returns>
-        public ActionResult StartCrawlCompleted(SetupModel result) // ② AsyncManager.Parameters.Add()で指定したkeyの名称を引数名に指定すると、値を受け取れる。
-        {
-            _crawlProgress.ProcessFinished(MESSAGE_CRAWL_FINISHED);
-
-            if (result != null)
-                result.Message = MESSAGE_CRAWL_FINISHED;
-
-            return RedirectToAction("Setup", "Setup", result);
         }
         #endregion
 

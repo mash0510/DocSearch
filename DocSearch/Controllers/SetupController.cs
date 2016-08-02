@@ -145,7 +145,8 @@ namespace DocSearch.Controllers
         {
             _crawlProgress.ProcessFinished(MESSAGE_CRAWL_FINISHED);
 
-            result.Message = MESSAGE_CRAWL_FINISHED;
+            if (result != null)
+                result.Message = MESSAGE_CRAWL_FINISHED;
 
             return RedirectToAction("Setup", "Setup", result);
         }

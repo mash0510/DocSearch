@@ -24,7 +24,15 @@ namespace FolderCrawler.TextDataExtract
         public string Extract(string fileName, Encoding encode)
         {
             string extractedText = null;
-            ExtractText(fileName, false, ref extractedText);
+
+            try
+            {
+                ExtractText(fileName, false, ref extractedText);
+            }
+            catch
+            {
+                throw;
+            }
 
             return extractedText;
         }

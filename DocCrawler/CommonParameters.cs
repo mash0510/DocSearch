@@ -190,6 +190,11 @@ namespace FolderCrawler
             }
         }
 
+        /// <summary>
+        /// 全体のドキュメント数が取得できなかったことを示す値
+        /// </summary>
+        public const decimal NO_TOTAL_DOCUMENTS = -1;
+
         private static long _defaultMaxTrainingFileSize = 100L * 1024 * 1024 * 1024;
         /// <summary>
         /// word2vecに機械学習させる文書データの最大サイズのデフォルト値の取得

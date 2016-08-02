@@ -80,6 +80,9 @@ namespace FolderCrawler
         {
             get
             {
+                if (PrevTotalDocuments == CommonParameters.NO_TOTAL_DOCUMENTS)
+                    return (int)CommonParameters.NO_TOTAL_DOCUMENTS;
+
                 double docNum = (double)CumulativeCrawlDocuments;
                 double totalNum = (double)PrevTotalDocuments;
                 int retval = (int)Math.Ceiling((docNum / totalNum) * 100);
@@ -104,6 +107,9 @@ namespace FolderCrawler
         {
             get
             {
+                if (PrevTotalDocuments == CommonParameters.NO_TOTAL_DOCUMENTS)
+                    return (int)CommonParameters.NO_TOTAL_DOCUMENTS;
+
                 double docNum = (double)CumulativeInsertedDocuments;
                 double totalNum = (double)PrevTotalDocuments;
                 int retval = (int)Math.Ceiling((docNum / totalNum) * 100);
@@ -256,6 +262,12 @@ namespace FolderCrawler
         /// </summary>
         private void LoadTotalDocuments()
         {
+            if (!File.Exists(CommonParameters.TotalDocumentsFile))
+            {
+                PrevTotalDocuments = CommonParameters.NO_TOTAL_DOCUMENTS;
+                return;
+            }
+
             StreamReader sr = new StreamReader(CommonParameters.TotalDocumentsFile);
 
             try
@@ -270,6 +282,7 @@ namespace FolderCrawler
             catch
             {
                 // 後ほどログ出力
+                PrevTotalDocuments = CommonParameters.NO_TOTAL_DOCUMENTS;
             }
             finally
             {

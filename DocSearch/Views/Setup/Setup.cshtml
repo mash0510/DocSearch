@@ -48,7 +48,7 @@
             <div class="row">
                 <div id="crawlProgressBar">
                     <div class="col-md-7">
-                        <div class="progress">
+                        <div class="progress progress-striped active">
                             <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%;">
                             </div>
                         </div>
@@ -105,6 +105,11 @@
     }
 
     function UpdateProgress(message, count, id) {
+        if (count == -1) {
+            $(id).find(".progress-bar").css({ 'width': 100 + '%' });
+            $(id).find(".progress-rate").html('処理中です...');
+        }
+
         $(id).find(".progress-bar").css({ 'width': count + '%' });
         $(id).find(".progress-rate").html(count + '%');
     }

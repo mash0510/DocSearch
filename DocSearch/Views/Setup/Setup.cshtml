@@ -41,7 +41,7 @@
                     <button type="submit" class="btn btn-default" onclick="ShowProgressBar('#crawlProgressBar')">開始</button>
                 </div>
                 <div class="col-md-1">
-                    <button type="submit" class="btn btn-default" onclick="CancelCrawl()">キャンセル</button>
+                    <button type="button" class="btn btn-default" onclick="CancelCrawl()">キャンセル</button>
                 </div>
             </div>
             <br />
@@ -80,6 +80,21 @@
 <script type="text/javascript">
     var progressNotifier;
 
+    window.onload = function () {
+        progressNotifier = $.connection.progressHub;
+
+        // サーバー側からのメッセージを受信する部分
+        progressNotifier.client.sendMessage = function (message, count) {
+            UpdateProgress(message, count, '#crawlProgressBar');
+        };
+
+        // 接続完了時の処理
+        $.connection.hub.start().done(function () {
+            progressNotifier.server.getMessage("");
+        });
+
+    };
+
     function ShowProgressBar(id)
     {
         StartInvoicing(id);
@@ -91,17 +106,15 @@
     }
 
     function StartInvoicing(id) {
-        progressNotifier = $.connection.progressHub;
-
         // サーバー側からのメッセージを受信する部分
         progressNotifier.client.sendMessage = function (message, count) {
-            UpdateProgress(message, count, id);
+            UpdateProgress(message, count, '#crawlProgressBar');
         };
 
-        // 接続完了時の処理
-        $.connection.hub.start().done(function () {
-            progressNotifier.server.getMessage("");
-        });
+        //// 接続完了時の処理
+        //$.connection.hub.start().done(function () {
+        //    progressNotifier.server.getMessage("");
+        //});
     }
 
     function UpdateProgress(message, count, id) {

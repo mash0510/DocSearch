@@ -20,7 +20,8 @@ namespace DocSearch.Controllers
         /// </summary>
         private const string EXEC_MACHINE_LEARNING = "1";
 
-        SendProgressRate _crawlProgress = new SendProgressRate();
+        SendProgressRate _crawlProgress = new ProgressRateCrawl();
+        SendProgressRate _machineLearningProgress = new ProgressRateMachineLearning();
 
         /// <summary>
         /// クロール中のメッセージ
@@ -32,6 +33,16 @@ namespace DocSearch.Controllers
         private string MESSAGE_CRAWL_FINISHED = "クロールが完了しました。";
 
         /// <summary>
+        /// 機械学習実行中のメッセージ
+        /// </summary>
+        private string MESSAGE_LEARNING = "機械学習実行中です...";
+
+        /// <summary>
+        /// 機械学習完了時のメッセージ
+        /// </summary>
+        private string MESSAGE_LEARNING_FINISHED = "機械学習が完了しました。";
+
+        /// <summary>
         /// コンストラクタ
         /// </summary>
         public SetupController()
@@ -40,6 +51,10 @@ namespace DocSearch.Controllers
             _crawlProgress.Message = MESSAGE_CRAWLING;
             _crawlProgress.MessageNoProgressRate = MESSAGE_CRAWLING;
             _crawlProgress.MessageFinished = MESSAGE_CRAWL_FINISHED;
+
+            _machineLearningProgress.Message = MESSAGE_LEARNING;
+            _machineLearningProgress.MessageNoProgressRate = MESSAGE_LEARNING;
+            _machineLearningProgress.MessageFinished = MESSAGE_LEARNING_FINISHED;
 
             ComHub.CatchBrowserMessage -= ProgressHub_CatchBrowserMessage;
             ComHub.CatchBrowserMessage += ProgressHub_CatchBrowserMessage;
@@ -62,6 +77,11 @@ namespace DocSearch.Controllers
                         break;
                     case "StartCrawl":
                         StartCrawl(args[0], args[1]);
+                        break;
+                    case "StartMachineLearning":
+                        StartMachineLearning(args[0]);
+                        break;
+                    case "CancelMachineLearning":
                         break;
                 }
             }
@@ -151,6 +171,26 @@ namespace DocSearch.Controllers
 
 
         #region 機械学習処理実行
+        /// <summary>
+        /// 機械学習の実行開始
+        /// </summary>
+        /// <param name="progressBarID"></param>
+        private void StartMachineLearning(string progressBarID)
+        {
+            EventHandler handler = (sender, e) =>
+            {
+                _machineLearningProgress.ProcessFinished(MESSAGE_LEARNING_FINISHED);
+            };
+
+            TrainingDataManager.GetInstance().MachineLearningFinished -= handler;
+            TrainingDataManager.GetInstance().MachineLearningFinished += handler;
+
+            _machineLearningProgress.ProgressBarID = progressBarID;
+            _machineLearningProgress.Start();
+
+            TrainingDataManager.GetInstance().StartTraining();
+        }
+
         /// <summary>
         /// 機械学習の実行開始
         /// </summary>

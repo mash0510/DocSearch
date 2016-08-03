@@ -71,8 +71,27 @@
                 <div class="col-md-5">
                     <label class="control-label">関連語を表示する人工知能の学習の実行</label>
                 </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-default" onclick="StartMachineLearning()">開始</button>
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-default" onclick="CancelMachineLearning()">キャンセル</button>
+                </div>
             </div>
-            <button type="submit" class="btn btn-default" onclick="ShowProcessingMessage('processingMessage2', '処理中です...')">開始</button>&nbsp;&nbsp;<span id="processingMessage2"></span>
+            <br />
+            <div class="row">
+                <div id="machineLearningProgressBar">
+                    <div class="col-md-7">
+                        <div class="progress progress-striped active" id="progressType">
+                            <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="progress-rate" id="progressRate"></label>
+                    </div>
+                </div>
+            </div>
         </div>
     }
 </div>
@@ -123,7 +142,7 @@
         comNotifier.server.getMessage(type, msg, args);
     }
 
-
+    // クロール開始
     function StartCrawl()
     {
         var machineLearning = $("#execMachineLearningOption").val();
@@ -132,20 +151,22 @@
         SendMessageToServer("PROGRESS_BAR", "StartCrawl", args);
     }
 
+    // クロールキャンセル
     function CancelCrawl()
     {
         SendMessageToServer("PROGRESS_BAR", "CancelCrawl", [""]);
     }
 
-
-</script>
-
-<!-- 応答メッセージ -->
-@{
-    if (Model.ProcessFinished)
+    // 機械学習開始
+    function StartMachineLearning()
     {
-        <script type="text/javascript">
-            alert('@Model.Message');
-        </script>
+        var args = ["#machineLearningProgressBar"];
+
+        SendMessageToServer("PROGRESS_BAR", "StartMachineLearning", args);
     }
-}
+
+    // 機械学習キャンセル
+    function CancelMachineLearning() {
+        SendMessageToServer("PROGRESS_BAR", "CancelMachineLearning", [""]);
+    }
+</script>

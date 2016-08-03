@@ -109,13 +109,23 @@ namespace DocSearch.CommonLogic
         }
 
         /// <summary>
+        /// 進捗率の取得
+        /// </summary>
+        /// <returns></returns>
+        protected virtual int GetProgressRate()
+        {
+            return 0;
+        }
+
+
+        /// <summary>
         /// PROGRESS_INTERVALで設定した時間の経過毎に呼ばれるメソッド
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void _progressRateTimer_Elapsed(object sender, EventArgs e)
         {
-            int rate = CrawlerManager.GetInstance().InsertProgressRate;
+            int rate = GetProgressRate();
 
             // 直近の進捗率と同じ値なら送信しない。
             if (_prevRate == rate)

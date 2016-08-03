@@ -43,6 +43,15 @@ namespace FolderCrawler
         }
 
         /// <summary>
+        /// 機械学習処理の進捗率
+        /// </summary>
+        public int MachineLearningProgressRate
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// 経過時間測定インスタンス
         /// </summary>
         private TimeElapse _timeElapse = new TimeElapse();
@@ -201,6 +210,11 @@ namespace FolderCrawler
         }
 
         /// <summary>
+        /// 機械学習終了時のイベント
+        /// </summary>
+        public event EventHandler MachineLearningFinished;
+
+        /// <summary>
         /// 訓練スタート
         /// </summary>
         public void StartTraining()
@@ -227,14 +241,72 @@ namespace FolderCrawler
             // 機械学習
             word2vecProc.StartInfo.FileName = CommonParameters.Word2VecProgram;
             word2vecProc.StartInfo.Arguments = "-train " + CommonParameters.MeCabOutputFileName + " -output " + CommonParameters.VectorFileNameFullPath + " -cbow 0 -size 200 -window 10 -negative 0 -hs 1 -sample 1e-3 -threads 12 -binary 1";
+            word2vecProc.StartInfo.UseShellExecute = false;
+            word2vecProc.StartInfo.RedirectStandardOutput = true;
+            word2vecProc.OutputDataReceived += Word2vecProc_OutputDataReceived;
+            word2vecProc.StartInfo.RedirectStandardInput = false;
+            word2vecProc.StartInfo.CreateNoWindow = true;
+
             word2vecProc.Start();
+            word2vecProc.BeginOutputReadLine();
 
             word2vecProc.WaitForExit();
+
+            MachineLearningFinished?.Invoke(this, new EventArgs());
 
             word2vecProc.Close();
             word2vecProc.Dispose();
 
             ChangeVectorFileNameInUse();
+        }
+
+        /// <summary>
+        /// word2vecの進捗率出力の識別子
+        /// </summary>
+        private const string WORD2VEC_PROGRESS_RATE_INDICATOR = "Progress:";
+        /// <summary>
+        /// word2vec出力データの分割文字
+        /// </summary>
+        private char[] delimiter = new char[] { ' ' };
+
+        /// <summary>
+        /// word2vecの出力内容読み取り
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Word2vecProc_OutputDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            string data = e.Data;
+
+            MachineLearningProgressRate = GetProgressRate(data);
+        }
+
+        /// <summary>
+        /// word2vecの出力から進捗率を取得する
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        private int GetProgressRate(string data)
+        {
+            if (data == null)
+                return 0;
+
+            // "Progress:"という文字が出力されるまでは学習が開始していないので、0%を返す
+            if (!data.Contains(WORD2VEC_PROGRESS_RATE_INDICATOR))
+                return 0;
+
+            string[] dataArray = data.Split(delimiter);
+            if (dataArray.Length < 4)
+                return 0;
+
+            var rateData = dataArray.Where(output => output.Contains("%")).First<string>().TrimEnd(new char[] { '%' });
+
+            double rate = 0;
+            double.TryParse(rateData, out rate);
+
+            int retval = Convert.ToInt32(Math.Ceiling(rate));
+
+            return retval;
         }
 
         /// <summary>

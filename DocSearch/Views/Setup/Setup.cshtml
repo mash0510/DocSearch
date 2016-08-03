@@ -78,28 +78,35 @@
 </div>
 
 <script type="text/javascript">
-    var progressNotifier;
+    var comNotifier;
 
     window.onload = function () {
-        progressNotifier = $.connection.progressHub;
+        comNotifier = $.connection.comHub;
 
         // サーバー側からのメッセージを受信する部分
-        progressNotifier.client.sendMessage = function (message, count, id) {
-            UpdateProgress(message, count, id);
+        comNotifier.client.sendMessage = function (type, message, args) {
+            if (type == "PROGRESS_BAR") {
+                var rate = parseInt(args[0]);
+                var id = args[1];
+
+                UpdateProgress(message, rate, id);
+            }
         };
 
         // 接続完了時の処理
         $.connection.hub.start().done(function () {
-            progressNotifier.server.getMessage("", "", "");
+            comNotifier.server.getMessage("", "", [""]);
         });
 
     };
 
+    // プログレスバーの更新
     function UpdateProgress(message, count, id) {
         if (count == -1 || count == 100) {
             $(id).find(".progress-bar").css({ 'width': 100 + '%' });
             $(id).find(".progress-rate").html(message);
 
+            // 処理が完了したら、プログレスバーの表示をアニメーション → 固定表示に切り替える
             if (count == 100) {
                 $(id).find("#progressType").removeClass("progress-striped active");
             }
@@ -112,20 +119,22 @@
     }
 
     // サーバーへのメッセージ送信
-    function SendMessageToServer(msg, arg1, arg2) {
-        progressNotifier.server.getMessage(msg, arg1, arg2);
+    function SendMessageToServer(type, msg, args) {
+        comNotifier.server.getMessage(type, msg, args);
     }
 
 
     function StartCrawl()
     {
         var machineLearning = $("#execMachineLearningOption").val();
-        SendMessageToServer("StartCrawl", machineLearning, "#crawlProgressBar");
+        var args = [machineLearning, "#crawlProgressBar"];
+
+        SendMessageToServer("PROGRESS_BAR", "StartCrawl", args);
     }
 
     function CancelCrawl()
     {
-        SendMessageToServer("CancelCrawl", "", "");
+        SendMessageToServer("PROGRESS_BAR", "CancelCrawl", [""]);
     }
 
 

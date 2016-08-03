@@ -41,26 +41,29 @@ namespace DocSearch.Controllers
             _crawlProgress.MessageNoProgressRate = MESSAGE_CRAWLING;
             _crawlProgress.MessageFinished = MESSAGE_CRAWL_FINISHED;
 
-            ProgressHub.CatchBrowserMessage -= ProgressHub_CatchBrowserMessage;
-            ProgressHub.CatchBrowserMessage += ProgressHub_CatchBrowserMessage;
+            ComHub.CatchBrowserMessage -= ProgressHub_CatchBrowserMessage;
+            ComHub.CatchBrowserMessage += ProgressHub_CatchBrowserMessage;
         }
         
         /// <summary>
         /// ブラウザからのメッセージ受信
         /// </summary>
+        /// <param name="type"></param>
         /// <param name="msg"></param>
-        /// <param name="arg2"></param>
-        /// <param name="arg1"></param>
-        private void ProgressHub_CatchBrowserMessage(string msg, string arg1, string arg2)
+        /// <param name="args"></param>
+        private void ProgressHub_CatchBrowserMessage(string type, string msg, string[] args)
         {
-            switch (msg)
+            if (type == SendProgressRate.TYPE)
             {
-                case "CancelCrawl":
-                    CrawlerManager.GetInstance().Stop();
-                    break;
-                case "StartCrawl":
-                    StartCrawl(arg1, arg2);
-                    break;
+                switch (msg)
+                {
+                    case "CancelCrawl":
+                        CrawlerManager.GetInstance().Stop();
+                        break;
+                    case "StartCrawl":
+                        StartCrawl(args[0], args[1]);
+                        break;
+                }
             }
         }
 

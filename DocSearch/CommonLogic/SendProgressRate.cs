@@ -13,6 +13,11 @@ namespace DocSearch.CommonLogic
     public class SendProgressRate
     {
         /// <summary>
+        /// タイプ
+        /// </summary>
+        public const string TYPE = "PROGRESS_BAR";
+
+        /// <summary>
         /// 進捗率取得のインターバル時間（ms）
         /// </summary>
         private const int PROGRESS_INTERVAL = 500;
@@ -98,7 +103,9 @@ namespace DocSearch.CommonLogic
         /// <param name="message">ブラウザ側に送るメッセージ</param>
         public void ProcessFinished(string message)
         {
-            ProgressHub.SendMessage(message, 100, ProgressBarID);
+            string[] args = { "100", ProgressBarID };
+
+            ComHub.SendMessage(TYPE, message, args);
         }
 
         /// <summary>
@@ -124,8 +131,10 @@ namespace DocSearch.CommonLogic
                 mes = MessageFinished;
             }
 
+            string[] args = { rate.ToString(), ProgressBarID };
+
             // ブラウザ側に進捗率を通知する
-            ProgressHub.SendMessage(mes, rate, ProgressBarID);
+            ComHub.SendMessage(TYPE, mes, args);
         }
     }
 }

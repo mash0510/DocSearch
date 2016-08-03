@@ -7,9 +7,9 @@ using Microsoft.AspNet.SignalR.Hubs;
 
 namespace DocSearch.hubs
 {
-    public class ProgressHub : Hub
+    public class ComHub : Hub
     {
-        public delegate void BrowserMessage(string msg, string arg1, string arg2);
+        public delegate void BrowserMessage(string type, string mes, string[] args);
         public static event BrowserMessage CatchBrowserMessage;
 
         /// <summary>
@@ -18,10 +18,10 @@ namespace DocSearch.hubs
         /// <param name="msg"></param>
         /// <param name="count"></param>
         /// <param name="arg1"></param>
-        public static void SendMessage(string msg, int count, string arg1)
+        public static void SendMessage(string type, string msg, string[] args)
         {
-            var hubContext = GlobalHost.ConnectionManager.GetHubContext<ProgressHub>();
-            hubContext.Clients.All.sendMessage(string.Format(msg), count, arg1);
+            var hubContext = GlobalHost.ConnectionManager.GetHubContext<ComHub>();
+            hubContext.Clients.All.sendMessage(string.Format(type), string.Format(msg), args);
         }
 
         /// <summary>
@@ -30,9 +30,9 @@ namespace DocSearch.hubs
         /// <param name="msg"></param>
         /// <param name="arg1"></param>
         /// <param name="arg2"></param>
-        public void GetMessage(string msg, string arg1, string arg2)
+        public void GetMessage(string type, string msg, string[] args)
         {
-            CatchBrowserMessage?.Invoke(msg, arg1, arg2);
+            CatchBrowserMessage?.Invoke(type, msg, args);
         }
     }
 }

@@ -121,8 +121,12 @@
 
     // プログレスバーの更新
     function UpdateProgress(message, count, id) {
-        if (count == -1 || count == 100) {
-            $(id).find(".progress-bar").css({ 'width': 100 + '%' });
+        if (count < 0 || count >= 100) {
+            var dispRate = 100;
+            if (count == -2) {
+                dispRate = 0;
+            }
+            $(id).find(".progress-bar").css({ 'width': dispRate + '%' });
             $(id).find(".progress-rate").html(message);
 
             // 処理が完了したら、プログレスバーの表示をアニメーション → 固定表示に切り替える

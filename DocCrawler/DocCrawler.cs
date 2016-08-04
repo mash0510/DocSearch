@@ -25,28 +25,37 @@ namespace FolderCrawler
         public List<string> TargetFileExt { get; set; }
 
         /// <summary>
+        /// 処理中かどうかの取得
+        /// </summary>
+        public bool IsProcessing { get; private set; }
+
+        /// <summary>
         /// クロールした文書ファイルの数
         /// </summary>
         private decimal _crawledDocCount = 0;
 
         /// <summary>
-        /// クロール処理の途中停止
+        /// クロールの停止フラグ
         /// </summary>
-        public bool Stop
-        {
-            set;
-            get;
-        }
+        private bool _stop = false;
 
         /// <summary>
-        /// クロールが完了したかどうか
+        /// クロール停止
         /// </summary>
-        public bool IsFinished
+        private bool StopProcessing
         {
-            get; set;
+            set
+            {
+                IsProcessing = !value;
+                _stop = value;
+            }
+            get
+            {
+                return _stop;
+            }
         }
 
-        public delegate void CrawlFinishedDelegate(object sender, decimal crawledFileCount, string crawlRootFolder);
+        public delegate void CrawlFinishedDelegate(object sender, decimal crawledFileCount, string crawlRootFolder, bool isCanceled);
         /// <summary>
         /// クロールの完了を通知するイベント
         /// </summary>
@@ -63,6 +72,7 @@ namespace FolderCrawler
         /// </summary>
         public DocCrawler()
         {
+            IsProcessing = false;
             SetDefaultFileExt();
         }
 
@@ -130,19 +140,27 @@ namespace FolderCrawler
         }
 
         /// <summary>
+        /// クロール処理の強制停止
+        /// </summary>
+        public void Stop()
+        {
+            StopProcessing = true;
+        }
+
+        /// <summary>
         /// クロール実行
         /// </summary>
         public void Crawl()
         {
-            IsFinished = false;
+            StopProcessing = false;
             _crawledDocCount = 0;
 
             DirectoryInfo di = new DirectoryInfo(this.CrawlRoot);
             CrawlRecursive(di);
 
-            IsFinished = true;
+            StopProcessing = true;
 
-            CrawlFinished?.Invoke(this, _crawledDocCount, this.CrawlRoot);
+            CrawlFinished?.Invoke(this, _crawledDocCount, this.CrawlRoot, StopProcessing);
         }
 
         /// <summary>
@@ -167,14 +185,14 @@ namespace FolderCrawler
                     }
                 }
 
-                if (Stop)
+                if (StopProcessing)
                 {
                     return;
                 }
 
                 foreach (FileInfo fi in di.GetFiles())
                 {
-                    if (Stop)
+                    if (StopProcessing)
                     {
                         return;
                     }

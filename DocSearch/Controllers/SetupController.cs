@@ -31,16 +31,23 @@ namespace DocSearch.Controllers
         /// クロール完了時のメッセージ
         /// </summary>
         private string MESSAGE_CRAWL_FINISHED = "クロールが完了しました。";
+        /// <summary>
+        /// クロール処理キャンセル時のメッセージ
+        /// </summary>
+        private string MESSAGE_CRAWL_CANCELED = "クロール処理がキャンセルされました。";
 
         /// <summary>
         /// 機械学習実行中のメッセージ
         /// </summary>
         private string MESSAGE_LEARNING = "機械学習実行中です...";
-
         /// <summary>
         /// 機械学習完了時のメッセージ
         /// </summary>
         private string MESSAGE_LEARNING_FINISHED = "機械学習が完了しました。";
+        /// <summary>
+        /// 機械学習処理キャンセル時のメッセージ
+        /// </summary>
+        private string MESSAGE_LEARNING_CANCELED = "機械学習処理がキャンセルされました。";
 
         /// <summary>
         /// コンストラクタ
@@ -82,6 +89,7 @@ namespace DocSearch.Controllers
                         StartMachineLearning(args[0]);
                         break;
                     case "CancelMachineLearning":
+                        TrainingDataManager.GetInstance().KillMachineLearningProcess();
                         break;
                 }
             }
@@ -130,19 +138,6 @@ namespace DocSearch.Controllers
         }
         #endregion
 
-        /// <summary>
-        /// 非同期処理完了メソッドに渡すパラメータを追加する
-        /// </summary>
-        /// <param name="keyName"></param>
-        /// <param name="value"></param>
-        private void AddValue(string keyName, SetupModel value)
-        {
-            if (AsyncManager.Parameters.ContainsKey(keyName))
-                AsyncManager.Parameters[keyName] = value;
-            else
-                AsyncManager.Parameters.Add(keyName, value);
-        }
-
         #region クロール処理実行
         /// <summary>
         /// クロール開始
@@ -151,12 +146,23 @@ namespace DocSearch.Controllers
         /// <param name="progressBarID"></param>
         private void StartCrawl(string execMachineLearning, string progressBarID)
         {
-            EventHandler handler = (sender, e) =>
+            if (!CrawlerManager.GetInstance().IsAllCrawlFinished || TrainingDataManager.GetInstance().IsProcessingTrainingDataGeneration)
+                return;
+
+            TrainingDataManager.TrainingDataGenerateFinishedDelegate handler = (isCanceled) =>
             {
                 if (execMachineLearning == EXEC_MACHINE_LEARNING)
                     TrainingDataManager.GetInstance().StartTraining();
 
-                _crawlProgress.ProcessFinished(MESSAGE_CRAWL_FINISHED);
+                int rate = SendProgressRate.PROGRESS_COMPLETED;
+                string message = MESSAGE_CRAWL_FINISHED;
+                if (isCanceled)
+                {
+                    rate = SendProgressRate.PROGRESS_RATE_CANCELED;
+                    message = MESSAGE_CRAWL_CANCELED;
+                }
+
+                _crawlProgress.ProcessFinished(message, rate);
             };
 
             TrainingDataManager.GetInstance().TrainingDataGenerateFinished -= handler;
@@ -177,9 +183,21 @@ namespace DocSearch.Controllers
         /// <param name="progressBarID"></param>
         private void StartMachineLearning(string progressBarID)
         {
-            EventHandler handler = (sender, e) =>
+            if (TrainingDataManager.GetInstance().IsProcessingMachineLearning)
+                return;
+
+            TrainingDataManager.MachineLearningFinishedDelegate handler = (isCanceled) =>
             {
-                _machineLearningProgress.ProcessFinished(MESSAGE_LEARNING_FINISHED);
+                int rate = SendProgressRate.PROGRESS_COMPLETED;
+                string message = MESSAGE_LEARNING_FINISHED;
+
+                if (isCanceled)
+                {
+                    rate = SendProgressRate.PROGRESS_RATE_CANCELED;
+                    message = MESSAGE_LEARNING_CANCELED;
+                }
+
+                _machineLearningProgress.ProcessFinished(message, rate);
             };
 
             TrainingDataManager.GetInstance().MachineLearningFinished -= handler;
@@ -189,38 +207,6 @@ namespace DocSearch.Controllers
             _machineLearningProgress.Start();
 
             TrainingDataManager.GetInstance().StartTraining();
-        }
-
-        /// <summary>
-        /// 機械学習の実行開始
-        /// </summary>
-        /// <param name="setupModel"></param>
-        [HttpPost]
-        [AsyncTimeout(21600000)]
-        public void StartMachineLearningAsync(SetupModel setupModel)
-        {
-            AsyncManager.OutstandingOperations.Increment();
-
-            Task.Run(() =>
-            {
-                TrainingDataManager.GetInstance().StartTraining();
-
-                AddValue("result", setupModel);  // ① keyを"result"にすると... → ②へ
-
-                AsyncManager.OutstandingOperations.Decrement();
-            });
-        }
-
-        /// <summary>
-        /// 機械学習の完了
-        /// </summary>
-        /// <param name="result"></param>
-        /// <returns></returns>
-        public ActionResult StartMachineLearningCompleted(SetupModel result) // ② AsyncManager.Parameters.Add()で指定したkeyの名称を引数名に指定すると、値を受け取れる。
-        {
-            result.Message = "関連語学習が完了しました。";
-
-            return RedirectToAction("Setup", "Setup", result);
         }
         #endregion
     }

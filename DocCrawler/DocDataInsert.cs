@@ -23,12 +23,28 @@ namespace FolderCrawler
         private IGenerateID _idObj;
 
         /// <summary>
-        /// 検索エンジンへのデータ投入をストップ
+        /// 処理の停止
         /// </summary>
-        public bool Stop
+        private bool _stop = false;
+        /// <summary>
+        /// ユーザーによるキャンセル操作が実行されたかどうか
+        /// </summary>
+        private bool _cancel = false;
+
+        /// <summary>
+        /// 処理の停止
+        /// </summary>
+        private bool StopProcessing
         {
-            set;
-            get;
+            set
+            {
+                IsProcessing = !value;
+                _stop = value;
+            }
+            get
+            {
+                return _stop;
+            }
         }
 
         /// <summary>
@@ -45,21 +61,33 @@ namespace FolderCrawler
             private set;
         }
 
+        /// <summary>
+        /// 処理中かどうかの取得
+        /// </summary>
+        public bool IsProcessing
+        {
+            get;
+            private set;
+        }
+
         public delegate void DocInsertedDelegate(object sender, decimal docCount);
         /// <summary>
         /// クロール処理実行中にElasticSearchに1ファイルIndexingされると発生するイベント
         /// </summary>
         public event DocInsertedDelegate SingleDocInserted;
+
+        public delegate void DocInsertedFinishedDelegate(object sender, decimal docCount, bool isCanceled);
         /// <summary>
         /// ElasticSearchへのIndexing完了時のイベント
         /// </summary>
-        public event DocInsertedDelegate DocInsertFinished;
+        public event DocInsertedFinishedDelegate DocInsertFinished;
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         public DocDataInsert()
         {
+            IsProcessing = false;
             SearchEngineConnection.InitConnectClient();
             _timeElapse.Elapsed += _timeElapse_Elapsed;
         }
@@ -113,13 +141,24 @@ namespace FolderCrawler
         }
 
         /// <summary>
+        /// データ挿入処理の強制停止
+        /// </summary>
+        public void Stop()
+        {
+            StopProcessing = true;
+            _cancel = true;
+
+            _timeElapse.TimerStop();
+        }
+
+        /// <summary>
         /// ワーカースレッドの未処理時間経過後、ワーカースレッドを止める
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void _timeElapse_Elapsed(object sender, EventArgs e)
         {
-            Stop = true;
+            StopProcessing = true;
             _timeElapse.TimerStop();
         }
 
@@ -128,7 +167,9 @@ namespace FolderCrawler
         /// </summary>
         public void DocDataInsertProc()
         {
-            Stop = false;
+            StopProcessing = false;
+            _cancel = false;
+
             bool first = true;
             CumurativeInsertedDocuments = 0;
 
@@ -139,7 +180,7 @@ namespace FolderCrawler
                     if (!_timeElapse.IsTimerStarted)
                         _timeElapse.TimerStart(CommonParameters.WorkerThreadStopDuration);
 
-                    if (Stop)
+                    if (StopProcessing)
                         break;
                     else
                         continue;
@@ -147,7 +188,7 @@ namespace FolderCrawler
 
                 _timeElapse.TimerStop();
 
-                if (Stop)
+                if (StopProcessing)
                 {
                     // ユーザーがキャンセル操作を実行したら、ループを停止する。
                     break;
@@ -196,7 +237,7 @@ namespace FolderCrawler
                 QueueManager.GetInstance().DocInfoQueue.Enqueue(docInfo);
             }
 
-            DocInsertFinished?.Invoke(this, CumurativeInsertedDocuments);
+            DocInsertFinished?.Invoke(this, CumurativeInsertedDocuments, _cancel);
         }
     }
 }

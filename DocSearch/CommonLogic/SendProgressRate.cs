@@ -28,6 +28,12 @@ namespace DocSearch.CommonLogic
         public const int PROGRESS_COMPLETED = 100;
 
         /// <summary>
+        /// キャンセル時に表示する進捗率。わざと-2にしている。
+        /// -2という値をブラウザに送り込むことで、プロブレスバーの表示を0%、進捗率表示部分に、任意のメッセージを表示することができるようにJavaScriptを書いている。
+        /// </summary>
+        public const int PROGRESS_RATE_CANCELED = -2;
+
+        /// <summary>
         /// 進捗率取得タイマー
         /// </summary>
         TimeElapse _progressRateTimer = new TimeElapse();
@@ -101,9 +107,10 @@ namespace DocSearch.CommonLogic
         /// 処理完了時に、ブラウザ側に進捗率100%の数字を送る
         /// </summary>
         /// <param name="message">ブラウザ側に送るメッセージ</param>
-        public void ProcessFinished(string message)
+        /// <param name="rate">進捗率表示</param>
+        public void ProcessFinished(string message, int rate)
         {
-            string[] args = { "100", ProgressBarID };
+            string[] args = { rate.ToString(), ProgressBarID };
 
             ComHub.SendMessage(TYPE, message, args);
         }

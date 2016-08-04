@@ -24,13 +24,41 @@ namespace FolderCrawler
         /// </summary>
         private const int BUFFER = 1024;
 
+        private bool _stopGenerateData = false;
+        private bool _cancelGenerateData = false;
+
         /// <summary>
-        /// 訓練データ作成スレッドの停止
+        /// 訓練データ生成処理実行中かどうか
         /// </summary>
-        public bool Stop
+        public bool IsProcessingTrainingDataGeneration
         {
-            set;
             get;
+            private set;
+        }
+
+        /// <summary>
+        /// 訓練データ生成処理の停止
+        /// </summary>
+        private bool StopGenerateData
+        {
+            set
+            {
+                IsProcessingTrainingDataGeneration = !value;
+                _stopGenerateData = value;
+            }
+            get
+            {
+                return _stopGenerateData;
+            }
+        }
+
+        /// <summary>
+        /// 機械学習処理を実行中かどうか
+        /// </summary>
+        public bool IsProcessingMachineLearning
+        {
+            get;
+            private set;
         }
 
         /// <summary>
@@ -79,17 +107,29 @@ namespace FolderCrawler
         }
 
         /// <summary>
+        /// 機械学習データ作成の
+        /// </summary>
+        public void Stop()
+        {
+            StopGenerateData = true;
+            _cancelGenerateData = true;
+
+            _timeElapse.TimerStop();
+        }
+
+        /// <summary>
         /// ワーカースレッドの未処理時間経過後、ワーカースレッドを止める
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void _timeElapse_Elapsed(object sender, EventArgs e)
         {
-            Stop = true;
+            StopGenerateData = true;
             _timeElapse.TimerStop();
         }
 
-        public event EventHandler TrainingDataGenerateFinished;
+        public delegate void TrainingDataGenerateFinishedDelegate(bool isCanceled);
+        public event TrainingDataGenerateFinishedDelegate TrainingDataGenerateFinished;
 
         /// <summary>
         /// 訓練データ生成処理
@@ -99,7 +139,8 @@ namespace FolderCrawler
             // 既存の訓練データの削除
             DeleteTrainingDataFile();
 
-            Stop = false;
+            StopGenerateData = false;
+            _cancelGenerateData = false;
 
             while (true)
             {
@@ -108,7 +149,7 @@ namespace FolderCrawler
                     if (!_timeElapse.IsTimerStarted)
                         _timeElapse.TimerStart(CommonParameters.WorkerThreadStopDuration);
 
-                    if (Stop)
+                    if (StopGenerateData)
                         break;
                     else
                         continue;
@@ -116,7 +157,7 @@ namespace FolderCrawler
 
                 _timeElapse.TimerStop();
 
-                if (Stop)
+                if (StopGenerateData)
                 {
                     // ユーザーがキャンセル操作を実行したら、ループを停止する。
                     break;
@@ -132,7 +173,7 @@ namespace FolderCrawler
             // 一時退避用に保持していたバックアップファイルを削除
             File.Delete(CommonParameters.TrainingDataFileBackupFullPath);
 
-            TrainingDataGenerateFinished?.Invoke(this, new EventArgs());
+            TrainingDataGenerateFinished?.Invoke(_cancelGenerateData);
         }
 
         /// <summary>
@@ -171,6 +212,9 @@ namespace FolderCrawler
         /// <param name="backupFile"></param>
         private void FileBackup(string sourceFile, string backupFile)
         {
+            if (!File.Exists(sourceFile))
+                return;
+
             // 既に取られたバックアップファイルがある場合は削除。
             if (File.Exists(backupFile))
             {
@@ -189,10 +233,7 @@ namespace FolderCrawler
             string outputFile = CommonParameters.TrainingDataFileFullPath;
             string backupFile = CommonParameters.TrainingDataFileBackupFullPath;
 
-            if (File.Exists(outputFile))
-            {
-                FileBackup(outputFile, backupFile);
-            }
+            FileBackup(outputFile, backupFile);
         }
 
         /// <summary>
@@ -203,29 +244,37 @@ namespace FolderCrawler
             string outputFile = CommonParameters.VectorFileNameFullPath;
             string newFileName = CommonParameters.VectorFileNameInUseFullPath;
 
-            if (File.Exists(newFileName))
-            {
-                FileBackup(outputFile, newFileName);
-            }
+            FileBackup(outputFile, newFileName);
         }
 
+        public delegate void MachineLearningFinishedDelegate(bool isCanceled);
         /// <summary>
         /// 機械学習終了時のイベント
         /// </summary>
-        public event EventHandler MachineLearningFinished;
+        public event MachineLearningFinishedDelegate MachineLearningFinished;
+        /// <summary>
+        /// 機械学習処理を途中でキャンセルしたかどうか
+        /// </summary>
+        private bool _cancelMachineLearning = false;
+
+        private Process mecabProgram = null;
+        private Process word2vecProc = null;
 
         /// <summary>
         /// 訓練スタート
         /// </summary>
         public void StartTraining()
         {
+            IsProcessingMachineLearning = true;
+
             if (File.Exists(CommonParameters.VectorFileNameFullPath))
                 File.Delete(CommonParameters.VectorFileNameFullPath);
 
-            Process mecabProgram = new Process();
-            Process word2vecProc = new Process();
-
             bool result = true;
+            _cancelMachineLearning = false;
+
+            mecabProgram = new Process();
+            word2vecProc = new Process();
 
             // 分かち書き
             mecabProgram.StartInfo.FileName = CommonParameters.MecabProgram;
@@ -237,27 +286,32 @@ namespace FolderCrawler
             mecabProgram.Close();
             mecabProgram.Dispose();
 
+            Task.Run(() =>
+            {
+                // 機械学習
+                word2vecProc.StartInfo.FileName = CommonParameters.Word2VecProgram;
+                word2vecProc.StartInfo.Arguments = "-train " + CommonParameters.MeCabOutputFileName + " -output " + CommonParameters.VectorFileNameFullPath + " -cbow 0 -size 200 -window 10 -negative 0 -hs 1 -sample 1e-3 -threads 12 -binary 1";
+                word2vecProc.StartInfo.UseShellExecute = false;
+                word2vecProc.StartInfo.RedirectStandardOutput = true;
+                word2vecProc.OutputDataReceived += Word2vecProc_OutputDataReceived;
+                word2vecProc.StartInfo.RedirectStandardInput = false;
+                word2vecProc.StartInfo.CreateNoWindow = true;
 
-            // 機械学習
-            word2vecProc.StartInfo.FileName = CommonParameters.Word2VecProgram;
-            word2vecProc.StartInfo.Arguments = "-train " + CommonParameters.MeCabOutputFileName + " -output " + CommonParameters.VectorFileNameFullPath + " -cbow 0 -size 200 -window 10 -negative 0 -hs 1 -sample 1e-3 -threads 12 -binary 1";
-            word2vecProc.StartInfo.UseShellExecute = false;
-            word2vecProc.StartInfo.RedirectStandardOutput = true;
-            word2vecProc.OutputDataReceived += Word2vecProc_OutputDataReceived;
-            word2vecProc.StartInfo.RedirectStandardInput = false;
-            word2vecProc.StartInfo.CreateNoWindow = true;
+                result = word2vecProc.Start();
+                word2vecProc.BeginOutputReadLine();
 
-            word2vecProc.Start();
-            word2vecProc.BeginOutputReadLine();
+                word2vecProc.WaitForExit();
 
-            word2vecProc.WaitForExit();
+                MachineLearningFinished?.Invoke(_cancelMachineLearning);
 
-            MachineLearningFinished?.Invoke(this, new EventArgs());
+                word2vecProc.Close();
+                word2vecProc.Dispose();
 
-            word2vecProc.Close();
-            word2vecProc.Dispose();
+                IsProcessingMachineLearning = false;
 
-            ChangeVectorFileNameInUse();
+                MachineLearningFinished?.Invoke(_cancelMachineLearning);
+                ChangeVectorFileNameInUse();
+            });
         }
 
         /// <summary>
@@ -307,6 +361,23 @@ namespace FolderCrawler
             int retval = Convert.ToInt32(Math.Ceiling(rate));
 
             return retval;
+        }
+
+        /// <summary>
+        /// 機械学習プロセスを途中で強制終了する。
+        /// </summary>
+        public void KillMachineLearningProcess()
+        {
+            IsProcessingMachineLearning = false;
+
+            if (word2vecProc == null)
+                return;
+
+            word2vecProc.Kill();
+
+            _cancelMachineLearning = true;
+
+            MachineLearningFinished?.Invoke(_cancelMachineLearning);
         }
 
         /// <summary>

@@ -19,13 +19,13 @@ namespace FolderCrawler
         /// </summary>
         private static List<DocCrawler> _crawlList = new List<DocCrawler>();
 
-        private bool _isAllCrawlFinished = true;
         /// <summary>
         /// 全てのクロールインスタンスのクロールが終わったかどうかの取得
         /// </summary>
         public bool IsAllCrawlFinished
         {
-            get { return this._isAllCrawlFinished; }
+            get;
+            private set;
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace FolderCrawler
             }
         }
 
-        public delegate void DocCrawlDelegate(object sender, decimal totalFiles);
+        public delegate void DocCrawlDelegate(object sender, decimal totalFiles, bool isCanceled);
         /// <summary>
         /// 全てのクロールが完了したときに発生するイベント
         /// </summary>
@@ -144,6 +144,7 @@ namespace FolderCrawler
         /// </summary>
         private CrawlerManager()
         {
+            IsAllCrawlFinished = true;
             LoadTotalDocuments();
         }
 
@@ -199,7 +200,7 @@ namespace FolderCrawler
         /// </summary>
         /// <param name="crawledFileCount"></param>
         /// <param name="crawlRootFolder"></param>
-        private void CrawlInstance_CrawlFinished(object sender, decimal crawledFileCount, string crawlRootFolder)
+        private void CrawlInstance_CrawlFinished(object sender, decimal crawledFileCount, string crawlRootFolder, bool isCanceled)
         {
             // 全クロールインスタンスのクロール処理が終わったかどうかを検出する。
 
@@ -209,20 +210,20 @@ namespace FolderCrawler
 
             foreach (DocCrawler crawlInstance in _crawlList)
             {
-                if (!crawlInstance.IsFinished)
+                if (crawlInstance.IsProcessing)
                 {
                     allFinished = false;
                     break;
                 }
             }
 
-            this._isAllCrawlFinished = allFinished;
+            IsAllCrawlFinished = allFinished;
 
             if (allFinished)
             {
                 PrevTotalDocuments = TotalDocuments;
                 SaveTotalDocuments();
-                AllCrawlFinished?.Invoke(this, TotalDocuments);
+                AllCrawlFinished?.Invoke(this, TotalDocuments, isCanceled);
             }
         }
 
@@ -231,9 +232,9 @@ namespace FolderCrawler
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="totalDocCount"></param>
-        private void _indexing_DocInsertFinished(object sender, decimal totalDocCount)
+        private void _indexing_DocInsertFinished(object sender, decimal totalDocCount, bool isCanceled)
         {
-            AllDocInsertFinished?.Invoke(this, totalDocCount);
+            AllDocInsertFinished?.Invoke(this, totalDocCount, isCanceled);
         }
 
         /// <summary>
@@ -296,6 +297,8 @@ namespace FolderCrawler
         /// </summary>
         public void Start()
         {
+            IsAllCrawlFinished = false;
+
             InitCrawlInstances();
 
             Task.Run(() => {
@@ -305,8 +308,6 @@ namespace FolderCrawler
             Task.Run(() => {
                 TrainingDataManager.GetInstance().StartTrainingDataGenerate();
             });
-
-            this._isAllCrawlFinished = false;
 
             foreach (DocCrawler crwl in _crawlList)
             {
@@ -322,13 +323,13 @@ namespace FolderCrawler
         /// </summary>
         public void Stop()
         {
-            _indexing.Stop = true;
+            _indexing.Stop();
 
-            TrainingDataManager.GetInstance().Stop = true;
+            TrainingDataManager.GetInstance().Stop();
 
             foreach (DocCrawler crwl in _crawlList)
             {
-                crwl.Stop = true;
+                crwl.Stop();
             }
         }
     }

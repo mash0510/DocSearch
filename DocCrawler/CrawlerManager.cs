@@ -87,6 +87,8 @@ namespace FolderCrawler
                 double totalNum = (double)PrevTotalDocuments;
                 int retval = (int)Math.Ceiling((docNum / totalNum) * 100);
 
+                if (retval > 100) retval = 100;
+
                 return retval;
             }
         }
@@ -109,10 +111,12 @@ namespace FolderCrawler
             {
                 if (PrevTotalDocuments == CommonParameters.NO_TOTAL_DOCUMENTS)
                     return (int)CommonParameters.NO_TOTAL_DOCUMENTS;
-
+           
                 double docNum = (double)CumulativeInsertedDocuments;
                 double totalNum = (double)PrevTotalDocuments;
                 int retval = (int)Math.Ceiling((docNum / totalNum) * 100);
+
+                if (retval > 100) retval = 100;
 
                 return retval;
             }
@@ -192,7 +196,7 @@ namespace FolderCrawler
         /// <param name="cumulativeDocCount"></param>
         private void _indexing_SingleDocInserted(object sender, decimal cumulativeDocCount)
         {
-            CumulativeInsertedDocuments++;
+            CumulativeInsertedDocuments = cumulativeDocCount;
         }
 
         /// <summary>

@@ -64,7 +64,7 @@ namespace FolderCrawler
         /// <summary>
         /// 機械学習用データの最大サイズの設定と取得
         /// </summary>
-        public long MaxTrainingFileSiz
+        public long MaxTrainingFileSize
         {
             get { return this._maxFileSize; }
             set { this._maxFileSize = value; }

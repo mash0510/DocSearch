@@ -221,6 +221,7 @@
     <Compile Include="CommonLogic\Pagination.cs" />
     <Compile Include="CommonLogic\ProgressRateCrawl.cs" />
     <Compile Include="CommonLogic\ProgressRateMachineLearning.cs" />
+    <Compile Include="CommonLogic\ReadSettings.cs" />
     <Compile Include="CommonLogic\SendProgressRate.cs" />
     <Compile Include="Controllers\DocSearchController.cs" />
     <Compile Include="Controllers\SetupController.cs" />

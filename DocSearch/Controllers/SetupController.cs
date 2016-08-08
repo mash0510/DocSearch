@@ -155,8 +155,6 @@ namespace DocSearch.Controllers
             if (!CrawlerManager.GetInstance().IsAllCrawlFinished || TrainingDataManager.GetInstance().IsProcessingTrainingDataGeneration)
                 return;
 
-            _crawlProgress.ProcessStarting(MESSAGE_PREPAREING);
-
             TrainingDataManager.TrainingDataGenerateFinishedDelegate handler = (isCanceled) =>
             {
                 int rate = SendProgressRate.PROGRESS_COMPLETED;
@@ -167,7 +165,7 @@ namespace DocSearch.Controllers
                     message = MESSAGE_CRAWL_CANCELED;
                 }
 
-                _crawlProgress.ProcessFinished(message, rate);
+                _crawlProgress.SendRate(message, rate);
 
                 if (!isCanceled && execMachineLearning == EXEC_MACHINE_LEARNING)
                 {
@@ -196,7 +194,7 @@ namespace DocSearch.Controllers
             if (TrainingDataManager.GetInstance().IsProcessingMachineLearning)
                 return;
 
-            _machineLearningProgress.ProcessStarting(MESSAGE_PREPAREING);
+            _crawlProgress.SendRate(MESSAGE_PREPAREING, SendProgressRate.PROGRESS_RATE_STARTING);
 
             TrainingDataManager.MachineLearningFinishedDelegate handler = (isCanceled) =>
             {
@@ -209,7 +207,7 @@ namespace DocSearch.Controllers
                     message = MESSAGE_LEARNING_CANCELED;
                 }
 
-                _machineLearningProgress.ProcessFinished(message, rate);
+                _machineLearningProgress.SendRate(message, rate);
             };
 
             TrainingDataManager.GetInstance().MachineLearningFinished -= handler;

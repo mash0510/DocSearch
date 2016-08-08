@@ -137,6 +137,10 @@
             return;
         }
 
+        if (!$(id).find("#progressType").hasClass("progress-striped active")) {
+            $(id).find("#progressType").addClass("progress-striped active");
+        }
+
         $(id).find(".progress-bar").css({ 'width': count + '%' });
         $(id).find(".progress-rate").html(count + '%');
     }
@@ -149,6 +153,8 @@
     // クロール開始
     function StartCrawl()
     {
+        UpdateProgress("処理開始の準備中です。", -3, "#crawlProgressBar")
+
         var machineLearning = $("#execMachineLearningOption").val();
         var args = [machineLearning, "#crawlProgressBar", "#machineLearningProgressBar"];
 
@@ -164,6 +170,8 @@
     // 機械学習開始
     function StartMachineLearning()
     {
+        UpdateProgress("処理開始の準備中です。", -3, "#machineLearningProgressBar")
+
         var args = ["#machineLearningProgressBar"];
 
         SendMessageToServer("PROGRESS_BAR", "StartMachineLearning", args);

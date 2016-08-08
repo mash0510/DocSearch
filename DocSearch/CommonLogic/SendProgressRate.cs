@@ -109,23 +109,11 @@ namespace DocSearch.CommonLogic
         }
 
         /// <summary>
-        /// 処理開始ボタン押下～実際の処理が開始されるまでの間、ブラウザに表示するメッセージを送りこむ。
-        /// </summary>
-        /// <param name="message"></param>
-        public void ProcessStarting(string message)
-        {
-            string[] args = { PROGRESS_RATE_STARTING.ToString(), ProgressBarID };
-
-            ComHub.SendMessage(TYPE, message, args);
-        }
-
-        /// <summary>
-        /// 処理完了時に、ブラウザ側に進捗率とメッセージを送る。
-        /// 主にキャンセル時を想定したメソッド。キャンセル時に表示したい進捗率やメッセージのブラウザへの表示を、このメソッドを使って実行する。
+        /// ブラウザ側に任意の進捗率とメッセージを送る
         /// </summary>
         /// <param name="message">ブラウザ側に送るメッセージ</param>
         /// <param name="rate">進捗率表示</param>
-        public void ProcessFinished(string message, int rate)
+        public void SendRate(string message, int rate)
         {
             string[] args = { rate.ToString(), ProgressBarID };
 

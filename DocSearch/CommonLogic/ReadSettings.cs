@@ -52,7 +52,7 @@ namespace DocSearch.CommonLogic
             get
             {
                 string val = ConfigurationManager.AppSettings["ThreadTimeout"];
-                int durationTime;
+                int durationTime = 0;
 
                 int.TryParse(val, out durationTime);
 
@@ -68,7 +68,7 @@ namespace DocSearch.CommonLogic
             get
             {
                 string val = ConfigurationManager.AppSettings["MaxTrainingFileSize"];
-                long sizeGB= (long)0;
+                long sizeGB= 0;
 
                 long.TryParse(val, out sizeGB);
 

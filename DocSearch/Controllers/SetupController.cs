@@ -88,7 +88,7 @@ namespace DocSearch.Controllers
                         CrawlerManager.GetInstance().Stop();
                         break;
                     case "StartCrawl":
-                        StartCrawl(args[0], args[1], args[2]);
+                        StartCrawl(args[0], args[1]);
                         break;
                     case "StartMachineLearning":
                         StartMachineLearning(args[0]);
@@ -150,7 +150,7 @@ namespace DocSearch.Controllers
         /// <param name="execMachineLearning"></param>
         /// <param name="progressBarID"></param>
         /// <param name="machineLearningProgressBarID"></param>
-        private void StartCrawl(string execMachineLearning, string progressBarID, string machineLearningProgressBarID)
+        private void StartCrawl(string progressBarID, string machineLearningProgressBarID)
         {
             if (!CrawlerManager.GetInstance().IsAllCrawlFinished || TrainingDataManager.GetInstance().IsProcessingTrainingDataGeneration)
                 return;
@@ -166,11 +166,6 @@ namespace DocSearch.Controllers
                 }
 
                 _crawlProgress.SendRate(message, rate);
-
-                if (!isCanceled && execMachineLearning == EXEC_MACHINE_LEARNING)
-                {
-                    StartMachineLearning(machineLearningProgressBarID);
-                }
             };
 
             TrainingDataManager.GetInstance().TrainingDataGenerateFinished -= handler;
@@ -193,8 +188,6 @@ namespace DocSearch.Controllers
         {
             if (TrainingDataManager.GetInstance().IsProcessingMachineLearning)
                 return;
-
-            _crawlProgress.SendRate(MESSAGE_PREPAREING, SendProgressRate.PROGRESS_RATE_STARTING);
 
             TrainingDataManager.MachineLearningFinishedDelegate handler = (isCanceled) =>
             {

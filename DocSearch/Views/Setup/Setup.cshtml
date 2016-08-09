@@ -126,17 +126,21 @@
             if (count < 0) {
                 dispRate = 0;
             }
+
             $(id).find(".progress-bar").css({ 'width': dispRate + '%' });
             $(id).find(".progress-rate").html(message);
 
             // 処理が完了したら、プログレスバーの表示をアニメーション → 固定表示に切り替える
             if (count == 100) {
                 $(id).find("#progressType").removeClass("progress-striped active");
+
+                JdugeStartMachineLearning(id);
             }
 
             return;
         }
 
+        // プログレスバーの表示をストライプ＆アニメーションに変更する。
         if (!$(id).find("#progressType").hasClass("progress-striped active")) {
             $(id).find("#progressType").addClass("progress-striped active");
         }
@@ -150,26 +154,34 @@
         comNotifier.server.getMessage(type, msg, args);
     }
 
-    // クロール開始
-    function StartCrawl()
-    {
-        UpdateProgress("処理開始の準備中です。", -3, "#crawlProgressBar")
+    // 機械学習をスタートさせるかどうかの判断
+    function JdugeStartMachineLearning(id) {
+        if (id != "#crawlProgressBar")
+            return;
 
         var machineLearning = $("#execMachineLearningOption").val();
-        var args = [machineLearning, "#crawlProgressBar", "#machineLearningProgressBar"];
+
+        if (machineLearning == 1) {
+            StartMachineLearning();
+        }
+    }
+
+    // クロール開始
+    function StartCrawl() {
+        UpdateProgress("処理開始の準備中です。", -3, "#crawlProgressBar")
+
+        var args = ["#crawlProgressBar", "#machineLearningProgressBar"];
 
         SendMessageToServer("PROGRESS_BAR", "StartCrawl", args);
     }
 
     // クロールキャンセル
-    function CancelCrawl()
-    {
+    function CancelCrawl() {
         SendMessageToServer("PROGRESS_BAR", "CancelCrawl", [""]);
     }
 
     // 機械学習開始
-    function StartMachineLearning()
-    {
+    function StartMachineLearning() {
         UpdateProgress("処理開始の準備中です。", -3, "#machineLearningProgressBar")
 
         var args = ["#machineLearningProgressBar"];

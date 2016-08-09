@@ -1,4 +1,6 @@
 ﻿using FolderCrawler;
+using FolderCrawler.GenerateID;
+using FolderCrawler.TextDataExtract;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,11 +26,20 @@ namespace DocSearch.CommonLogic
             // Queueからのデータ取得が0件である状態がここで設定した時間だけ経過したら、そのスレッドを終了させる。
             CommonParameters.WorkerThreadStopDuration = ReadSettings.ThreadTimeout;
 
+            // 設定ファイルや訓練データなどのファイル読み書きバッファサイズ
+            CommonParameters.FileIOBufferSize = ReadSettings.FileIOBufferSize;
+
             // ElasticsearchのURI
             SearchEngineConnection.ElasticsearchUri = new Uri(ReadSettings.ElasticsearchURI);
 
             // 検索システムのIndex名
             SearchEngineConnection.IndexName = ReadSettings.ElasticsearchIndex;
+
+            // テキスト抽出方式
+            TextExtractFactory.TextExtractWay = ReadSettings.TextExtractWay;
+
+            // ElasticsearchのID生成方式
+            GenerateIDFactory.IDType = ReadSettings.IDType;
         }
     }
 }

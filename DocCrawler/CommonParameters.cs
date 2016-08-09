@@ -222,5 +222,15 @@ namespace FolderCrawler
             get { return _workerThreadStopDuration; }
             set { _workerThreadStopDuration = value; }
         }
+
+        private static int _fileIOBufferSize = 1024;
+        /// <summary>
+        /// 設定ファイルや訓練データなどのファイル読み書きバッファサイズ
+        /// </summary>
+        public static int FileIOBufferSize
+        {
+            get { return _fileIOBufferSize; }
+            set { _fileIOBufferSize = value; }
+        }
     }
 }

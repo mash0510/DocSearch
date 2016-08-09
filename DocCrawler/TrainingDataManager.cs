@@ -22,7 +22,7 @@ namespace FolderCrawler
         /// <summary>
         /// ファイル書き出しバッファサイズ
         /// </summary>
-        private const int BUFFER = 1024;
+        private int BUFFER = CommonParameters.FileIOBufferSize;
 
         private bool _stopGenerateData = false;
         private bool _cancelGenerateData = false;

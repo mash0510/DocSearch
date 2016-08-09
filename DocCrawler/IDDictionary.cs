@@ -30,7 +30,7 @@ namespace FolderCrawler
         /// <summary>
         /// 読み書きバッファサイズ
         /// </summary>
-        private const int BUFFER = 1024;
+        private int BUFFER = CommonParameters.FileIOBufferSize;
 
         private static IDDictionary _self = new IDDictionary();
 

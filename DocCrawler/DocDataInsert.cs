@@ -21,6 +21,10 @@ namespace FolderCrawler
         /// データへ与えるID生成オブジェクト
         /// </summary>
         private IGenerateID _idObj;
+        /// <summary>
+        /// テキスト抽出オブジェクト
+        /// </summary>
+        private ITextExtract _textExt;
 
         /// <summary>
         /// 処理の停止
@@ -103,7 +107,7 @@ namespace FolderCrawler
         {
             if (this._idObj == null)
             {
-                _idObj = new GenerateIDFactory<GetGUID>().Create();
+                _idObj = GenerateIDFactory.GeObj();
             }
 
             string retval = _idObj.GetID(null);
@@ -128,8 +132,10 @@ namespace FolderCrawler
 
             try
             {
-                ITextExtract textExt = new TextExtractFactory<ExtractWithXdoc2Txt>().Create();
-                docInfo.DocContent = textExt.Extract(fi.FullName, Encoding.Unicode);
+                if (_textExt == null)
+                    _textExt = TextExtractFactory.GeObj();
+
+                docInfo.DocContent = _textExt.Extract(fi.FullName, Encoding.Unicode);
 
                 return docInfo;
             }

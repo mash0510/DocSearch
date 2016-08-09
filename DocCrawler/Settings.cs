@@ -39,8 +39,6 @@ namespace FolderCrawler
         /// <param name="parameters"></param>
         public void RestoreSettings(Settings parameters)
         {
-            HomeDirectory = parameters.HomeDirectory;
-
             CrawlFolders.Clear();
             CrawlFolders = parameters.CrawlFolders;
         }
@@ -102,38 +100,6 @@ namespace FolderCrawler
         #endregion
 
         #region 設定パラメータ（ファイル保存されるもの）
-        /// <summary>
-        /// ホームディレクトリのデフォルト値
-        /// </summary>
-        private string _homeDirectoryDefault = @"C:\DocSearch";
-        /// <summary>
-        /// ホームディレクトリ
-        /// </summary>
-        private string _homeDirectory = string.Empty;
-
-        /// <summary>
-        /// クローラーシステムのホームディレクトリ
-        /// </summary>
-        /// <summary>
-        /// クローラープログラムのホームディレクトリ。
-        /// </summary>
-        public string HomeDirectory
-        {
-            get
-            {
-                string retval = _homeDirectory;
-
-                if (retval == null || retval == string.Empty)
-                    retval = _homeDirectoryDefault;
-
-                return retval;
-            }
-            set
-            {
-                _homeDirectory = value;
-            }
-        }
-
         /// <summary>
         /// クロール先のフォルダリスト
         /// </summary>

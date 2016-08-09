@@ -17,7 +17,7 @@ namespace FolderCrawler
         /// <summary>
         /// 機械学習用データの最大サイズ(単位：バイト)
         /// </summary>
-        private long _maxFileSize = CommonParameters.DefaultMaxTrainingFileSize;
+        private long _maxFileSize = CommonParameters.MaxTrainingFileSize;
 
         /// <summary>
         /// ファイル書き出しバッファサイズ
@@ -408,11 +408,11 @@ namespace FolderCrawler
         /// <returns></returns>
         private bool CheckMaxSize()
         {
-            long fileSize = GetTrainingDataFileSize();
-
             // 0が設定されていたら、上限なし。
-            if (fileSize == 0)
+            if (_maxFileSize == 0)
                 return false;
+
+            long fileSize = GetTrainingDataFileSize();
 
             if (fileSize > _maxFileSize)
                 return true;

@@ -47,11 +47,34 @@ namespace DocSearch.CommonLogic
         /// <summary>
         /// Elasticsearchへのデータ挿入スレッドや訓練データ生成スレッドが、Queueからのデータ受付 0件になった後に何秒後に終了するかを取得
         /// </summary>
-        public static string ThreadTimeout
+        public static int ThreadTimeout
         {
             get
             {
-                return ConfigurationManager.AppSettings["ThreadTimeout"];
+                string val = ConfigurationManager.AppSettings["ThreadTimeout"];
+                int durationTime;
+
+                int.TryParse(val, out durationTime);
+
+                return durationTime;
+            }
+        }
+
+        /// <summary>
+        /// 訓練データの最大ファイルサイズの取得
+        /// </summary>
+        public static long MaxTrainingFileSize
+        {
+            get
+            {
+                string val = ConfigurationManager.AppSettings["MaxTrainingFileSize"];
+                long sizeGB= (long)0;
+
+                long.TryParse(val, out sizeGB);
+
+                long sizeKB = sizeGB * 1024 * 1024 * 1024;
+
+                return sizeKB;
             }
         }
     }

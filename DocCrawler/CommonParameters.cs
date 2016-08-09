@@ -12,12 +12,19 @@ namespace FolderCrawler
     public static class CommonParameters
     {
         /// <summary>
+        /// ホームディレクトリ
+        /// </summary>
+        private static string _homeDirectory = @"C:\DocSearch";
+        /// <summary>
+        /// クローラーシステムのホームディレクトリ
+        /// </summary>
+        /// <summary>
         /// クローラープログラムのホームディレクトリ。
         /// </summary>
         public static string HomeDirectory
         {
-            get { return Settings.GetInstance().HomeDirectory; }
-            set {  Settings.GetInstance().HomeDirectory = value; }
+            get { return _homeDirectory; }
+            set { _homeDirectory = value; }
         }
 
         /// <summary>
@@ -195,16 +202,15 @@ namespace FolderCrawler
         /// </summary>
         public const decimal NO_TOTAL_DOCUMENTS = -1;
 
-        private static long _defaultMaxTrainingFileSize = 100L * 1024 * 1024 * 1024;
+
+        private static long _maxTrainingFileSize = 0;
         /// <summary>
         /// word2vecに機械学習させる文書データの最大サイズのデフォルト値の取得
         /// </summary>
-        public static long DefaultMaxTrainingFileSize
+        public static long MaxTrainingFileSize
         {
-            get
-            {
-                return _defaultMaxTrainingFileSize;
-            }
+            get { return _maxTrainingFileSize; }
+            set { _maxTrainingFileSize = value; }
         }
 
         private static int _workerThreadStopDuration = 5 * 1000;
@@ -214,6 +220,7 @@ namespace FolderCrawler
         public static int WorkerThreadStopDuration
         {
             get { return _workerThreadStopDuration; }
+            set { _workerThreadStopDuration = value; }
         }
     }
 }

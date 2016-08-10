@@ -178,7 +178,6 @@ namespace DocSearch.Controllers
         }
         #endregion
 
-
         #region 機械学習処理実行
         /// <summary>
         /// 機械学習の実行開始

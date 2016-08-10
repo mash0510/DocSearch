@@ -13,9 +13,9 @@
     {
         <div class="form-group">
             <label class="control-label">クロール先のフォルダを指定して下さい。改行で複数のフォルダを指定出来ます。</label>
-            @Html.TextAreaFor(m => m.CrawlFolders, new { @class = "form-control", rows = "5" })
+            @Html.TextAreaFor(m => m.CrawlFolders, new { @class = "form-control", rows = "5", id="crawlFoldersTextBox" })
         </div>
-        <button type="submit" class="btn btn-default right">適用</button>
+        <button type="submit" id="folderApplyButton" class="btn btn-default right">適用</button>
     }
 </div>
 
@@ -38,10 +38,10 @@
                      new { @class="form-control", id="execMachineLearningOption" })
                 </div>
                 <div class="col-md-1">
-                    <button type="button" class="btn btn-default" onclick="StartCrawl()">開始</button>
+                    <button type="button" id="crawlStartButton" class="btn btn-default" onclick="StartCrawl()">開始</button>
                 </div>
                 <div class="col-md-1">
-                    <button type="button" class="btn btn-default" onclick="CancelCrawl()">キャンセル</button>
+                    <button type="button" id="crawlCancelButton" class="btn btn-default" onclick="CancelCrawl()">キャンセル</button>
                 </div>
             </div>
             <br />
@@ -72,10 +72,10 @@
                     <label class="control-label">関連語を表示する人工知能の学習の実行</label>
                 </div>
                 <div class="col-md-1">
-                    <button type="button" class="btn btn-default" onclick="StartMachineLearning()">開始</button>
+                    <button type="button" id="machineLearningStartButton" class="btn btn-default" onclick="StartMachineLearning()">開始</button>
                 </div>
                 <div class="col-md-1">
-                    <button type="button" class="btn btn-default" onclick="CancelMachineLearning()">キャンセル</button>
+                    <button type="button" id="machineLearningCancelButton" class="btn btn-default" onclick="CancelMachineLearning()">キャンセル</button>
                 </div>
             </div>
             <br />
@@ -96,10 +96,22 @@
     }
 </div>
 
+<!-- 応答メッセージ -->
+@{
+    if (Model.ProcessFinished)
+    {
+        <script type="text/javascript">
+            alert('@Model.Message');
+        </script>
+    }
+}
+
 <script type="text/javascript">
     var comNotifier;
 
     window.onload = function () {
+        DisableControls(false);
+
         comNotifier = $.connection.comHub;
 
         // サーバー側からのメッセージを受信する部分
@@ -121,7 +133,7 @@
 
     // プログレスバーの更新
     function UpdateProgress(message, count, id) {
-        if (count < 0 || count >= 100) {
+        if (count < 0 || count > 100) {
             var dispRate = 100;
             if (count < 0) {
                 dispRate = 0;
@@ -131,10 +143,13 @@
             $(id).find(".progress-rate").html(message);
 
             // 処理が完了したら、プログレスバーの表示をアニメーション → 固定表示に切り替える
-            if (count == 100) {
+            // 100ではなく、101が処理終了を表すコード。
+            if (count == 101) {
                 $(id).find("#progressType").removeClass("progress-striped active");
 
-                JdugeStartMachineLearning(id);
+                var result = JdugeStartMachineLearning(id);
+                if (!result)
+                    DisableControls(false);
             }
 
             return;
@@ -157,17 +172,22 @@
     // 機械学習をスタートさせるかどうかの判断
     function JdugeStartMachineLearning(id) {
         if (id != "#crawlProgressBar")
-            return;
+            return false;
 
         var machineLearning = $("#execMachineLearningOption").val();
 
         if (machineLearning == 1) {
             StartMachineLearning();
+            return true;
         }
+
+        return false;
     }
 
     // クロール開始
     function StartCrawl() {
+        DisableControls(true, "#crawlProgressBar");
+
         UpdateProgress("処理開始の準備中です。", -3, "#crawlProgressBar")
 
         var args = ["#crawlProgressBar", "#machineLearningProgressBar"];
@@ -177,11 +197,15 @@
 
     // クロールキャンセル
     function CancelCrawl() {
+        DisableControls(false);
+
         SendMessageToServer("PROGRESS_BAR", "CancelCrawl", [""]);
     }
 
     // 機械学習開始
     function StartMachineLearning() {
+        DisableControls(true, "#machineLearningProgressBar");
+
         UpdateProgress("処理開始の準備中です。", -3, "#machineLearningProgressBar")
 
         var args = ["#machineLearningProgressBar"];
@@ -191,6 +215,32 @@
 
     // 機械学習キャンセル
     function CancelMachineLearning() {
+        DisableControls(false);
+
         SendMessageToServer("PROGRESS_BAR", "CancelMachineLearning", [""]);
+    }
+
+    // UIの活性・非活性制御
+    function DisableControls(enabled, id) {
+        // UIコントロール（キャンセルボタン以外）
+        $("#crawlFoldersTextBox").prop('disabled', enabled);
+        $("#folderApplyButton").prop('disabled', enabled);
+        $("#execMachineLearningOption").prop('disabled', enabled);
+        $("#crawlStartButton").prop('disabled', enabled);
+        $("#machineLearningStartButton").prop('disabled', enabled);
+
+        // キャンセルボタン
+        if (id == "#crawlProgressBar") {
+            $("#crawlCancelButton").prop('disabled', !enabled);
+            $("#machineLearningCancelButton").prop('disabled', enabled);
+        }
+        else if (id == "#machineLearningProgressBar") {
+            $("#crawlCancelButton").prop('disabled', enabled);
+            $("#machineLearningCancelButton").prop('disabled', !enabled);
+        }
+        else {
+            $("#crawlCancelButton").prop('disabled', !enabled);
+            $("#machineLearningCancelButton").prop('disabled', !enabled);
+        }
     }
 </script>

@@ -25,7 +25,7 @@ namespace DocSearch.CommonLogic
         /// <summary>
         /// 完了時の進捗率
         /// </summary>
-        public const int PROGRESS_COMPLETED = 100;
+        public const int PROGRESS_COMPLETED = 101;
 
         /// <summary>
         /// キャンセル時に表示する進捗率。わざと-2にしている。

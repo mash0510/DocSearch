@@ -57,7 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommonParameters.cs" />
-    <Compile Include="Common\CommonLogic.cs" />
+    <Compile Include="CommonLogic.cs" />
     <Compile Include="CrawlerManager.cs" />
     <Compile Include="DocCrawler.cs" />
     <Compile Include="DocDataInsert.cs" />

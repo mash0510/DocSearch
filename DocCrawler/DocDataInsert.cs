@@ -1,5 +1,4 @@
-﻿using FolderCrawler.Common;
-using FolderCrawler.GenerateID;
+﻿using FolderCrawler.GenerateID;
 using FolderCrawler.TextDataExtract;
 using Nest;
 using System;
@@ -142,7 +141,7 @@ namespace FolderCrawler
             }
             catch
             {
-                // 例外が発生してもnullを返してクロールは続ける。
+                // 例外が発生してもnullを返してクロールは続ける。ログ出力はする
                 return null;
             }
         }

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FolderCrawler.Common
+namespace FolderCrawler
 {
     /// <summary>
     /// 共通ロジック

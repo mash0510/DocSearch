@@ -19,12 +19,6 @@ namespace FolderCrawler
         private Queue _filePathQueue = new Queue();
         private Queue _filePathQueueSynchronized = null;
 
-        /// <summary>
-        /// テキスト抽出したドキュメント情報を訓練データ生成ロジックに渡すキュー
-        /// </summary>
-        private Queue _docInfoQueue = new Queue();
-        private Queue _docInfoQueueSynchronized = null;
-
         private static QueueManager _self = new QueueManager();
 
         /// <summary>
@@ -36,20 +30,11 @@ namespace FolderCrawler
         }
 
         /// <summary>
-        /// テキスト抽出したドキュメント情報を訓練データ生成ロジックに渡すキューの取得
-        /// </summary>
-        public Queue DocInfoQueue
-        {
-            get { return _docInfoQueueSynchronized; }
-        }
-
-        /// <summary>
         /// コンストラクタ
         /// </summary>
         private QueueManager()
         {
             _filePathQueueSynchronized = Queue.Synchronized(_filePathQueue);
-            _docInfoQueueSynchronized = Queue.Synchronized(_docInfoQueue);
         }
 
         /// <summary>

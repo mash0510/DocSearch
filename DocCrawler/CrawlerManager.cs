@@ -29,6 +29,14 @@ namespace FolderCrawler
         }
 
         /// <summary>
+        /// 検索エンジンへのデータ挿入が完了したかどうか
+        /// </summary>
+        public bool IsAllInsertFinished
+        {
+            get { return !_indexing.IsProcessing; }
+        }
+
+        /// <summary>
         /// クロールシステムのホームディレクトリの設定と取得。本システムの管理用ファイルの保存先ルートフォルダになる。
         /// </summary>
         public string HomeDirectory
@@ -309,10 +317,6 @@ namespace FolderCrawler
                 _indexing.DocDataInsertProc();
             });
 
-            Task.Run(() => {
-                TrainingDataManager.GetInstance().StartTrainingDataGenerate();
-            });
-
             foreach (DocCrawler crwl in _crawlList)
             {
                 Task.Run(() =>
@@ -328,8 +332,6 @@ namespace FolderCrawler
         public void Stop()
         {
             _indexing.Stop();
-
-            TrainingDataManager.GetInstance().Stop();
 
             foreach (DocCrawler crwl in _crawlList)
             {

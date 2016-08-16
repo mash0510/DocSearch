@@ -17,7 +17,7 @@ namespace DocSearch.CommonLogic
         /// <returns></returns>
         protected override int GetProgressRate()
         {
-            int rate = TrainingDataManager.GetInstance().MachineLearningProgressRate;
+            int rate = MachineLearningManager.GetInstance().MachineLearningProgressRate;
             return rate;
         }
     }

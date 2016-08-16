@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CommonParameters.cs" />
+    <Compile Include="Common\CommonLogic.cs" />
     <Compile Include="CrawlerManager.cs" />
     <Compile Include="DocCrawler.cs" />
     <Compile Include="DocDataInsert.cs" />
@@ -75,11 +76,12 @@
     <Compile Include="TextDataExtract\ITextExtract.cs" />
     <Compile Include="TextDataExtract\TextExtractFactory.cs" />
     <Compile Include="TimeElapse.cs" />
-    <Compile Include="TrainingDataManager.cs" />
+    <Compile Include="MachineLearningManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

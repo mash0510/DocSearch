@@ -94,7 +94,7 @@ namespace DocSearch.Controllers
                         StartMachineLearning(args[0]);
                         break;
                     case "CancelMachineLearning":
-                        TrainingDataManager.GetInstance().KillMachineLearningProcess();
+                        MachineLearningManager.GetInstance().KillMachineLearningProcess();
                         break;
                 }
             }
@@ -152,10 +152,10 @@ namespace DocSearch.Controllers
         /// <param name="machineLearningProgressBarID"></param>
         private void StartCrawl(string progressBarID, string machineLearningProgressBarID)
         {
-            if (!CrawlerManager.GetInstance().IsAllCrawlFinished || TrainingDataManager.GetInstance().IsProcessingTrainingDataGeneration)
+            if (!CrawlerManager.GetInstance().IsAllCrawlFinished || !CrawlerManager.GetInstance().IsAllInsertFinished)
                 return;
 
-            TrainingDataManager.TrainingDataGenerateFinishedDelegate handler = (isCanceled) =>
+            CrawlerManager.DocCrawlDelegate handler = (sender, fileCount, isCanceled) =>
             {
                 int rate = SendProgressRate.PROGRESS_COMPLETED;
                 string message = MESSAGE_CRAWL_FINISHED;
@@ -168,8 +168,8 @@ namespace DocSearch.Controllers
                 _crawlProgress.SendRate(message, rate);
             };
 
-            TrainingDataManager.GetInstance().TrainingDataGenerateFinished -= handler;
-            TrainingDataManager.GetInstance().TrainingDataGenerateFinished += handler;
+            CrawlerManager.GetInstance().AllDocInsertFinished -= handler;
+            CrawlerManager.GetInstance().AllDocInsertFinished += handler;
 
             CrawlerManager.GetInstance().Start();
 
@@ -185,10 +185,10 @@ namespace DocSearch.Controllers
         /// <param name="progressBarID"></param>
         private void StartMachineLearning(string progressBarID)
         {
-            if (TrainingDataManager.GetInstance().IsProcessingMachineLearning)
+            if (MachineLearningManager.GetInstance().IsProcessingMachineLearning)
                 return;
 
-            TrainingDataManager.MachineLearningFinishedDelegate handler = (isCanceled) =>
+            MachineLearningManager.MachineLearningFinishedDelegate handler = (isCanceled) =>
             {
                 int rate = SendProgressRate.PROGRESS_COMPLETED;
                 string message = MESSAGE_LEARNING_FINISHED;
@@ -202,13 +202,13 @@ namespace DocSearch.Controllers
                 _machineLearningProgress.SendRate(message, rate);
             };
 
-            TrainingDataManager.GetInstance().MachineLearningFinished -= handler;
-            TrainingDataManager.GetInstance().MachineLearningFinished += handler;
+            MachineLearningManager.GetInstance().MachineLearningFinished -= handler;
+            MachineLearningManager.GetInstance().MachineLearningFinished += handler;
 
             _machineLearningProgress.ProgressBarID = progressBarID;
             _machineLearningProgress.Start();
 
-            TrainingDataManager.GetInstance().StartTraining();
+            MachineLearningManager.GetInstance().StartTraining();
         }
         #endregion
     }

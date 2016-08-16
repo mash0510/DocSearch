@@ -1,4 +1,5 @@
-﻿using FolderCrawler.GenerateID;
+﻿using FolderCrawler.Common;
+using FolderCrawler.GenerateID;
 using FolderCrawler.TextDataExtract;
 using Nest;
 using System;
@@ -179,6 +180,9 @@ namespace FolderCrawler
             bool first = true;
             CumurativeInsertedDocuments = 0;
 
+            // 既存の訓練データの削除
+            DeleteTrainingDataFile();
+
             while (true)
             {
                 if (QueueManager.GetInstance().FileInfoQueue.Count == 0)
@@ -236,14 +240,104 @@ namespace FolderCrawler
 
                 IDDictionary.GetInstanse().AddID(docInfo.FileFullPath, id, true);
 
+                // 訓練データの生成
+                GenerateTrainingData(docInfo);
+
                 CumurativeInsertedDocuments++;
                 SingleDocInserted?.Invoke(this, CumurativeInsertedDocuments);
+            }
 
-                // 訓練データ作成ロジックに、ドキュメントデータを渡す。
-                QueueManager.GetInstance().DocInfoQueue.Enqueue(docInfo);
+            try
+            {
+                // 一時退避用に保持していたバックアップファイルを削除
+                File.Delete(CommonParameters.TrainingDataFileBackupFullPath);
+            }
+            catch
+            {
+                // 後ほどログ出力
             }
 
             DocInsertFinished?.Invoke(this, CumurativeInsertedDocuments, _cancel);
+        }
+
+        /// <summary>
+        /// 訓練データの作成
+        /// </summary>
+        private void GenerateTrainingData(DocumentInfo docInfo)
+        {
+            if (CheckMaxSize())
+                return;
+
+            string outputFile = CommonParameters.TrainingDataFileFullPath;
+            FileStream fs = new FileStream(outputFile, FileMode.Append);
+            StreamWriter sw = new StreamWriter(fs, Encoding.UTF8, CommonParameters.FileIOBufferSize);
+
+            try
+            {
+                string docDataWithoutNewLine = docInfo.DocContent.Replace(Environment.NewLine, string.Empty);
+                sw.Write(docDataWithoutNewLine);
+                sw.Flush();
+            }
+            catch (Exception ex)
+            {
+                // ログ出力のロジックを後ほど入れる
+            }
+            finally
+            {
+                sw.Close();
+                fs.Close();
+            }
+        }
+
+        /// <summary>
+        /// 訓練データの削除
+        /// </summary>
+        public void DeleteTrainingDataFile()
+        {
+            string outputFile = CommonParameters.TrainingDataFileFullPath;
+            string backupFile = CommonParameters.TrainingDataFileBackupFullPath;
+
+            CommonLogic.FileBackup(outputFile, backupFile);
+        }
+
+        /// <summary>
+        /// 訓練データファイルのサイズを取得
+        /// </summary>
+        /// <returns></returns>
+        private long GetTrainingDataFileSize()
+        {
+            string file = CommonParameters.TrainingDataFileFullPath;
+            FileInfo fi = null;
+
+            try
+            {
+                fi = new FileInfo(file);
+                return fi.Length;
+            }
+            catch
+            {
+                // ログ出力をする。
+
+                return -1;
+            }
+        }
+
+        /// <summary>
+        /// 訓練データファイルにこれ以上ファイルを書き出すかどうかのチェック
+        /// </summary>
+        /// <returns></returns>
+        private bool CheckMaxSize()
+        {
+            // 0が設定されていたら、上限なし。
+            if (CommonParameters.MaxTrainingFileSize == 0)
+                return false;
+
+            long fileSize = GetTrainingDataFileSize();
+
+            if (fileSize > CommonParameters.MaxTrainingFileSize)
+                return true;
+
+            return false;
         }
     }
 }

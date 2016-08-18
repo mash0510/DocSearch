@@ -92,6 +92,9 @@ namespace FolderCrawler
         private void SaveData(string fileFullPath, string id)
         {
             string saveFile = CommonParameters.DicFileNameFullPath;
+
+            CommonLogic.SafeCreateDirectory(Path.GetDirectoryName(saveFile));
+
             StreamWriter sw = new StreamWriter(saveFile, true, Encoding.UTF8);
 
             string writeData = fileFullPath + "\t" + id;
@@ -121,6 +124,8 @@ namespace FolderCrawler
             await Task.Run(() =>
             {
                 string saveFile = CommonParameters.DicFileNameFullPath;
+
+                CommonLogic.SafeCreateDirectory(Path.GetDirectoryName(saveFile));
 
                 FileStream fs = new FileStream(saveFile, FileMode.Create);
                 StreamWriter sw = new StreamWriter(fs, Encoding.UTF8, BUFFER);
@@ -175,6 +180,9 @@ namespace FolderCrawler
         {
             string readFile = CommonParameters.DicFileNameFullPath;
             char[] delimiter = { '\t' };
+
+            if (!File.Exists(readFile))
+                return;
 
             FileStream fs = new FileStream(readFile, FileMode.OpenOrCreate);
             StreamReader sr = new StreamReader(fs, Encoding.UTF8, true);

@@ -93,6 +93,8 @@ namespace FolderCrawler
             mecabProgram = new Process();
             word2vecProc = new Process();
 
+            CommonLogic.SafeCreateDirectory(Path.GetDirectoryName(CommonParameters.MeCabOutputFileName));
+
             // 分かち書き
             mecabProgram.StartInfo.FileName = CommonParameters.MecabProgram;
             mecabProgram.StartInfo.Arguments = CommonParameters.TrainingDataFileFullPath + " -b 8192000 -Owakati -o " + CommonParameters.MeCabOutputFileName;
@@ -119,15 +121,14 @@ namespace FolderCrawler
 
                 word2vecProc.WaitForExit();
 
-                MachineLearningFinished?.Invoke(_cancelMachineLearning);
-
                 word2vecProc.Close();
                 word2vecProc.Dispose();
 
                 IsProcessingMachineLearning = false;
 
-                MachineLearningFinished?.Invoke(_cancelMachineLearning);
                 ChangeVectorFileNameInUse();
+
+                MachineLearningFinished?.Invoke(_cancelMachineLearning);
             });
         }
 

@@ -113,6 +113,39 @@ namespace DocSearch.CommonLogic
         }
 
         /// <summary>
+        /// クロールの履歴を記録するファイル名のプレフィックス。
+        /// </summary>
+        public static string HistoryFileNameCrawl
+        {
+            get
+            {
+                return ConfigurationManager.AppSettings["HistoryFileNameCrawl"];
+            }
+        }
+
+        /// <summary>
+        /// word2vecの履歴を記録するファイル名のプレフィックス。
+        /// </summary>
+        public static string HistoryFileNameWord2Vec
+        {
+            get
+            {
+                return ConfigurationManager.AppSettings["HistoryFileNameWord2Vec"];
+            }
+        }
+
+        /// <summary>
+        /// 履歴として記録する最大レコード数
+        /// </summary>
+        public static int HistoryMaxRecord
+        {
+            get
+            {
+                return Convert.ToInt32(ConfigurationManager.AppSettings["HistoryMaxRecord"]);
+            }
+        }
+
+        /// <summary>
         /// int型への変換
         /// </summary>
         /// <param name="val"></param>

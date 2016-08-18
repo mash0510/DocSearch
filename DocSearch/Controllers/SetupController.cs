@@ -5,6 +5,7 @@ using System;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using DocSearch.CommonLogic;
+using FolderCrawler.History;
 
 namespace DocSearch.Controllers
 {
@@ -166,6 +167,15 @@ namespace DocSearch.Controllers
                 }
 
                 _crawlProgress.SendRate(message, rate);
+
+                // 履歴保存
+                CrawlHistoryInfo history = History.CrawlHistory.CreateHistoryInstance();
+                history.allFileNum = CrawlerManager.GetInstance().TotalDocuments;
+                history.fileNum = fileCount;
+                history.isCanceled = isCanceled;
+
+                History.CrawlHistory.Add(history);
+                History.CrawlHistory.Save();
             };
 
             CrawlerManager.GetInstance().AllDocInsertFinished -= handler;
@@ -200,6 +210,13 @@ namespace DocSearch.Controllers
                 }
 
                 _machineLearningProgress.SendRate(message, rate);
+
+                // 履歴保存
+                Word2VecHistoryInfo history = History.Word2VecHistory.CreateHistoryInstance();
+                history.isCanceled = isCanceled;
+
+                History.Word2VecHistory.Add(history);
+                History.Word2VecHistory.Save();
             };
 
             MachineLearningManager.GetInstance().MachineLearningFinished -= handler;

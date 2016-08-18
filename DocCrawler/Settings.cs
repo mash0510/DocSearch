@@ -48,6 +48,8 @@ namespace FolderCrawler
         /// </summary>
         public void SaveSettings()
         {
+            CommonLogic.SafeCreateDirectory(Path.GetDirectoryName(CommonParameters.SettingFileFullPath));
+
             //ファイルを開く（UTF-8 BOM無し）
             StreamWriter sw = new StreamWriter(CommonParameters.SettingFileFullPath, false, new UTF8Encoding(false));
 

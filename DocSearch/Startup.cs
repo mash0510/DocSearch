@@ -18,8 +18,8 @@ namespace DocSearch
 
             app.MapSignalR();
 
-            // 文書IDのロード
-            IDDictionary.GetInstanse().LoadAsync();
+            // 保存したデータの読み込み
+            InitParameters.Load();
         }
     }
 }

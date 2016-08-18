@@ -198,6 +198,36 @@ namespace FolderCrawler
         }
 
         /// <summary>
+        /// クロール履歴フォルダ
+        /// </summary>
+        private static string _historyFolderCrawl = HomeDirectory + @"\history\crawl";
+        /// <summary>
+        /// クロール・機械学習履歴フォルダの取得
+        /// </summary>
+        public static string HistoryFolderCrawl
+        {
+            get
+            {
+                return _historyFolderCrawl;
+            }
+        }
+
+        /// <summary>
+        /// word2vec履歴フォルダ
+        /// </summary>
+        private static string _historyFolderWord2Vec = HomeDirectory + @"\history\word2vec";
+        /// <summary>
+        /// クロール・機械学習履歴フォルダの取得
+        /// </summary>
+        public static string HistoryFolderWord2Vec
+        {
+            get
+            {
+                return _historyFolderWord2Vec;
+            }
+        }
+
+        /// <summary>
         /// 全体のドキュメント数が取得できなかったことを示す値
         /// </summary>
         public const decimal NO_TOTAL_DOCUMENTS = -1;

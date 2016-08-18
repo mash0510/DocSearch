@@ -38,5 +38,24 @@ namespace FolderCrawler
                 // 後ほどログ出力をする
             }
         }
+
+        /// <summary>
+        /// 指定したパスにディレクトリが存在しない場合
+        /// すべてのディレクトリとサブディレクトリを作成します
+        /// </summary>
+        public static void SafeCreateDirectory(string path)
+        {
+            try
+            {
+                if (Directory.Exists(path))
+                    return;
+
+                Directory.CreateDirectory(path);
+            }
+            catch (Exception ex)
+            {
+                // 後ほどログ出力をする
+            }
+        }
     }
 }

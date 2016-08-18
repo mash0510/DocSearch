@@ -61,6 +61,9 @@
     <Compile Include="CrawlerManager.cs" />
     <Compile Include="DocCrawler.cs" />
     <Compile Include="DocDataInsert.cs" />
+    <Compile Include="History\HistoryBase.cs" />
+    <Compile Include="History\HistoryCrawl.cs" />
+    <Compile Include="History\HistoryWord2Vec.cs" />
     <Compile Include="QueueManager.cs" />
     <Compile Include="DocumentInfo.cs" />
     <Compile Include="GenerateID\GenerateIDFactory.cs" />

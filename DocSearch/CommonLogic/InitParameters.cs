@@ -40,6 +40,28 @@ namespace DocSearch.CommonLogic
 
             // ElasticsearchのID生成方式
             GenerateIDFactory.IDType = ReadSettings.IDType;
+
+            // 履歴ファイル名と保持する履歴件数
+            History.CrawlHistory.HistoryFolder = CommonParameters.HistoryFolderCrawl;
+            History.CrawlHistory.HistoryFile = ReadSettings.HistoryFileNameCrawl;
+            History.CrawlHistory.MaxRecord = ReadSettings.HistoryMaxRecord;
+
+            History.Word2VecHistory.HistoryFolder = CommonParameters.HistoryFolderWord2Vec;
+            History.Word2VecHistory.HistoryFile = ReadSettings.HistoryFileNameWord2Vec;
+            History.Word2VecHistory.MaxRecord = ReadSettings.HistoryMaxRecord;
+        }
+
+        /// <summary>
+        /// システム起動時のデータロード
+        /// </summary>
+        public static void Load()
+        {
+            // 文書IDのロード
+            IDDictionary.GetInstanse().LoadAsync();
+
+            // 履歴のロード
+            History.CrawlHistory.Load();
+            History.Word2VecHistory.Load();
         }
     }
 }

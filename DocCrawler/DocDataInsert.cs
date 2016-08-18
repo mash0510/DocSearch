@@ -267,6 +267,8 @@ namespace FolderCrawler
             if (CheckMaxSize())
                 return;
 
+            CommonLogic.SafeCreateDirectory(Path.GetDirectoryName(CommonParameters.TrainingDataFileFullPath));
+
             string outputFile = CommonParameters.TrainingDataFileFullPath;
             FileStream fs = new FileStream(outputFile, FileMode.Append);
             StreamWriter sw = new StreamWriter(fs, Encoding.UTF8, CommonParameters.FileIOBufferSize);

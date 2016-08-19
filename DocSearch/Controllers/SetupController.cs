@@ -30,6 +30,10 @@ namespace DocSearch.Controllers
         private string MESSAGE_PREPAREING = "処理開始の準備中です。";
 
         /// <summary>
+        /// クロール未実行
+        /// </summary>
+        private string MESSAGE_NOT_CRAWLED = "クロールが実行されていません";
+        /// <summary>
         /// クロール中のメッセージ
         /// </summary>
         private string MESSAGE_CRAWLING = "クロール中です...";
@@ -43,6 +47,10 @@ namespace DocSearch.Controllers
         private string MESSAGE_CRAWL_CANCELED = "クロール処理がキャンセルされました。";
 
         /// <summary>
+        /// 機械学習未実行
+        /// </summary>
+        private string MESSAGE_NOT_LEARNED = "機械学習が実行されていません。";
+        /// <summary>
         /// 機械学習実行中のメッセージ
         /// </summary>
         private string MESSAGE_LEARNING = "機械学習実行中です...";
@@ -54,6 +62,11 @@ namespace DocSearch.Controllers
         /// 機械学習処理キャンセル時のメッセージ
         /// </summary>
         private string MESSAGE_LEARNING_CANCELED = "機械学習処理がキャンセルされました。";
+
+        /// <summary>
+        /// 保存完了メッセージ
+        /// </summary>
+        private string MESSAGE_SAVED = "保存が完了しました";
 
         /// <summary>
         /// コンストラクタ
@@ -97,6 +110,12 @@ namespace DocSearch.Controllers
                     case "CancelMachineLearning":
                         MachineLearningManager.GetInstance().KillMachineLearningProcess();
                         break;
+                    case "IsCrawlExecuted":
+                        CheckCrawlExecuted(args[0]);
+                        break;
+                    case "IsWord2VecLearned":
+                        CheckWord2VecExecuted(args[0]);
+                        break;
                 }
             }
         }
@@ -138,9 +157,49 @@ namespace DocSearch.Controllers
 
             Settings.GetInstance().SaveSettings();
 
-            setupModel.Message = "保存が完了しました。";
+            setupModel.Message = MESSAGE_SAVED;
 
             return RedirectToAction("Setup", "Setup", setupModel);
+        }
+        #endregion
+
+        #region クロール・機械学習が実行済みかどうかの確認
+        /// <summary>
+        /// クロールが実行済みかどうかを返す
+        /// </summary>
+        /// <param name="progressBarID"></param>
+        private void CheckCrawlExecuted(string progressBarID)
+        {
+            string message = MESSAGE_NOT_CRAWLED;
+            int rate = 0;
+
+            if (History.CrawlHistory.HistoryData.Count > 0)
+            {
+                message = MESSAGE_CRAWL_FINISHED;
+                rate = SendProgressRate.PROGRESS_COMPLETED;
+            }
+
+            _crawlProgress.ProgressBarID = progressBarID;
+            _crawlProgress.SendRate(message, rate);
+        }
+
+        /// <summary>
+        /// word2vecの機械学習が実行済みかどうかを返す
+        /// </summary>
+        /// <param name="progressBarID"></param>
+        private void CheckWord2VecExecuted(string progressBarID)
+        {
+            string message = MESSAGE_NOT_LEARNED;
+            int rate = 0;
+
+            if (History.CrawlHistory.HistoryData.Count > 0)
+            {
+                message = MESSAGE_LEARNING_FINISHED;
+                rate = SendProgressRate.PROGRESS_COMPLETED;
+            }
+
+            _machineLearningProgress.ProgressBarID = progressBarID;
+            _machineLearningProgress.SendRate(message, rate);
         }
         #endregion
 

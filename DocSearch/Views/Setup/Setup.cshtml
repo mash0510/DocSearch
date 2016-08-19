@@ -126,9 +126,9 @@
 
         // 接続完了時の処理
         $.connection.hub.start().done(function () {
-            comNotifier.server.getMessage("", "", [""]);
+            SendMessageToServer("PROGRESS_BAR", "IsCrawlExecuted", ["#crawlProgressBar"]);
+            SendMessageToServer("PROGRESS_BAR", "IsWord2VecLearned", ["#machineLearningProgressBar"]);
         });
-
     };
 
     // プログレスバーの更新

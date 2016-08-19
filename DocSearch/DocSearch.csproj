@@ -234,7 +234,7 @@
     <Compile Include="Models\FileTreeViewModel.cs" />
     <Compile Include="Models\SetupModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="hubs\ProgressHub.cs" />
+    <Compile Include="hubs\ComHub.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>

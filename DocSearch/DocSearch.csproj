@@ -322,7 +322,6 @@
     <Content Include="Views\DocSearch\Index.cshtml" />
     <Content Include="Views\Setup\Setup.cshtml" />
     <Content Include="Views\DocSearch\GetFiles.cshtml" />
-    <Content Include="Views\Setup\ProgressBar.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

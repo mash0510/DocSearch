@@ -94,7 +94,7 @@ namespace DocSearch.Controllers
         /// <param name="args"></param>
         private void ProgressHub_CatchBrowserMessage(string type, string msg, string[] args)
         {
-            if (type == SendProgressRate.TYPE)
+            if (type == SendProgressRate.TYPE || type == History.TYPE)
             {
                 switch (msg)
                 {
@@ -115,6 +115,9 @@ namespace DocSearch.Controllers
                         break;
                     case "IsWord2VecLearned":
                         CheckWord2VecExecuted(args[0]);
+                        break;
+                    case "GetHistoryData":
+                        GetHistory(args[0]);
                         break;
                 }
             }
@@ -200,6 +203,17 @@ namespace DocSearch.Controllers
 
             _machineLearningProgress.ProgressBarID = progressBarID;
             _machineLearningProgress.SendRate(message, rate);
+        }
+        #endregion
+
+        #region 履歴取得
+        /// <summary>
+        /// 履歴の取得
+        /// </summary>
+        /// <param name="historyKind"></param>
+        private void GetHistory(string historyKind)
+        {
+            History.SendHistory(historyKind);
         }
         #endregion
 

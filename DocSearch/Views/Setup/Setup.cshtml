@@ -37,11 +37,14 @@
                      },
                      new { @class="form-control", id="execMachineLearningOption" })
                 </div>
-                <div class="col-md-1">
+                <div class="col-md-1 text-center">
                     <button type="button" id="crawlStartButton" class="btn btn-default" onclick="StartCrawl()">開始</button>
                 </div>
-                <div class="col-md-1">
+                <div class="col-md-1 text-center">
                     <button type="button" id="crawlCancelButton" class="btn btn-default" onclick="CancelCrawl()">キャンセル</button>
+                </div>
+                <div class="col-md-1 text-center">
+                    <button type="button" id="crawlHistoryButton" class="btn btn-default" onclick="GetHistoryData('Crawl')">履歴</button>
                 </div>
             </div>
             <br />
@@ -71,11 +74,14 @@
                 <div class="col-md-5">
                     <label class="control-label">関連語を表示する人工知能の学習の実行</label>
                 </div>
-                <div class="col-md-1">
+                <div class="col-md-1 text-center">
                     <button type="button" id="machineLearningStartButton" class="btn btn-default" onclick="StartMachineLearning()">開始</button>
                 </div>
-                <div class="col-md-1">
+                <div class="col-md-1 text-center">
                     <button type="button" id="machineLearningCancelButton" class="btn btn-default" onclick="CancelMachineLearning()">キャンセル</button>
+                </div>
+                <div class="col-md-1 text-center">
+                    <button type="button" id="crawlHistoryButton" class="btn btn-default" onclick="GetHistoryData('word2vec')">履歴</button>
                 </div>
             </div>
             <br />
@@ -96,6 +102,16 @@
     }
 </div>
 
+<!-- 履歴テーブル -->
+<div id="history-form">
+    <div class="container">
+        <table class="table" id="history">
+            <thead id="historyHeader"></thead>
+            <tbody id="historyData"></tbody>
+        </table>
+    </div>
+</div>
+
 <!-- 応答メッセージ -->
 @{
     if (Model.ProcessFinished)
@@ -108,6 +124,7 @@
 
 <script type="text/javascript">
     var comNotifier;
+    var dialog;
 
     window.onload = function () {
         DisableControls(false);
@@ -122,6 +139,9 @@
 
                 UpdateProgress(message, rate, id);
             }
+            else if (type == "HISTORY") {
+                ShowHistoryDialog(message, args);
+            }
         };
 
         // 接続完了時の処理
@@ -129,7 +149,67 @@
             SendMessageToServer("PROGRESS_BAR", "IsCrawlExecuted", ["#crawlProgressBar"]);
             SendMessageToServer("PROGRESS_BAR", "IsWord2VecLearned", ["#machineLearningProgressBar"]);
         });
+
+        dialog = $("#history-form").dialog({
+            autoOpen: false,
+            title: "History",
+            height: 400,
+            width: 650,
+            modal: true,
+            buttons: {
+                "Close": function () {
+                    dialog.dialog("close");
+                }
+            },
+            close: function () {
+                $("#historyHeader").empty();
+                $("#historyData").empty();
+            }
+        });
     };
+
+    // 履歴データの取得
+    function GetHistoryData(historyKind) {
+        SendMessageToServer("HISTORY", "GetHistoryData", [historyKind]);   
+    }
+    // 取得した履歴データの表示
+    function ShowHistoryDialog(historyKind, historyData) {
+        var title = "クロール履歴";
+        if (historyKind == "word2vec") {
+            title = "機械学習履歴"
+        }
+        $('#history-form').dialog('option', 'title', title);
+
+        var headerTag = GenerateHeader(historyKind);
+        $('#historyHeader').append(headerTag);
+
+        var recordTag = "";
+
+        for (var i = 0; i < historyData.length; i++) {
+            var dataArray = historyData[i].split(",");
+            recordTag += "<tr>"
+            for (var j = 0; j < dataArray.length; j++) {
+                recordTag += "<td>" + dataArray[j] + "</td>";
+            }
+            recordTag += "</tr>"
+
+            $('#historyData').append(recordTag);
+            recordTag = ""
+        }
+
+        dialog.dialog("open");
+    }
+    // 履歴ヘッダタグ生成
+    function GenerateHeader(historyKind) {
+        var header;
+        if (historyKind == "Crawl") {
+            header = "<tr><th>日時</th><th>クロールファイル数</th><th>Insertファイル数</th><th>キャンセル</th></tr>";
+        }
+        else if (historyKind == "word2vec") {
+            header = "<tr><th>日時</th><th>キャンセル</th></tr>";
+        }
+        return header;
+    }
 
     // プログレスバーの更新
     function UpdateProgress(message, count, id) {

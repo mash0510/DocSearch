@@ -103,5 +103,32 @@ namespace FolderCrawler.History
 
             _history.Add(dt, info);
         }
+
+        /// <summary>
+        /// 文字列配列形式に履歴データを変換。降順ソートする。
+        /// </summary>
+        /// <returns></returns>
+        protected override string[] ConvertToStringArray()
+        {
+            List<string> data = new List<string>();
+
+            StringBuilder record = new StringBuilder();
+
+            foreach(DateTime dt in _history.Keys)
+            {
+                record.Append(dt.ToString()).Append(",");
+                record.Append(_history[dt].allFileNum.ToString()).Append(",");
+                record.Append(_history[dt].fileNum.ToString()).Append(",");
+                record.Append(_history[dt].isCanceled.ToString());
+
+                data.Add(record.ToString());
+
+                record.Clear();
+            }
+
+            string[] retval = data.ToArray();
+
+            return retval;
+        }
     }
 }

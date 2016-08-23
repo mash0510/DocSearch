@@ -64,11 +64,28 @@ namespace FolderCrawler.History
         }
 
         /// <summary>
+        /// 履歴データを文字列配列形式で取得
+        /// </summary>
+        public string[] HistoryDataArray
+        {
+            get { return ConvertToStringArray(); }
+        }
+
+        /// <summary>
         /// コンストラクタ
         /// </summary>
         public HistoryBase()
         {
 
+        }
+
+        /// <summary>
+        /// 履歴データを文字列配列に変換
+        /// </summary>
+        /// <returns></returns>
+        protected virtual string[] ConvertToStringArray()
+        {
+            return null;
         }
 
         /// <summary>

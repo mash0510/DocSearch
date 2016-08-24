@@ -68,6 +68,10 @@ namespace DocSearch.Controllers
         /// </summary>
         private string MESSAGE_SAVED = "保存が完了しました";
 
+        // ブラウザからののメッセージ受信イベントを登録したかどうか
+        // （二重登録防止用のフラグ）
+        private static bool isCatchBrowerMessageRegistered = false;
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -82,8 +86,11 @@ namespace DocSearch.Controllers
             _machineLearningProgress.MessageNoProgressRate = MESSAGE_LEARNING;
             _machineLearningProgress.MessageFinished = MESSAGE_LEARNING_FINISHED;
 
-            ComHub.CatchBrowserMessage -= ProgressHub_CatchBrowserMessage;
-            ComHub.CatchBrowserMessage += ProgressHub_CatchBrowserMessage;
+            if (!isCatchBrowerMessageRegistered)
+            {
+                ComHub.CatchBrowserMessage += ProgressHub_CatchBrowserMessage;
+                isCatchBrowerMessageRegistered = true;
+            }
         }
         
         /// <summary>
@@ -102,7 +109,7 @@ namespace DocSearch.Controllers
                         CrawlerManager.GetInstance().Stop();
                         break;
                     case "StartCrawl":
-                        StartCrawl(args[0], args[1]);
+                        StartCrawl(args[0], args[1], args[2]);
                         break;
                     case "StartMachineLearning":
                         StartMachineLearning(args[0]);
@@ -221,10 +228,10 @@ namespace DocSearch.Controllers
         /// <summary>
         /// クロール開始
         /// </summary>
-        /// <param name="execMachineLearning"></param>
         /// <param name="progressBarID"></param>
         /// <param name="machineLearningProgressBarID"></param>
-        private void StartCrawl(string progressBarID, string machineLearningProgressBarID)
+        /// <param name="execMachineLearning"></param>
+        private void StartCrawl(string progressBarID, string machineLearningProgressBarID, string execMachineLearning)
         {
             if (!CrawlerManager.GetInstance().IsAllCrawlFinished || !CrawlerManager.GetInstance().IsAllInsertFinished)
                 return;
@@ -249,6 +256,12 @@ namespace DocSearch.Controllers
 
                 History.CrawlHistory.Add(history);
                 History.CrawlHistory.Save();
+
+                if (execMachineLearning == EXEC_MACHINE_LEARNING)
+                {
+                    // 機械学習を続けて実行する場合は、機械学習実行。
+                    StartMachineLearning(machineLearningProgressBarID);
+                }
             };
 
             CrawlerManager.GetInstance().AllDocInsertFinished -= handler;

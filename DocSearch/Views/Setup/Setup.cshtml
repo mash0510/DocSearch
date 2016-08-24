@@ -4,7 +4,7 @@
     ViewBag.Title = "Setup";
 }
 
-<h2 style="margin-bottom: 30px">設定画面</h2>
+<h2 style="margin-bottom: 20px">設定画面</h2>
 
 <!-- クロール先フォルダの指定 -->
 <div class="ds-container">
@@ -102,6 +102,11 @@
     }
 </div>
 
+<!-- スケジューリング設定 -->
+<div class="container">
+
+</div>
+
 <!-- 履歴テーブル -->
 <div id="history-form">
     <div class="container">
@@ -146,8 +151,7 @@
 
         // 接続完了時の処理
         $.connection.hub.start().done(function () {
-            SendMessageToServer("PROGRESS_BAR", "IsCrawlExecuted", ["#crawlProgressBar"]);
-            SendMessageToServer("PROGRESS_BAR", "IsWord2VecLearned", ["#machineLearningProgressBar"]);
+            SendMessageToServer("", "", [""]);
         });
 
         dialog = $("#history-form").dialog({
@@ -213,6 +217,10 @@
 
     // プログレスバーの更新
     function UpdateProgress(message, count, id) {
+        // クロール・機械学習実行の途中で設定画面を表示したときでも
+        // 画面を非活性状態にするために、常にこれを実行しておく。
+        DisableControls(true, id);
+
         if (count < 0 || count > 100) {
             var dispRate = 100;
             if (count < 0) {
@@ -256,8 +264,11 @@
 
         var machineLearning = $("#execMachineLearningOption").val();
 
+        // スタートさせる選択をしていても、ここから実行することはしない。サーバー側から実行する。
+        // UIの活性・非活性の変更とプログレスバーへの処理準備中表示をするのみ。
         if (machineLearning == 1) {
-            StartMachineLearning();
+            DisableControls(true, "#machineLearningProgressBar");
+            UpdateProgress("処理開始の準備中です。", -3, "#machineLearningProgressBar");
             return true;
         }
 
@@ -270,7 +281,10 @@
 
         UpdateProgress("処理開始の準備中です。", -3, "#crawlProgressBar")
 
-        var args = ["#crawlProgressBar", "#machineLearningProgressBar"];
+        // クロール後に機械学習を実行するかどうか。
+        var machineLearning = $("#execMachineLearningOption").val();
+        // サーバーへ渡すパラメータの生成
+        var args = ["#crawlProgressBar", "#machineLearningProgressBar", machineLearning];
 
         SendMessageToServer("PROGRESS_BAR", "StartCrawl", args);
     }
@@ -286,7 +300,7 @@
     function StartMachineLearning() {
         DisableControls(true, "#machineLearningProgressBar");
 
-        UpdateProgress("処理開始の準備中です。", -3, "#machineLearningProgressBar")
+        UpdateProgress("処理開始の準備中です。", -3, "#machineLearningProgressBar");
 
         var args = ["#machineLearningProgressBar"];
 

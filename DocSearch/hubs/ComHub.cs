@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
@@ -12,8 +13,10 @@ namespace DocSearch.hubs
         public delegate void BrowserMessage(string type, string mes, string[] args);
         public static event BrowserMessage CatchBrowserMessage;
 
+        private static string connectionID;
+
         /// <summary>
-        /// ブラウザへのデータ送信
+        /// 全ブラウザへのデータ送信
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="count"></param>
@@ -25,6 +28,18 @@ namespace DocSearch.hubs
         }
 
         /// <summary>
+        /// 呼び出し元へのみメッセージを返す
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="msg"></param>
+        /// <param name="args"></param>
+        public static void SendMessageToCaller(string type, string msg, string[] args)
+        {
+            var hubContext = GlobalHost.ConnectionManager.GetHubContext<ComHub>();
+            hubContext.Clients.Client(connectionID).sendMessage(string.Format(type), string.Format(msg), args);
+        }
+
+        /// <summary>
         /// ブラウザからのメッセージを取得するメソッド
         /// </summary>
         /// <param name="msg"></param>
@@ -32,6 +47,7 @@ namespace DocSearch.hubs
         /// <param name="arg2"></param>
         public void GetMessage(string type, string msg, string[] args)
         {
+            connectionID = Context.ConnectionId;
             CatchBrowserMessage?.Invoke(type, msg, args);
         }
     }

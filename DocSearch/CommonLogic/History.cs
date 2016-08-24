@@ -45,11 +45,11 @@ namespace DocSearch.CommonLogic
         {
             if (historyKind == HISTORY_CRAWL)
             {
-                ComHub.SendMessage(TYPE, historyKind, History.CrawlHistory.HistoryDataArray);
+                ComHub.SendMessageToCaller(TYPE, historyKind, History.CrawlHistory.HistoryDataArray);
             }
             else if (historyKind == HISTORY_WORD2VEC)
             {
-                ComHub.SendMessage(TYPE, historyKind, History.Word2VecHistory.HistoryDataArray);
+                ComHub.SendMessageToCaller(TYPE, historyKind, History.Word2VecHistory.HistoryDataArray);
             }
         }
     }

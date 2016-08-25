@@ -104,7 +104,55 @@
 
 <!-- スケジューリング設定 -->
 <div class="container">
-
+    <h4>スケジュール設定</h4>
+    <div id="onetime">
+        <div class="row">
+            <div class="col-md-1">
+                <select id="schedule-select" onchange="ScheduleTypeChanged(this)">
+                    <option value="oneTime" selected>1回のみ</option>
+                    <option value="date">日毎</option>
+                    <option value="day">曜日</option>
+                    <option value="detail">詳細設定</option>
+                </select>
+            </div>
+            <div class="col-md-11">
+                <div id="schedule-oneTime">
+                    <input type="datetime-local" />
+                </div>
+                <div id="schedule-daily">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <input type="text" /><lable class="ds-label">日毎</lable>
+                        </div>
+                        <div class="col-xs-9">
+                            <label class="ds-label">実行時間</label><input type="time" />
+                        </div>
+                    </div>
+                </div>
+                <div id="schedule-day">
+                        <input type="checkbox" value="mon" />月
+                        <input type="checkbox" value="tue" style="margin-left: 10px" />火
+                        <input type="checkbox" value="wed" style="margin-left: 10px" />水
+                        <input type="checkbox" value="thr" style="margin-left: 10px" />木
+                        <input type="checkbox" value="fri" style="margin-left: 10px" />金
+                        <input type="checkbox" value="sat" style="margin-left: 10px" />土
+                        <input type="checkbox" value="sun" style="margin-left: 10px" />日
+                        <label class="ds-label">実行時間</label><input type="time" />
+                </div>
+                <div id="schedule-detail">
+                    <div class="row">
+                        <div class="col-xs-3">
+                            <label>crontab形式で指定して下さい。</label>
+                        </div>
+                        <div class="col-xs-9">
+                            <input type="text" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button type="button" id="setSchedule" class="btn btn-default" >設定</button>
+    </div>
 </div>
 
 <!-- 履歴テーブル -->
@@ -170,7 +218,47 @@
                 $("#historyData").empty();
             }
         });
+
+        // スケジュール設定UIの初期表示
+        ScheduleSettingUISwitch($("#schedule-select").selectedOptions[0].value);
     };
+
+    // サーバーへのメッセージ送信
+    function SendMessageToServer(type, msg, args) {
+        comNotifier.server.getMessage(type, msg, args);
+    }
+
+    // スケジューリングの種別設定変更
+    function ScheduleTypeChanged(args) {
+        ScheduleSettingUISwitch(args.selectedOptions[0].value);
+    }
+    // スケジュール設定UIの表示・非表示
+    function ScheduleSettingUISwitch(type) {
+        if (type == "oneTime") {
+            $("#schedule-oneTime").css("display", "block");
+            $("#schedule-daily").css("display", "none");
+            $("#schedule-day").css("display", "none");
+            $("#schedule-detail").css("display", "none");
+        }
+        else if (type == "date") {
+            $("#schedule-oneTime").css("display", "none");
+            $("#schedule-daily").css("display", "block");
+            $("#schedule-day").css("display", "none");
+            $("#schedule-detail").css("display", "none");
+        }
+        else if (type == "day") {
+            $("#schedule-oneTime").css("display", "none");
+            $("#schedule-daily").css("display", "none");
+            $("#schedule-day").css("display", "block");
+            $("#schedule-detail").css("display", "none");
+        }
+        else if (type == "detail") {
+            $("#schedule-oneTime").css("display", "none");
+            $("#schedule-daily").css("display", "none");
+            $("#schedule-day").css("display", "none");
+            $("#schedule-detail").css("display", "block");
+        }
+    }
 
     // 履歴データの取得
     function GetHistoryData(historyKind) {
@@ -250,11 +338,6 @@
 
         $(id).find(".progress-bar").css({ 'width': count + '%' });
         $(id).find(".progress-rate").html(count + '%');
-    }
-
-    // サーバーへのメッセージ送信
-    function SendMessageToServer(type, msg, args) {
-        comNotifier.server.getMessage(type, msg, args);
     }
 
     // 機械学習をスタートさせるかどうかの判断

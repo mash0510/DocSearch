@@ -99,7 +99,8 @@ namespace DocSearch.Controllers
         /// <param name="type"></param>
         /// <param name="msg"></param>
         /// <param name="args"></param>
-        private void ProgressHub_CatchBrowserMessage(string type, string msg, string[] args)
+        /// <param name="connectionID"></param>
+        private void ProgressHub_CatchBrowserMessage(string type, string msg, string[] args, string connectionID)
         {
             if (type == SendProgressRate.TYPE || type == History.TYPE)
             {
@@ -124,7 +125,7 @@ namespace DocSearch.Controllers
                         CheckWord2VecExecuted(args[0]);
                         break;
                     case "GetHistoryData":
-                        GetHistory(args[0]);
+                        GetHistory(args[0], connectionID);
                         break;
                 }
             }
@@ -218,9 +219,10 @@ namespace DocSearch.Controllers
         /// 履歴の取得
         /// </summary>
         /// <param name="historyKind"></param>
-        private void GetHistory(string historyKind)
+        /// <param name="connectionID"></param>
+        private void GetHistory(string historyKind, string connectionID)
         {
-            History.SendHistory(historyKind);
+            History.SendHistory(historyKind, connectionID);
         }
         #endregion
 

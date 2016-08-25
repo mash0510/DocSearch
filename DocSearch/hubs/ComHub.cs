@@ -10,10 +10,8 @@ namespace DocSearch.hubs
 {
     public class ComHub : Hub
     {
-        public delegate void BrowserMessage(string type, string mes, string[] args);
+        public delegate void BrowserMessage(string type, string mes, string[] args, string connectionID);
         public static event BrowserMessage CatchBrowserMessage;
-
-        private static string connectionID;
 
         /// <summary>
         /// 全ブラウザへのデータ送信
@@ -21,19 +19,20 @@ namespace DocSearch.hubs
         /// <param name="msg"></param>
         /// <param name="count"></param>
         /// <param name="arg1"></param>
-        public static void SendMessage(string type, string msg, string[] args)
+        public static void SendMessageToAll(string type, string msg, string[] args)
         {
             var hubContext = GlobalHost.ConnectionManager.GetHubContext<ComHub>();
             hubContext.Clients.All.sendMessage(string.Format(type), string.Format(msg), args);
         }
 
         /// <summary>
-        /// 呼び出し元へのみメッセージを返す
+        /// 引数connectionIDで示されるクライアントに対してのみメッセージを返す
         /// </summary>
         /// <param name="type"></param>
         /// <param name="msg"></param>
         /// <param name="args"></param>
-        public static void SendMessageToCaller(string type, string msg, string[] args)
+        /// <param name="connectionID"></param>
+        public static void SendMessageToTargetClient(string type, string msg, string[] args, string connectionID)
         {
             var hubContext = GlobalHost.ConnectionManager.GetHubContext<ComHub>();
             hubContext.Clients.Client(connectionID).sendMessage(string.Format(type), string.Format(msg), args);
@@ -47,8 +46,7 @@ namespace DocSearch.hubs
         /// <param name="arg2"></param>
         public void GetMessage(string type, string msg, string[] args)
         {
-            connectionID = Context.ConnectionId;
-            CatchBrowserMessage?.Invoke(type, msg, args);
+            CatchBrowserMessage?.Invoke(type, msg, args, Context.ConnectionId);
         }
     }
 }

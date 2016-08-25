@@ -41,15 +41,16 @@ namespace DocSearch.CommonLogic
         /// 履歴データのブラウザへの送信
         /// </summary>
         /// <param name="historyKind"></param>
-        public static void SendHistory(string historyKind)
+        /// <param name="connectionID"></param>
+        public static void SendHistory(string historyKind, string connectionID)
         {
             if (historyKind == HISTORY_CRAWL)
             {
-                ComHub.SendMessageToCaller(TYPE, historyKind, History.CrawlHistory.HistoryDataArray);
+                ComHub.SendMessageToTargetClient(TYPE, historyKind, History.CrawlHistory.HistoryDataArray, connectionID);
             }
             else if (historyKind == HISTORY_WORD2VEC)
             {
-                ComHub.SendMessageToCaller(TYPE, historyKind, History.Word2VecHistory.HistoryDataArray);
+                ComHub.SendMessageToTargetClient(TYPE, historyKind, History.Word2VecHistory.HistoryDataArray, connectionID);
             }
         }
     }

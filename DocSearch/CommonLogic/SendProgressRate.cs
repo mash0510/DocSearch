@@ -117,7 +117,7 @@ namespace DocSearch.CommonLogic
         {
             string[] args = { rate.ToString(), ProgressBarID };
 
-            ComHub.SendMessage(TYPE, message, args);
+            ComHub.SendMessageToAll(TYPE, message, args);
             Stop();
         }
 
@@ -157,7 +157,7 @@ namespace DocSearch.CommonLogic
             string[] args = { rate.ToString(), ProgressBarID };
 
             // ブラウザ側に進捗率を通知する
-            ComHub.SendMessage(TYPE, mes, args);
+            ComHub.SendMessageToAll(TYPE, mes, args);
         }
     }
 }

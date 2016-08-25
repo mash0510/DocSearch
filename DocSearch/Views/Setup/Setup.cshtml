@@ -140,14 +140,8 @@
                         <label class="ds-label">実行時間</label><input type="time" />
                 </div>
                 <div id="schedule-detail">
-                    <div class="row">
-                        <div class="col-xs-3">
-                            <label>crontab形式で指定して下さい。</label>
-                        </div>
-                        <div class="col-xs-9">
-                            <input type="text" />
-                        </div>
-                    </div>
+                        <label class="ds-label">crontab形式で指定して下さい。</label>
+                        <input type="text" style="width:300px" />
                 </div>
             </div>
         </div>
@@ -220,7 +214,7 @@
         });
 
         // スケジュール設定UIの初期表示
-        ScheduleSettingUISwitch($("#schedule-select").selectedOptions[0].value);
+        ScheduleSettingUISwitch($("#schedule-select").val());
     };
 
     // サーバーへのメッセージ送信

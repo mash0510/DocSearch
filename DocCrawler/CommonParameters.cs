@@ -36,6 +36,10 @@ namespace FolderCrawler
         /// </summary>
         private static string _settingFileName = "setting.xml";
         /// <summary>
+        /// スケジュール設定ファイル名
+        /// </summary>
+        private static string _scheduleFileName = "scheduling.xml";
+        /// <summary>
         /// 設定ファイルのフルパス取得
         /// </summary>
         public static string SettingFileFullPath
@@ -43,6 +47,16 @@ namespace FolderCrawler
             get
             {
                 return _settingDataFolder + "\\" + _settingFileName;
+            }
+        }
+        /// <summary>
+        /// スケジュール設定ファイルのフルパス取得
+        /// </summary>
+        public static string SchedulingFileFullPath
+        {
+            get
+            {
+                return _settingDataFolder + "\\" + _scheduleFileName;
             }
         }
 

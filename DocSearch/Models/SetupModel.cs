@@ -46,5 +46,115 @@ namespace DocSearch.Models
                 _message = value;
             }
         }
+
+        #region スケジューリング設定
+        /// <summary>
+        /// 定期実行スケジュールのタイプ（１回のみ、日毎、曜日毎など）
+        /// </summary>
+        public string ScheduleType
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 「１回のみ」を選択したときの実行日時
+        /// </summary>
+        public string OneTimeDateTime
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 「1回のみ」以外を選択したときの実行時間
+        /// </summary>
+        public string ExecTime
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 日毎を選択した場合の、実行日インターバル
+        /// </summary>
+        public int DayInterval
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 月曜実行
+        /// </summary>
+        public bool ExecMonday
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 火曜実行
+        /// </summary>
+        public bool ExecTuesday
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 水曜実行
+        /// </summary>
+        public bool ExecWendnesday
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 木曜実行
+        /// </summary>
+        public bool ExecThursday
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 金曜実行
+        /// </summary>
+        public bool ExecFriday
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 土曜実行
+        /// </summary>
+        public bool ExecSurtarday
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 日曜実行
+        /// </summary>
+        public bool ExecSunday
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// cron形式の設定文字列
+        /// </summary>
+        public string CronString
+        {
+            get;
+            set;
+        }
+        #endregion
     }
 }

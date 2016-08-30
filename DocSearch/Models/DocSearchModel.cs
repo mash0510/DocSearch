@@ -1,4 +1,5 @@
 ﻿using FolderCrawler;
+using FolderCrawler.Setting;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

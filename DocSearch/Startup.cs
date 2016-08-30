@@ -1,5 +1,6 @@
 ﻿using DocSearch.CommonLogic;
 using FolderCrawler;
+using FolderCrawler.Setting;
 using Microsoft.Owin;
 using Owin;
 
@@ -15,6 +16,7 @@ namespace DocSearch
 
             // 設定ファイルのロード
             Settings.GetInstance().LoadSettings();
+            ScheduleSettings.GetInstance().Load();
 
             app.MapSignalR();
 

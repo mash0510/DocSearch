@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace FolderCrawler
+namespace FolderCrawler.Setting
 {
     /// <summary>
     /// ファイル保存する設定項目

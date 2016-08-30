@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Web.Mvc;
 using DocSearch.CommonLogic;
 using FolderCrawler.History;
+using FolderCrawler.Setting;
 
 namespace DocSearch.Controllers
 {
@@ -102,7 +103,7 @@ namespace DocSearch.Controllers
         /// <param name="connectionID"></param>
         private void ProgressHub_CatchBrowserMessage(string type, string msg, string[] args, string connectionID)
         {
-            if (type == SendProgressRate.TYPE || type == History.TYPE)
+            if (type == SendProgressRate.TYPE || type == History.TYPE || type == Scheduling.TYPE)
             {
                 switch (msg)
                 {
@@ -127,6 +128,9 @@ namespace DocSearch.Controllers
                     case "GetHistoryData":
                         GetHistory(args[0], connectionID);
                         break;
+                    case "SaveScheduling":
+                        SaveSchedule(args, connectionID);
+                        break;
                 }
             }
         }
@@ -139,6 +143,8 @@ namespace DocSearch.Controllers
             {
                 setupModel.CrawlFolders += crawlFolder.Replace(@"\\", @"\") + Environment.NewLine;
             }
+
+            Scheduling.GetSchedule(setupModel);
 
             return View(setupModel);
         }
@@ -172,6 +178,22 @@ namespace DocSearch.Controllers
 
             return RedirectToAction("Setup", "Setup", setupModel);
         }
+        #endregion
+
+        #region スケジューリング設定の読み込み・保存
+        /// <summary>
+        /// スケジューリング設定の保存
+        /// </summary>
+        /// <param name="args"></param>
+        /// <param name="connectionID"></param>
+        public void SaveSchedule(string[] args, string connectionID)
+        {
+            Scheduling.SetSchedule(args);
+            ScheduleSettings.GetInstance().Save();
+
+            Scheduling.SendMessage(Scheduling.MESSAGE_SAVED, connectionID);
+        }
+
         #endregion
 
         #region クロール・機械学習が実行済みかどうかの確認

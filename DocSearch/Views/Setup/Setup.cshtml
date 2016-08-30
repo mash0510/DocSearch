@@ -108,40 +108,47 @@
     <div id="onetime">
         <div class="row">
             <div class="col-md-1">
-                <select id="schedule-select" onchange="ScheduleTypeChanged(this)">
-                    <option value="oneTime" selected>1回のみ</option>
-                    <option value="date">日毎</option>
-                    <option value="day">曜日</option>
-                    <option value="detail">詳細設定</option>
-                </select>
+                @Html.DropDownListFor(m => m.ScheduleType,
+                    new SelectListItem[]
+                    {
+                        new SelectListItem() { Value="oneTime", Text="1回のみ" },
+                        new SelectListItem() { Value="date", Text="日毎" },
+                        new SelectListItem() { Value="day", Text="曜日" },
+                        new SelectListItem() { Value="detail", Text="詳細設定" }
+                    },
+                    new { id= "schedule-select", onchange = "ScheduleTypeChanged(this)" }
+               )
             </div>
             <div class="col-md-11">
                 <div id="schedule-oneTime">
-                    <input type="datetime-local" id="schedule-oneTime-input" />
+                    @Html.TextBoxFor(m => m.OneTimeDateTime, new { type = "datetime-local", id = "schedule-oneTime-input" })
                 </div>
                 <div id="schedule-daily">
                     <div class="row">
                         <div class="col-xs-3">
-                            <input type="text" id="schedule-daily-interval" /><lable class="ds-label">日毎</lable>
+                            @Html.TextBoxFor(m => m.DayInterval, new { type = "text", id = "schedule-daily-interval" })
+                            <lable class="ds-label">日毎</lable>
                         </div>
                         <div class="col-xs-9">
-                            <label class="ds-label">実行時間</label><input type="time" id="schedule-daily-time"/>
+                            <label class="ds-label">実行時間</label>
+                            @Html.TextBoxFor(m => m.ExecTimeDaily, new { type = "time", id = "schedule-daily-time" })
                         </div>
                     </div>
                 </div>
                 <div id="schedule-day">
-                        <input type="checkbox" value="mon" name="schedule-day-mon" />月
-                        <input type="checkbox" value="tue" name="schedule-day-tue" style="margin-left: 10px" />火
-                        <input type="checkbox" value="wed" name="schedule-day-wed" style="margin-left: 10px" />水
-                        <input type="checkbox" value="thr" name="schedule-day-thr" style="margin-left: 10px" />木
-                        <input type="checkbox" value="fri" name="schedule-day-fri" style="margin-left: 10px" />金
-                        <input type="checkbox" value="sat" name="schedule-day-sat" style="margin-left: 10px" />土
-                        <input type="checkbox" value="sun" name="schedule-day-sun" style="margin-left: 10px" />日
-                        <label class="ds-label">実行時間</label><input type="time" id="schedule-day-time" />
+                    @Html.CheckBoxFor(m => m.ExecMonday, new { value = "mon" })月
+                    @Html.CheckBoxFor(m => m.ExecTuesday, new { value = "tue", style = "margin-left: 10px" })火
+                    @Html.CheckBoxFor(m => m.ExecWendnesday, new { value = "wed", style = "margin-left: 10px" })水
+                    @Html.CheckBoxFor(m => m.ExecThursday, new { value = "thr", style = "margin-left: 10px" })木
+                    @Html.CheckBoxFor(m => m.ExecFriday, new { value = "fri", style = "margin-left: 10px" })金
+                    @Html.CheckBoxFor(m => m.ExecSurtarday, new { value = "sat", style = "margin-left: 10px" })土
+                    @Html.CheckBoxFor(m => m.ExecSunday, new { value = "sun", style = "margin-left: 10px" })日
+                    <label class="ds-label">実行時間</label>
+                    @Html.TextBoxFor(m => m.ExecTimeDay, new { type = "time", id = "schedule-day-time" })
                 </div>
                 <div id="schedule-detail">
-                        <label class="ds-label">crontab形式で指定して下さい。</label>
-                        <input type="text" id="schedule-cron" style="width:300px" />
+                    <label class="ds-label">crontab形式で指定して下さい。</label>
+                    @Html.TextBoxFor(m => m.CronString, new { type = "text", id = "schedule-cron", style = "width:300px" })
                 </div>
             </div>
         </div>
@@ -243,8 +250,8 @@
 
     // ******* スケジューリング *******
     // スケジューリングの種別設定変更
-    function ScheduleTypeChanged(args) {
-        ScheduleSettingUISwitch(args.selectedOptions[0].value);
+    function ScheduleTypeChanged() {
+        ScheduleSettingUISwitch($("#schedule-select").val());
     }
     // スケジュール設定UIの表示・非表示
     function ScheduleSettingUISwitch(type) {
@@ -279,13 +286,13 @@
         var schOneTime = $("#schedule-oneTime-input").val();
         var schDailyInterval = $("#schedule-daily-interval").val();
         var schDailyTime = $("#schedule-daily-time").val();
-        var schMon = $('[name=schedule-day-mon]').prop("checked");
-        var schTue = $('[name=schedule-day-tue]').prop("checked");
-        var schWed = $('[name=schedule-day-wed]').prop("checked");
-        var schThr = $('[name=schedule-day-thr]').prop("checked");
-        var schFri = $('[name=schedule-day-fri]').prop("checked");
-        var schSat = $('[name=schedule-day-sat]').prop("checked");
-        var schSun = $('[name=schedule-day-sun]').prop("checked");
+        var schMon = $('[name=ExecMonday]').prop("checked");
+        var schTue = $('[name=ExecTuesday]').prop("checked");
+        var schWed = $('[name=ExecWendnesday]').prop("checked");
+        var schThr = $('[name=ExecThursday]').prop("checked");
+        var schFri = $('[name=ExecFriday]').prop("checked");
+        var schSat = $('[name=ExecSurtarday]').prop("checked");
+        var schSun = $('[name=ExecSunday]').prop("checked");
         var schDayTime = $("#schedule-day-time").val();
         var schCron = $("#schedule-cron").val();
 

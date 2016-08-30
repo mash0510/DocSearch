@@ -190,7 +190,7 @@ namespace FolderCrawler.Setting
 
             try
             {
-                XmlSerializer serializer = new XmlSerializer(typeof(Settings));
+                XmlSerializer serializer = new XmlSerializer(typeof(ScheduleSettings));
 
                 //XMLファイルから読み込み、逆シリアル化する
                 _self.RestoreSettings((ScheduleSettings)serializer.Deserialize(sr));

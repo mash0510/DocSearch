@@ -52,7 +52,8 @@ namespace DocSearch.CommonLogic
             setupModel.ExecSunday = ScheduleSettings.GetInstance().ExecSunday;
             setupModel.ExecSurtarday = ScheduleSettings.GetInstance().ExecSurtarday;
             setupModel.ExecThursday = ScheduleSettings.GetInstance().ExecThursday;
-            setupModel.ExecTime = ScheduleSettings.GetInstance().ExecTimeDaily;
+            setupModel.ExecTimeDaily = ScheduleSettings.GetInstance().ExecTimeDaily;
+            setupModel.ExecTimeDay = ScheduleSettings.GetInstance().ExecTimeDay;
             setupModel.ExecTuesday = ScheduleSettings.GetInstance().ExecTuesday;
             setupModel.ExecWendnesday = ScheduleSettings.GetInstance().ExecWendnesday;
             setupModel.OneTimeDateTime = ScheduleSettings.GetInstance().OneTimeDateTime;

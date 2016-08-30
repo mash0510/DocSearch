@@ -67,9 +67,18 @@ namespace DocSearch.Models
         }
 
         /// <summary>
-        /// 「1回のみ」以外を選択したときの実行時間
+        /// 日毎を選択したときの実行時間
         /// </summary>
-        public string ExecTime
+        public string ExecTimeDaily
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// 曜日指定時の実行時間
+        /// </summary>
+        public string ExecTimeDay
         {
             get;
             set;

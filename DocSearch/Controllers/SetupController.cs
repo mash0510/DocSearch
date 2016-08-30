@@ -193,7 +193,6 @@ namespace DocSearch.Controllers
 
             Scheduling.SendMessage(Scheduling.MESSAGE_SAVED, connectionID);
         }
-
         #endregion
 
         #region クロール・機械学習が実行済みかどうかの確認

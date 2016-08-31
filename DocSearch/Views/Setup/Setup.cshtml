@@ -111,6 +111,7 @@
                 @Html.DropDownListFor(m => m.ScheduleType,
                     new SelectListItem[]
                     {
+                        new SelectListItem() { Value="none", Text="非実行" },
                         new SelectListItem() { Value="oneTime", Text="1回のみ" },
                         new SelectListItem() { Value="date", Text="日毎" },
                         new SelectListItem() { Value="day", Text="曜日" },
@@ -158,10 +159,7 @@
                 <button type="button" id="setSchedule" class="btn btn-default" onclick="SaveScheduling()">設定</button>
             </div>
             <div class="col-md-1">
-                <button type="button" id="revertSchedule" class="btn btn-default">元に戻す</button>
-            </div>
-            <div class="col-md-1">
-                <button type="button" id="clearSchedule" class="btn btn-default">クリア</button>
+                <button type="button" id="revertSchedule" class="btn btn-default" onclick="RevertScheduling()">元に戻す</button>
             </div>
         </div>
     </div>
@@ -191,6 +189,9 @@
     var comNotifier;
     var dialog;
 
+    // 変更前のスケジュール設定
+    var org_schedule = {};
+
     window.onload = function () {
         DisableControls(false);
 
@@ -201,14 +202,13 @@
             if (type == "PROGRESS_BAR") {
                 var rate = parseInt(args[0]);
                 var id = args[1];
-
                 UpdateProgress(message, rate, id);
             }
             else if (type == "HISTORY") {
                 ShowHistoryDialog(message, args);
             }
             else if (type == "SCHEDULING") {
-                ShowMessage(message);
+                SetScheduleFinished(message);
             }
         };
 
@@ -236,6 +236,8 @@
 
         // スケジュール設定UIの初期表示
         ScheduleSettingUISwitch($("#schedule-select").val());
+        // 変更前のスケジュール設定を保存しておく
+        GetScheduleSettings(org_schedule);
     };
 
     // サーバーへのメッセージ送信
@@ -255,7 +257,13 @@
     }
     // スケジュール設定UIの表示・非表示
     function ScheduleSettingUISwitch(type) {
-        if (type == "oneTime") {
+        if (type == "none") {
+            $("#schedule-oneTime").css("display", "none");
+            $("#schedule-daily").css("display", "none");
+            $("#schedule-day").css("display", "none");
+            $("#schedule-detail").css("display", "none");
+        }
+        else if (type == "oneTime") {
             $("#schedule-oneTime").css("display", "block");
             $("#schedule-daily").css("display", "none");
             $("#schedule-day").css("display", "none");
@@ -280,25 +288,58 @@
             $("#schedule-detail").css("display", "block");
         }
     }
+    // UI上で編集されたスケジュール設定をオブジェクトに読み込む
+    function GetScheduleSettings(schData)
+    {
+        schData.type = $("#schedule-select").val();
+        schData.schOneTime = $("#schedule-oneTime-input").val();
+        schData.schDailyInterval = $("#schedule-daily-interval").val();
+        schData.schDailyTime = $("#schedule-daily-time").val();
+        schData.schMon = $('[name=ExecMonday]').prop("checked");
+        schData.schTue = $('[name=ExecTuesday]').prop("checked");
+        schData.schWed = $('[name=ExecWendnesday]').prop("checked");
+        schData.schThr = $('[name=ExecThursday]').prop("checked");
+        schData.schFri = $('[name=ExecFriday]').prop("checked");
+        schData.schSat = $('[name=ExecSurtarday]').prop("checked");
+        schData.schSun = $('[name=ExecSunday]').prop("checked");
+        schData.schDayTime = $("#schedule-day-time").val();
+        schData.schCron = $("#schedule-cron").val();
+    }
+    // オブジェクト中のスケジュールデータをUIに反映する
+    function SetScheduleSettings(schData)
+    {
+        $("#schedule-select").val(schData.type);
+        $("#schedule-oneTime-input").val(schData.schOneTime);
+        $("#schedule-daily-interval").val(schData.schDailyInterval);
+        $("#schedule-daily-time").val(schData.schDailyTime);
+        $('[name=ExecMonday]').prop("checked", schData.schMon);
+        $('[name=ExecTuesday]').prop("checked", schData.schTue);
+        $('[name=ExecWendnesday]').prop("checked", schData.schWed);
+        $('[name=ExecThursday]').prop("checked", schData.schThr);
+        $('[name=ExecFriday]').prop("checked", schData.schFri);
+        $('[name=ExecSurtarday]').prop("checked", schData.schSat);
+        $('[name=ExecSunday]').prop("checked", schData.schSun);
+        $("#schedule-day-time").val(schData.schDayTime);
+        $("#schedule-cron").val(schData.schCron);
+    }
     // スケジュール設定の保存
     function SaveScheduling() {
-        var type = $("#schedule-select").val();
-        var schOneTime = $("#schedule-oneTime-input").val();
-        var schDailyInterval = $("#schedule-daily-interval").val();
-        var schDailyTime = $("#schedule-daily-time").val();
-        var schMon = $('[name=ExecMonday]').prop("checked");
-        var schTue = $('[name=ExecTuesday]').prop("checked");
-        var schWed = $('[name=ExecWendnesday]').prop("checked");
-        var schThr = $('[name=ExecThursday]').prop("checked");
-        var schFri = $('[name=ExecFriday]').prop("checked");
-        var schSat = $('[name=ExecSurtarday]').prop("checked");
-        var schSun = $('[name=ExecSunday]').prop("checked");
-        var schDayTime = $("#schedule-day-time").val();
-        var schCron = $("#schedule-cron").val();
+        var scheData = {};
+        GetScheduleSettings(scheData);
 
-        var schArgs = [type, schOneTime, schDailyInterval, schDailyTime, schMon, schTue, schWed, schThr, schFri, schSat, schSun, schDayTime, schCron];
+        var schArgs = [scheData.type, scheData.schOneTime, scheData.schDailyInterval, scheData.schDailyTime, scheData.schMon, scheData.schTue, scheData.schWed, scheData.schThr, scheData.schFri, scheData.schSat, scheData.schSun, scheData.schDayTime, scheData.schCron];
 
         SendMessageToServer("SCHEDULING", "SaveScheduling", schArgs);
+    }
+    // スケジュール設定を元に戻す
+    function RevertScheduling() {
+        SetScheduleSettings(org_schedule);
+        ScheduleTypeChanged();
+    }
+    // スケジュール設定完了
+    function SetScheduleFinished(message) {
+        GetScheduleSettings(org_schedule);
+        alert(message);
     }
     // ******* スケジューリング *******
 

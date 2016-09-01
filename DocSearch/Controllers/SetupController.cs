@@ -297,6 +297,9 @@ namespace DocSearch.Controllers
                 {
                     rate = SendProgressRate.PROGRESS_RATE_CANCELED;
                     message = MESSAGE_CRAWL_CANCELED;
+                    _crawlProgress.SendRate(message, rate);
+
+                    return;
                 }
 
                 _crawlProgress.SendRate(message, rate);

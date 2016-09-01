@@ -262,7 +262,7 @@ namespace DocSearch.CommonLogic
                 week += ScheduleSettings.GetInstance().ExecMonday ? "MON," : "";
                 week += ScheduleSettings.GetInstance().ExecTuesday ? "TUE," : "";
                 week += ScheduleSettings.GetInstance().ExecWendnesday ? "WED," : "";
-                week += ScheduleSettings.GetInstance().ExecThursday ? "THR," : "";
+                week += ScheduleSettings.GetInstance().ExecThursday ? "THU," : "";
                 week += ScheduleSettings.GetInstance().ExecFriday ? "FRI," : "";
                 week += ScheduleSettings.GetInstance().ExecSurtarday ? "SAT," : "";
                 week += ScheduleSettings.GetInstance().ExecSunday ? "SUN," : "";

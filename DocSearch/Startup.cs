@@ -3,6 +3,8 @@ using FolderCrawler;
 using FolderCrawler.Setting;
 using Microsoft.Owin;
 using Owin;
+using Quartz;
+using System;
 
 [assembly: OwinStartupAttribute(typeof(DocSearch.Startup))]
 namespace DocSearch
@@ -19,7 +21,14 @@ namespace DocSearch
             ScheduleSettings.GetInstance().Load();
 
             // スケジューリングの設定
-            Scheduling.GetInstance().SetQuartz();
+            try
+            {
+                Scheduling.GetInstance().SetQuartz();
+            }
+            catch
+            {
+                // ここで発生した例外は無視する。ログ出力を後日実装
+            }
 
             app.MapSignalR();
 

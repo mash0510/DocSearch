@@ -7,6 +7,7 @@ using System.Web.Mvc;
 using DocSearch.CommonLogic;
 using FolderCrawler.History;
 using FolderCrawler.Setting;
+using Quartz;
 
 namespace DocSearch.Controllers
 {
@@ -20,7 +21,7 @@ namespace DocSearch.Controllers
         /// <summary>
         /// 「機械学習をする」を示す値
         /// </summary>
-        private const string EXEC_MACHINE_LEARNING = "1";
+        internal const string EXEC_MACHINE_LEARNING = "1";
 
         SendProgressRate _crawlProgress = new ProgressRateCrawl();
         SendProgressRate _machineLearningProgress = new ProgressRateMachineLearning();
@@ -144,7 +145,7 @@ namespace DocSearch.Controllers
                 setupModel.CrawlFolders += crawlFolder.Replace(@"\\", @"\") + Environment.NewLine;
             }
 
-            Scheduling.GetSchedule(setupModel);
+            Scheduling.GetInstance().GetSchedule(setupModel);
 
             return View(setupModel);
         }
@@ -180,7 +181,7 @@ namespace DocSearch.Controllers
         }
         #endregion
 
-        #region スケジューリング設定の読み込み・保存
+        #region スケジューリング設定
         /// <summary>
         /// スケジューリング設定の保存
         /// </summary>
@@ -188,10 +189,26 @@ namespace DocSearch.Controllers
         /// <param name="connectionID"></param>
         public void SaveSchedule(string[] args, string connectionID)
         {
-            Scheduling.SetSchedule(args);
+            try
+            {
+                Scheduling.GetInstance().SetSchedule(args);
+            }
+            catch (FormatException ex)
+            {
+                // 詳細設定選択時にcron文字列が不正だったら、設定保存させない。
+                Scheduling.GetInstance().SendMessage(Scheduling.MESSAGE_CRON_STRING_ERROR, connectionID);
+                ScheduleSettings.GetInstance().Restore();
+                return;
+            }
+            catch (SchedulerException ex)
+            {
+                // 一度もスケジュール実行されないような設定（過去日を指定したなど）の場合は、エラーメッセージを出す。
+                Scheduling.GetInstance().SendMessage(Scheduling.MESSAGE_NO_EXECUTE_DATE, connectionID);
+            }
+
             ScheduleSettings.GetInstance().Save();
 
-            Scheduling.SendMessage(Scheduling.MESSAGE_SAVED, connectionID);
+            Scheduling.GetInstance().SendMessage(Scheduling.MESSAGE_SAVED, connectionID);
         }
         #endregion
 

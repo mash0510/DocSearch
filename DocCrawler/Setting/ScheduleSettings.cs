@@ -130,7 +130,14 @@ namespace FolderCrawler.Setting
             set;
         }
 
+        /// <summary>
+        /// 最新設定
+        /// </summary>
         private static ScheduleSettings _self = new ScheduleSettings();
+        /// <summary>
+        /// 1つ前の設定
+        /// </summary>
+        private static ScheduleSettings _prev = new ScheduleSettings();
 
         /// <summary>
         /// インスタンス取得
@@ -142,11 +149,58 @@ namespace FolderCrawler.Setting
         }
 
         /// <summary>
+        /// 1つ前の設定のインスタンスを取得
+        /// </summary>
+        /// <returns></returns>
+        public static ScheduleSettings GetPrevInstance()
+        {
+            return _prev;
+        }
+
+        /// <summary>
         /// コンストラクタ
         /// </summary>
         private ScheduleSettings()
         {
 
+        }
+
+        /// <summary>
+        /// 今の設定を１つ前の設定インスタンスに退避する
+        /// </summary>
+        /// <param name="copySource">コピー元</param>
+        /// <param name="copyDest">コピー先</param>
+        private void Copy(ScheduleSettings copySource, ScheduleSettings copyDest)
+        {
+            copyDest.ScheduleType = copySource.ScheduleType;
+            copyDest.OneTimeDateTime = copySource.OneTimeDateTime;
+            copyDest.DayInterval = copySource.DayInterval;
+            copyDest.ExecTimeDaily = copySource.ExecTimeDaily;
+            copyDest.ExecMonday = copySource.ExecMonday;
+            copyDest.ExecTuesday = copySource.ExecTuesday;
+            copyDest.ExecWendnesday = copySource.ExecWendnesday;
+            copyDest.ExecThursday = copySource.ExecThursday;
+            copyDest.ExecFriday = copySource.ExecFriday;
+            copyDest.ExecSurtarday = copySource.ExecSurtarday;
+            copyDest.ExecSunday = copySource.ExecSunday;
+            copyDest.ExecTimeDay = copySource.ExecTimeDay;
+            copyDest.CronString = copySource.CronString;
+        }
+
+        /// <summary>
+        /// 今現在の設定を退避
+        /// </summary>
+        public void Backup()
+        {
+            Copy(_self, _prev);
+        }
+
+        /// <summary>
+        /// 1つ前の設定を戻す
+        /// </summary>
+        public void Restore()
+        {
+            Copy(_prev, _self);
         }
 
         /// <summary>
@@ -193,7 +247,7 @@ namespace FolderCrawler.Setting
                 XmlSerializer serializer = new XmlSerializer(typeof(ScheduleSettings));
 
                 //XMLファイルから読み込み、逆シリアル化する
-                _self.RestoreSettings((ScheduleSettings)serializer.Deserialize(sr));
+                Copy((ScheduleSettings)serializer.Deserialize(sr), _self);
             }
             catch (Exception ex)
             {
@@ -210,21 +264,21 @@ namespace FolderCrawler.Setting
         /// 読み込んだ設定を復元
         /// </summary>
         /// <param name="parameters"></param>
-        public void RestoreSettings(ScheduleSettings parameters)
-        {
-            _self.ScheduleType = parameters.ScheduleType;
-            _self.OneTimeDateTime = parameters.OneTimeDateTime;
-            _self.ExecTimeDaily = parameters.ExecTimeDaily;
-            _self.ExecTimeDay = parameters.ExecTimeDay;
-            _self.DayInterval = parameters.DayInterval;
-            _self.ExecFriday = parameters.ExecFriday;
-            _self.ExecMonday = parameters.ExecMonday;
-            _self.ExecSunday = parameters.ExecSunday;
-            _self.ExecSurtarday = parameters.ExecSurtarday;
-            _self.ExecThursday = parameters.ExecThursday;
-            _self.ExecTuesday = parameters.ExecTuesday;
-            _self.ExecWendnesday = parameters.ExecWendnesday;
-            _self.CronString = parameters.CronString;
-        }
+        //public void RestoreSettings(ScheduleSettings parameters)
+        //{
+        //    _self.ScheduleType = parameters.ScheduleType;
+        //    _self.OneTimeDateTime = parameters.OneTimeDateTime;
+        //    _self.ExecTimeDaily = parameters.ExecTimeDaily;
+        //    _self.ExecTimeDay = parameters.ExecTimeDay;
+        //    _self.DayInterval = parameters.DayInterval;
+        //    _self.ExecFriday = parameters.ExecFriday;
+        //    _self.ExecMonday = parameters.ExecMonday;
+        //    _self.ExecSunday = parameters.ExecSunday;
+        //    _self.ExecSurtarday = parameters.ExecSurtarday;
+        //    _self.ExecThursday = parameters.ExecThursday;
+        //    _self.ExecTuesday = parameters.ExecTuesday;
+        //    _self.ExecWendnesday = parameters.ExecWendnesday;
+        //    _self.CronString = parameters.CronString;
+        //}
     }
 }

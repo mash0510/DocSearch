@@ -70,9 +70,9 @@ namespace DocSearch.Controllers
         /// </summary>
         private string MESSAGE_SAVED = "保存が完了しました";
 
-        // ブラウザからののメッセージ受信イベントを登録したかどうか
+        //  イベントを登録したかどうか
         // （二重登録防止用のフラグ）
-        private static bool isCatchBrowerMessageRegistered = false;
+        private static bool isEventRegistered = false;
 
         /// <summary>
         /// コンストラクタ
@@ -88,13 +88,15 @@ namespace DocSearch.Controllers
             _machineLearningProgress.MessageNoProgressRate = MESSAGE_LEARNING;
             _machineLearningProgress.MessageFinished = MESSAGE_LEARNING_FINISHED;
 
-            if (!isCatchBrowerMessageRegistered)
+            if (!isEventRegistered)
             {
                 ComHub.CatchBrowserMessage += ProgressHub_CatchBrowserMessage;
-                isCatchBrowerMessageRegistered = true;
+                Scheduling.GetInstance().ExecJob += SetupController_ExecJob;
+
+                isEventRegistered = true;
             }
         }
-        
+
         /// <summary>
         /// ブラウザからのメッセージ受信
         /// </summary>
@@ -181,7 +183,7 @@ namespace DocSearch.Controllers
         }
         #endregion
 
-        #region スケジューリング設定
+        #region スケジューリング
         /// <summary>
         /// スケジューリング設定の保存
         /// </summary>
@@ -209,6 +211,17 @@ namespace DocSearch.Controllers
             ScheduleSettings.GetInstance().Save();
 
             Scheduling.GetInstance().SendMessage(Scheduling.MESSAGE_SAVED, connectionID);
+        }
+
+        /// <summary>
+        /// スケジュールイベントハンドラ
+        /// </summary>
+        /// <param name="args"></param>
+        private void SetupController_ExecJob(System.Collections.Generic.Dictionary<string, object> args)
+        {
+            string arg = args[Scheduling.KEY_EXEC_MACHINE_LEARNING].ToString();
+
+            StartCrawl("#crawlProgressBar", "#machineLearningProgressBar", arg);
         }
         #endregion
 

@@ -23,6 +23,11 @@ namespace DocSearch.CommonLogic
         public const string MESSAGE_NO_EXECUTE_DATE = "スケジュールが一度も実行されない設定です（過去日など）。";
 
         /// <summary>
+        /// Key情報 - 機械学習をクロール後に実行するかどうか
+        /// </summary>
+        public const string KEY_EXEC_MACHINE_LEARNING = "execMachineLearning";
+
+        /// <summary>
         /// スケジューラーオブジェクト
         /// </summary>
         IScheduler scheduler;
@@ -175,7 +180,7 @@ namespace DocSearch.CommonLogic
         /// <summary>
         /// スケジューリングモジュールへの設定
         /// </summary>
-        private void SetQuartz()
+        public void SetQuartz()
         {
             if (scheduler == null)
                 return;
@@ -284,7 +289,7 @@ namespace DocSearch.CommonLogic
             public void Execute(IJobExecutionContext context)
             {
                 Dictionary<string, object> args = new Dictionary<string, object>();
-                args["execMachineLearning"] = SetupController.EXEC_MACHINE_LEARNING;
+                args[KEY_EXEC_MACHINE_LEARNING] = SetupController.EXEC_MACHINE_LEARNING;
 
                 Scheduling.GetInstance().ExecJob(args);
             }

@@ -18,6 +18,9 @@ namespace DocSearch
             Settings.GetInstance().LoadSettings();
             ScheduleSettings.GetInstance().Load();
 
+            // スケジューリングの設定
+            Scheduling.GetInstance().SetQuartz();
+
             app.MapSignalR();
 
             // 保存したデータの読み込み

@@ -180,7 +180,7 @@ namespace FolderCrawler
             CumurativeInsertedDocuments = 0;
 
             // 既存の訓練データの削除
-            DeleteTrainingDataFile();
+            BackupTrainingDataFile();
 
             while (true)
             {
@@ -248,8 +248,16 @@ namespace FolderCrawler
 
             try
             {
-                // 一時退避用に保持していたバックアップファイルを削除
-                File.Delete(CommonParameters.TrainingDataFileBackupFullPath);
+                if (!_cancel)
+                {
+                    // キャンセルせずに最後まで処理したら、一時退避用に保持していたバックアップファイルを削除
+                    File.Delete(CommonParameters.TrainingDataFileBackupFullPath);
+                }
+                else
+                {
+                    // キャンセルされたら、バックアップしておいた訓練データを元に戻す
+                    RevertTrainingDataFile();
+                }
             }
             catch
             {
@@ -291,14 +299,25 @@ namespace FolderCrawler
         }
 
         /// <summary>
-        /// 訓練データの削除
+        /// 訓練データのバックアップ
         /// </summary>
-        public void DeleteTrainingDataFile()
+        public void BackupTrainingDataFile()
         {
             string outputFile = CommonParameters.TrainingDataFileFullPath;
             string backupFile = CommonParameters.TrainingDataFileBackupFullPath;
 
             CommonLogic.FileBackup(outputFile, backupFile);
+        }
+
+        /// <summary>
+        /// バックアップしていた訓練データを元に戻す
+        /// </summary>
+        public void RevertTrainingDataFile()
+        {
+            string outputFile = CommonParameters.TrainingDataFileFullPath;
+            string backupFile = CommonParameters.TrainingDataFileBackupFullPath;
+
+            CommonLogic.FileBackup(backupFile, outputFile);
         }
 
         /// <summary>

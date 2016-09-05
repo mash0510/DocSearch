@@ -297,9 +297,6 @@ namespace DocSearch.Controllers
                 {
                     rate = SendProgressRate.PROGRESS_RATE_CANCELED;
                     message = MESSAGE_CRAWL_CANCELED;
-                    _crawlProgress.SendRate(message, rate);
-
-                    return;
                 }
 
                 _crawlProgress.SendRate(message, rate);
@@ -313,7 +310,7 @@ namespace DocSearch.Controllers
                 History.CrawlHistory.Add(history);
                 History.CrawlHistory.Save();
 
-                if (execMachineLearning == EXEC_MACHINE_LEARNING)
+                if (!isCanceled && execMachineLearning == EXEC_MACHINE_LEARNING)
                 {
                     // 機械学習を続けて実行する場合は、機械学習実行。
                     StartMachineLearning(machineLearningProgressBarID);

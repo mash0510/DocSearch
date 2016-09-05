@@ -105,7 +105,7 @@
 <!-- スケジューリング設定 -->
 <div class="container">
     <h4>スケジュール設定</h4>
-    <div id="onetime">
+    <div id="scheduling">
         <div class="row">
             <div class="col-md-1">
                 @Html.DropDownListFor(m => m.ScheduleType,
@@ -156,10 +156,10 @@
         <br />
         <div class="row">
             <div class="col-md-1">
-                <button type="button" id="setSchedule" class="btn btn-default" onclick="SaveScheduling()">設定</button>
+                <input type="button" id="setSchedule" class="btn btn-default" onclick="SaveScheduling()" value="設定" />
             </div>
             <div class="col-md-1">
-                <button type="button" id="revertSchedule" class="btn btn-default" onclick="RevertScheduling()">元に戻す</button>
+                <input type="button" id="revertSchedule" class="btn btn-default" onclick="RevertScheduling()" value="元に戻す" />
             </div>
         </div>
     </div>
@@ -405,8 +405,8 @@
             $(id).find(".progress-rate").html(message);
 
             // 処理が完了したら、プログレスバーの表示をアニメーション → 固定表示に切り替える
-            // 100ではなく、101が処理終了を表すコード。
-            if (count == 101) {
+            // 100ではなく、101が処理終了を表すコード。-2はキャンセルされたことを示すコード。
+            if (count == 101 || count == -2) {
                 $(id).find("#progressType").removeClass("progress-striped active");
 
                 var result = JdugeStartMachineLearning(id);
@@ -505,6 +505,13 @@
             $("#crawlCancelButton").prop('disabled', !enabled);
             $("#machineLearningCancelButton").prop('disabled', !enabled);
         }
+
+        var schedulingInput = $("#scheduling").find("input");
+        for (var i = 0; i < schedulingInput.length; i++) {
+            schedulingInput[i].disabled = enabled;
+        }
+
+        $("#schedule-select").prop('disabled', enabled);
     }
     // ******* クロールと機械学習 *******
 

@@ -13,6 +13,8 @@ namespace FolderCrawler.Setting
     /// </summary>
     public class Settings
     {
+        public const string TYPE = "SETUP_CRAWL_FOLDER";
+
         private static Settings _self = new Settings();
 
         /// <summary>

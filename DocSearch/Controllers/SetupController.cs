@@ -106,10 +106,13 @@ namespace DocSearch.Controllers
         /// <param name="connectionID"></param>
         private void ProgressHub_CatchBrowserMessage(string type, string msg, string[] args, string connectionID)
         {
-            if (type == SendProgressRate.TYPE || type == History.TYPE || type == Scheduling.TYPE)
+            if (type == SendProgressRate.TYPE || type == History.TYPE || type == Scheduling.TYPE || type == Settings.TYPE)
             {
                 switch (msg)
                 {
+                    case "SetupCrawlFolders":
+                        SetupCrawlFolder(args[0], connectionID);
+                        break;
                     case "CancelCrawl":
                         CrawlerManager.GetInstance().Stop();
                         break;
@@ -158,10 +161,9 @@ namespace DocSearch.Controllers
         /// </summary>
         /// <param name="setupModel"></param>
         /// <returns></returns>
-        [HttpPost]
-        public ActionResult SetupCrawlFolder(SetupModel setupModel)
+        public void SetupCrawlFolder(string crawlFolders, string connectionID)
         {
-            string pathes = setupModel.CrawlFolders.Replace(Environment.NewLine, ",");
+            string pathes = crawlFolders.Replace("\n", ",");
             string[] pathesArray = pathes.Split(delimiter);
 
             Settings.GetInstance().CrawlFolders.Clear();
@@ -177,9 +179,7 @@ namespace DocSearch.Controllers
 
             Settings.GetInstance().SaveSettings();
 
-            setupModel.Message = MESSAGE_SAVED;
-
-            return RedirectToAction("Setup", "Setup", setupModel);
+            ComHub.SendMessageToTargetClient(Settings.TYPE, MESSAGE_SAVED, new string[0], connectionID);
         }
         #endregion
 

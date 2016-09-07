@@ -9,97 +9,84 @@
 <!-- クロール先フォルダの指定 -->
 <div class="ds-container">
     <h4>クロール先のフォルダの指定</h4>
-    @using (Html.BeginForm("SetupCrawlFolder", "Setup", FormMethod.Post))
-    {
-        <div class="form-group">
-            <label class="control-label">クロール先のフォルダを指定して下さい。改行で複数のフォルダを指定出来ます。</label>
-            @Html.TextAreaFor(m => m.CrawlFolders, new { @class = "form-control", rows = "5", id="crawlFoldersTextBox" })
-        </div>
-        <button type="submit" id="folderApplyButton" class="btn btn-default right">適用</button>
-    }
+    <div class="form-group">
+        <label class="control-label">クロール先のフォルダを指定して下さい。改行で複数のフォルダを指定出来ます。</label>
+        @Html.TextAreaFor(m => m.CrawlFolders, new { @class = "form-control", rows = "5", id="crawlFoldersTextBox" })
+    </div>
+    <input type="button" id="folderApplyButton" class="btn btn-default right" value="適用" onclick="SetupCrawlFolders()" />
 </div>
 
 <!-- クロール開始 -->
 <div class="ds-container">
     <h4>クロール処理の開始</h4>
-    @using (Html.BeginForm("StartCrawl", "Setup", FormMethod.Post))
-    {
-        <div class="form-group">
-            <div class="row">
-                <div class="col-md-3">
-                    <label class="control-label">クロール後の関連語学習</label>
-                </div>
-                <div class="col-md-2">
-                   @Html.DropDownListFor(m => m.ExecMachineLearning,
-                     new SelectListItem[] {
-                        new SelectListItem() { Value="0", Text="しない" },
-                        new SelectListItem() { Value="1", Text="する" }
-                     },
-                     new { @class="form-control", id="execMachineLearningOption" })
-                </div>
-                <div class="col-md-1 text-center">
-                    <button type="button" id="crawlStartButton" class="btn btn-default" onclick="StartCrawl()">開始</button>
-                </div>
-                <div class="col-md-1 text-center">
-                    <button type="button" id="crawlCancelButton" class="btn btn-default" onclick="CancelCrawl()">キャンセル</button>
-                </div>
-                <div class="col-md-1 text-center">
-                    <button type="button" id="crawlHistoryButton" class="btn btn-default" onclick="GetHistoryData('Crawl')">履歴</button>
-                </div>
-            </div>
-            <br />
-            <div class="row">
-                <div id="crawlProgressBar">
-                    <div class="col-md-7">
-                        <div class="progress progress-striped active" id="progressType">
-                            <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%;">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-5">
-                        <label class="progress-rate" id="progressRate"></label>
+    <div class="row">
+        <div class="col-md-3">
+            <label class="control-label">クロール後の関連語学習</label>
+        </div>
+        <div class="col-md-2">
+            @Html.DropDownListFor(m => m.ExecMachineLearning,
+                new SelectListItem[] {
+                new SelectListItem() { Value="0", Text="しない" },
+                new SelectListItem() { Value="1", Text="する" }
+                },
+                new { @class="form-control", id="execMachineLearningOption" })
+        </div>
+        <div class="col-md-1 text-center">
+            <button type="button" id="crawlStartButton" class="btn btn-default" onclick="StartCrawl()">開始</button>
+        </div>
+        <div class="col-md-1 text-center">
+            <button type="button" id="crawlCancelButton" class="btn btn-default" onclick="CancelCrawl()">キャンセル</button>
+        </div>
+        <div class="col-md-1 text-center">
+            <button type="button" id="crawlHistoryButton" class="btn btn-default" onclick="GetHistoryData('Crawl')">履歴</button>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div id="crawlProgressBar">
+            <div class="col-md-7">
+                <div class="progress progress-striped active" id="progressType">
+                    <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%;">
                     </div>
                 </div>
             </div>
-       </div>
-    }
+            <div class="col-md-5">
+                <label class="progress-rate" id="progressRate"></label>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="ds-container">
     <h4>関連語学習の開始</h4>
-    @using (Html.BeginForm("StartMachineLearning", "Setup", FormMethod.Post))
-    {
-        <div class="form-group">
-            <div class="row">
-                <div class="col-md-5">
-                    <label class="control-label">関連語を表示する人工知能の学習の実行</label>
-                </div>
-                <div class="col-md-1 text-center">
-                    <button type="button" id="machineLearningStartButton" class="btn btn-default" onclick="StartMachineLearning()">開始</button>
-                </div>
-                <div class="col-md-1 text-center">
-                    <button type="button" id="machineLearningCancelButton" class="btn btn-default" onclick="CancelMachineLearning()">キャンセル</button>
-                </div>
-                <div class="col-md-1 text-center">
-                    <button type="button" id="crawlHistoryButton" class="btn btn-default" onclick="GetHistoryData('word2vec')">履歴</button>
+    <div class="row">
+        <div class="col-md-5">
+            <label class="control-label">関連語を表示する人工知能の学習の実行</label>
+        </div>
+        <div class="col-md-1 text-center">
+            <button type="button" id="machineLearningStartButton" class="btn btn-default" onclick="StartMachineLearning()">開始</button>
+        </div>
+        <div class="col-md-1 text-center">
+            <button type="button" id="machineLearningCancelButton" class="btn btn-default" onclick="CancelMachineLearning()">キャンセル</button>
+        </div>
+        <div class="col-md-1 text-center">
+            <button type="button" id="crawlHistoryButton" class="btn btn-default" onclick="GetHistoryData('word2vec')">履歴</button>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div id="machineLearningProgressBar">
+            <div class="col-md-7">
+                <div class="progress progress-striped active" id="progressType">
+                    <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%;">
+                    </div>
                 </div>
             </div>
-            <br />
-            <div class="row">
-                <div id="machineLearningProgressBar">
-                    <div class="col-md-7">
-                        <div class="progress progress-striped active" id="progressType">
-                            <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%;">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-5">
-                        <label class="progress-rate" id="progressRate"></label>
-                    </div>
-                </div>
+            <div class="col-md-5">
+                <label class="progress-rate" id="progressRate"></label>
             </div>
         </div>
-    }
+    </div>
 </div>
 
 <!-- スケジューリング設定 -->
@@ -210,6 +197,9 @@
             else if (type == "SCHEDULING") {
                 SetScheduleFinished(message);
             }
+            else if (type == "SETUP_CRAWL_FOLDER") {
+                ShowMessage(message);
+            }
         };
 
         // 接続完了時の処理
@@ -249,6 +239,14 @@
     function ShowMessage(message) {
         alert(message);
     }
+
+    // ******* クロール先のフォルダ指定 *******
+    function SetupCrawlFolders() {
+        var crawlFolders = $("#crawlFoldersTextBox").val();
+        var args = [crawlFolders];
+        SendMessageToServer("SETUP_CRAWL_FOLDER", "SetupCrawlFolders", args);
+    }
+    // ******* クロール先のフォルダ指定 *******
 
     // ******* スケジューリング *******
     // スケジューリングの種別設定変更

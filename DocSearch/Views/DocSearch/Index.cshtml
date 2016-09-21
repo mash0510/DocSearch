@@ -1,7 +1,7 @@
 ﻿@model DocSearch.Models.DocSearchModel
 
 @{
-    ViewBag.Title = "Document Search";
+    ViewBag.Title = DocSearch.Resources.Message.TOOLBAR_TITLE_SEARCH;
 }
 
 <!-- 検索キーワード入力部分 -->
@@ -10,24 +10,24 @@
         @using (Html.BeginForm("Index", "DocSearch", FormMethod.Get))
         {
             <div class="form-group input-group">
-                @Html.TextBoxFor(m => m.InputKeywords, new { id = "keywordTextBox", @class="form-control", placeholder = "キーワード" })
+                @Html.TextBoxFor(m => m.InputKeywords, new { id = "keywordTextBox", @class="form-control", placeholder = DocSearch.Resources.Message.PLACEHOLDER_KEYWORD })
                 @Html.HiddenFor(m => m.Page, new { @Value = "1" })
                 <span class="input-group-btn">
-                    <button class="btn btn-default" type="submit">検索</button>
+                    <button class="btn btn-default" type="submit">@DocSearch.Resources.Message.BUTTON_SEARCH</button>
                 </span>
             </div>
         }
     </div>
     <div class="col-md-1">
-        <input class="btn btn-default" type="button" value="フォルダ" onclick="openDialog()"/>
+        <input class="btn btn-default" type="button" value="@DocSearch.Resources.Message.BUTTON_FOLDER_SELECT" onclick="openDialog()"/>
     </div>
     <div class="col-md-1">
-        <input class="btn btn-default" type="button" value="選択クリア" onclick="folderClear()" />
+        <input class="btn btn-default" type="button" value="@DocSearch.Resources.Message.BUTTON_FOLDER_CLEAR" onclick="folderClear()" />
     </div>
     <div class="col-md-3">
         @if (Model.SearchExecuted)
         {
-            <label>@Model.Total 件ヒット</label>
+            <label>@Model.Total @DocSearch.Resources.Message.HIT_COUNT</label>
         }
     </div>
 </div>
@@ -36,7 +36,7 @@
     @if (Model.SearchFolder != null && Model.SearchFolder != string.Empty)
     {
         <div class="col-md-1">
-            <label id="searchFolderLabel">検索先</label>
+            <label id="searchFolderLabel">@DocSearch.Resources.Message.SEARCH_FOLDER_LABEL</label>
         </div>
         <div class="col-md-11">
             <span id="searchFolder">@Model.SearchFolder</span>
@@ -63,7 +63,7 @@
                 {
                     <li>
                         <a href="@result.FileFullPath" target="_blank">@result.FileName</a>
-                        <div class="ds-updateddate">更新日 : @result.UpdatedDate</div>
+                        <div class="ds-updateddate">@DocSearch.Resources.Message.UPDATE_DATE @DocSearch.Resources.Message.COLON @result.UpdatedDate</div>
                         <p class="ds-docsummary">
                             @result.DocSummary
                         </p>
@@ -77,7 +77,7 @@
     <div class="col-md-3  ds-relatedwords">
         @if (Model.SearchExecuted)
         {
-            <h4>関連語</h4>
+            <h4>@DocSearch.Resources.Message.RELATED_WORD</h4>
             foreach (var keyword in Model.InputKeywordList)
             {
                 <h5>@keyword</h5>
@@ -150,7 +150,7 @@
     // 選択した検索先フォルダの表示
     function dispSelectedFolder(folder) {
         if (folder != "") {
-            $('#searchFolderLabel').html("検索先");
+            $('#searchFolderLabel').html("@DocSearch.Resources.Message.SEARCH_FOLDER_LABEL");
             $('#searchFolder').html(folder);
         }
         else {

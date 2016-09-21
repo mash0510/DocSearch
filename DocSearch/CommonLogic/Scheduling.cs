@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using DocSearch.Resources;
 
 namespace DocSearch.CommonLogic
 {
@@ -17,10 +18,6 @@ namespace DocSearch.CommonLogic
     public class Scheduling
     {
         public const string TYPE = "SCHEDULING";
-
-        public const string MESSAGE_SAVED = "保存しました";
-        public const string MESSAGE_CRON_STRING_ERROR = "詳細設定の文字列が正しいcron形式になっていません。";
-        public const string MESSAGE_NO_EXECUTE_DATE = "スケジュールが一度も実行されない設定です（過去日など）。";
 
         /// <summary>
         /// Key情報 - 機械学習をクロール後に実行するかどうか

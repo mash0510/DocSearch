@@ -8,6 +8,7 @@ using DocSearch.CommonLogic;
 using FolderCrawler.History;
 using FolderCrawler.Setting;
 using Quartz;
+using DocSearch.Resources;
 
 namespace DocSearch.Controllers
 {
@@ -26,50 +27,6 @@ namespace DocSearch.Controllers
         SendProgressRate _crawlProgress = new ProgressRateCrawl();
         SendProgressRate _machineLearningProgress = new ProgressRateMachineLearning();
 
-        /// <summary>
-        /// 処理開始ボタン押下～実際の処理開始までの間に表示するメッセージ
-        /// </summary>
-        private string MESSAGE_PREPAREING = "処理開始の準備中です。";
-
-        /// <summary>
-        /// クロール未実行
-        /// </summary>
-        private string MESSAGE_NOT_CRAWLED = "クロールが実行されていません";
-        /// <summary>
-        /// クロール中のメッセージ
-        /// </summary>
-        private string MESSAGE_CRAWLING = "クロール中です...";
-        /// <summary>
-        /// クロール完了時のメッセージ
-        /// </summary>
-        private string MESSAGE_CRAWL_FINISHED = "クロールが完了しました。";
-        /// <summary>
-        /// クロール処理キャンセル時のメッセージ
-        /// </summary>
-        private string MESSAGE_CRAWL_CANCELED = "クロール処理がキャンセルされました。";
-
-        /// <summary>
-        /// 機械学習未実行
-        /// </summary>
-        private string MESSAGE_NOT_LEARNED = "機械学習が実行されていません。";
-        /// <summary>
-        /// 機械学習実行中のメッセージ
-        /// </summary>
-        private string MESSAGE_LEARNING = "機械学習実行中です...";
-        /// <summary>
-        /// 機械学習完了時のメッセージ
-        /// </summary>
-        private string MESSAGE_LEARNING_FINISHED = "機械学習が完了しました。";
-        /// <summary>
-        /// 機械学習処理キャンセル時のメッセージ
-        /// </summary>
-        private string MESSAGE_LEARNING_CANCELED = "機械学習処理がキャンセルされました。";
-
-        /// <summary>
-        /// 保存完了メッセージ
-        /// </summary>
-        private string MESSAGE_SAVED = "保存が完了しました";
-
         //  イベントを登録したかどうか
         // （二重登録防止用のフラグ）
         private static bool isEventRegistered = false;
@@ -80,13 +37,13 @@ namespace DocSearch.Controllers
         public SetupController()
         {
             // 処理中にブラウザに送るメッセージ
-            _crawlProgress.Message = MESSAGE_CRAWLING;
-            _crawlProgress.MessageNoProgressRate = MESSAGE_CRAWLING;
-            _crawlProgress.MessageFinished = MESSAGE_CRAWL_FINISHED;
+            _crawlProgress.Message = Message.CRAWLING;
+            _crawlProgress.MessageNoProgressRate = Message.CRAWLING;
+            _crawlProgress.MessageFinished = Message.CRAWL_FINISHED;
 
-            _machineLearningProgress.Message = MESSAGE_LEARNING;
-            _machineLearningProgress.MessageNoProgressRate = MESSAGE_LEARNING;
-            _machineLearningProgress.MessageFinished = MESSAGE_LEARNING_FINISHED;
+            _machineLearningProgress.Message = Message.LEARNING;
+            _machineLearningProgress.MessageNoProgressRate = Message.LEARNING;
+            _machineLearningProgress.MessageFinished = Message.LEARNING_FINISHED;
 
             if (!isEventRegistered)
             {
@@ -179,7 +136,7 @@ namespace DocSearch.Controllers
 
             Settings.GetInstance().SaveSettings();
 
-            ComHub.SendMessageToTargetClient(Settings.TYPE, MESSAGE_SAVED, new string[0], connectionID);
+            ComHub.SendMessageToTargetClient(Settings.TYPE, Message.SAVED, new string[0], connectionID);
         }
         #endregion
 
@@ -198,19 +155,19 @@ namespace DocSearch.Controllers
             catch (FormatException ex)
             {
                 // 詳細設定選択時にcron文字列が不正だったら、設定保存させない。
-                Scheduling.GetInstance().SendMessage(Scheduling.MESSAGE_CRON_STRING_ERROR, connectionID);
+                Scheduling.GetInstance().SendMessage(Message.CRON_STRING_ERROR, connectionID);
                 ScheduleSettings.GetInstance().Restore();
                 return;
             }
             catch (SchedulerException ex)
             {
                 // 一度もスケジュール実行されないような設定（過去日を指定したなど）の場合は、エラーメッセージを出す。
-                Scheduling.GetInstance().SendMessage(Scheduling.MESSAGE_NO_EXECUTE_DATE, connectionID);
+                Scheduling.GetInstance().SendMessage(Message.NO_EXECUTE_DATE, connectionID);
             }
 
             ScheduleSettings.GetInstance().Save();
 
-            Scheduling.GetInstance().SendMessage(Scheduling.MESSAGE_SAVED, connectionID);
+            Scheduling.GetInstance().SendMessage(Message.SAVED, connectionID);
         }
 
         /// <summary>
@@ -232,12 +189,12 @@ namespace DocSearch.Controllers
         /// <param name="progressBarID"></param>
         private void CheckCrawlExecuted(string progressBarID)
         {
-            string message = MESSAGE_NOT_CRAWLED;
+            string message = Message.NOT_CRAWLED;
             int rate = 0;
 
             if (History.CrawlHistory.HistoryData.Count > 0)
             {
-                message = MESSAGE_CRAWL_FINISHED;
+                message = Message.CRAWL_FINISHED;
                 rate = SendProgressRate.PROGRESS_COMPLETED;
             }
 
@@ -251,12 +208,12 @@ namespace DocSearch.Controllers
         /// <param name="progressBarID"></param>
         private void CheckWord2VecExecuted(string progressBarID)
         {
-            string message = MESSAGE_NOT_LEARNED;
+            string message = Message.NOT_LEARNED;
             int rate = 0;
 
             if (History.CrawlHistory.HistoryData.Count > 0)
             {
-                message = MESSAGE_LEARNING_FINISHED;
+                message = Message.LEARNING_FINISHED;
                 rate = SendProgressRate.PROGRESS_COMPLETED;
             }
 
@@ -292,11 +249,11 @@ namespace DocSearch.Controllers
             CrawlerManager.DocCrawlDelegate handler = (sender, fileCount, isCanceled) =>
             {
                 int rate = SendProgressRate.PROGRESS_COMPLETED;
-                string message = MESSAGE_CRAWL_FINISHED;
+                string message = Message.CRAWL_FINISHED;
                 if (isCanceled)
                 {
                     rate = SendProgressRate.PROGRESS_RATE_CANCELED;
-                    message = MESSAGE_CRAWL_CANCELED;
+                    message = Message.CRAWL_CANCELED;
                 }
 
                 _crawlProgress.SendRate(message, rate);
@@ -340,12 +297,12 @@ namespace DocSearch.Controllers
             MachineLearningManager.MachineLearningFinishedDelegate handler = (isCanceled) =>
             {
                 int rate = SendProgressRate.PROGRESS_COMPLETED;
-                string message = MESSAGE_LEARNING_FINISHED;
+                string message = Message.LEARNING_FINISHED;
 
                 if (isCanceled)
                 {
                     rate = SendProgressRate.PROGRESS_RATE_CANCELED;
-                    message = MESSAGE_LEARNING_CANCELED;
+                    message = Message.LEARNING_CANCELED;
                 }
 
                 _machineLearningProgress.SendRate(message, rate);

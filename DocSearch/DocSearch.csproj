@@ -248,6 +248,11 @@
     <Compile Include="Models\SetupModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="hubs\ComHub.cs" />
+    <Compile Include="Resources\Message.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Message.resx</DependentUpon>
+    </Compile>
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -354,6 +359,13 @@
       <Project>{878c7b63-e2fb-4b02-8c7d-21c6a1057eef}</Project>
       <Name>FolderCrawler</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Message.ja-JP.resx" />
+    <EmbeddedResource Include="Resources\Message.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Message.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

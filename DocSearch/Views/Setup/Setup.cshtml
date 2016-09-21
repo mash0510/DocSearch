@@ -1,44 +1,44 @@
 ﻿@model DocSearch.Models.SetupModel
 
 @{
-    ViewBag.Title = "Setup";
+    ViewBag.Title = DocSearch.Resources.Message.TOOLBAR_TITLE_SETUP;
 }
 
-<h2 style="margin-bottom: 20px">設定画面</h2>
+<h2 style="margin-bottom: 20px">@DocSearch.Resources.Message.TITLE_SETUP</h2>
 
 <!-- クロール先フォルダの指定 -->
 <div class="ds-container">
-    <h4>クロール先のフォルダの指定</h4>
+    <h4>@DocSearch.Resources.Message.CRAWL_FOLDER_SETUP</h4>
     <div class="form-group">
-        <label class="control-label">クロール先のフォルダを指定して下さい。改行で複数のフォルダを指定出来ます。</label>
+        <label class="control-label">@DocSearch.Resources.Message.CRAWL_FOLDER_NOTE</label>
         @Html.TextAreaFor(m => m.CrawlFolders, new { @class = "form-control", rows = "5", id="crawlFoldersTextBox" })
     </div>
-    <input type="button" id="folderApplyButton" class="btn btn-default right" value="適用" onclick="SetupCrawlFolders()" />
+    <input type="button" id="folderApplyButton" class="btn btn-default right" value="@DocSearch.Resources.Message.APPLY" onclick="SetupCrawlFolders()" />
 </div>
 
 <!-- クロール開始 -->
 <div class="ds-container">
-    <h4>クロール処理の開始</h4>
+    <h4>@DocSearch.Resources.Message.CRAWL_START</h4>
     <div class="row">
         <div class="col-md-3">
-            <label class="control-label">クロール後の関連語学習</label>
+            <label class="control-label">@DocSearch.Resources.Message.MACHINE_LEARNING_AFTER_CRAWLING</label>
         </div>
         <div class="col-md-2">
             @Html.DropDownListFor(m => m.ExecMachineLearning,
                 new SelectListItem[] {
-                new SelectListItem() { Value="0", Text="しない" },
-                new SelectListItem() { Value="1", Text="する" }
+                new SelectListItem() { Value="0", Text=DocSearch.Resources.Message.NOT_EXECUTE },
+                new SelectListItem() { Value="1", Text=DocSearch.Resources.Message.EXECUTE }
                 },
                 new { @class="form-control", id="execMachineLearningOption" })
         </div>
         <div class="col-md-1 text-center">
-            <button type="button" id="crawlStartButton" class="btn btn-default" onclick="StartCrawl()">開始</button>
+            <button type="button" id="crawlStartButton" class="btn btn-default" onclick="StartCrawl()">@DocSearch.Resources.Message.START</button>
         </div>
         <div class="col-md-1 text-center">
-            <button type="button" id="crawlCancelButton" class="btn btn-default" onclick="CancelCrawl()">キャンセル</button>
+            <button type="button" id="crawlCancelButton" class="btn btn-default" onclick="CancelCrawl()">@DocSearch.Resources.Message.CANCEL</button>
         </div>
         <div class="col-md-1 text-center">
-            <button type="button" id="crawlHistoryButton" class="btn btn-default" onclick="GetHistoryData('Crawl')">履歴</button>
+            <button type="button" id="crawlHistoryButton" class="btn btn-default" onclick="GetHistoryData('Crawl')">@DocSearch.Resources.Message.HISTORY</button>
         </div>
     </div>
     <br />
@@ -58,19 +58,19 @@
 </div>
 
 <div class="ds-container">
-    <h4>関連語学習の開始</h4>
+    <h4>@DocSearch.Resources.Message.MACHINE_LEARNING_WORD2VEC</h4>
     <div class="row">
         <div class="col-md-5">
-            <label class="control-label">関連語を表示する人工知能の学習の実行</label>
+            <label class="control-label">@DocSearch.Resources.Message.MACHINE_LEARNING_WORD2VEC_EXPLAIN</label>
         </div>
         <div class="col-md-1 text-center">
-            <button type="button" id="machineLearningStartButton" class="btn btn-default" onclick="StartMachineLearning()">開始</button>
+            <button type="button" id="machineLearningStartButton" class="btn btn-default" onclick="StartMachineLearning()">@DocSearch.Resources.Message.START</button>
         </div>
         <div class="col-md-1 text-center">
-            <button type="button" id="machineLearningCancelButton" class="btn btn-default" onclick="CancelMachineLearning()">キャンセル</button>
+            <button type="button" id="machineLearningCancelButton" class="btn btn-default" onclick="CancelMachineLearning()">@DocSearch.Resources.Message.CANCEL</button>
         </div>
         <div class="col-md-1 text-center">
-            <button type="button" id="crawlHistoryButton" class="btn btn-default" onclick="GetHistoryData('word2vec')">履歴</button>
+            <button type="button" id="crawlHistoryButton" class="btn btn-default" onclick="GetHistoryData('word2vec')">@DocSearch.Resources.Message.HISTORY</button>
         </div>
     </div>
     <br />
@@ -91,18 +91,18 @@
 
 <!-- スケジューリング設定 -->
 <div class="container">
-    <h4>スケジュール設定</h4>
+    <h4>@DocSearch.Resources.Message.SCHEDULING_SETUP</h4>
     <div id="scheduling">
         <div class="row">
             <div class="col-md-1">
                 @Html.DropDownListFor(m => m.ScheduleType,
                     new SelectListItem[]
                     {
-                        new SelectListItem() { Value="none", Text="非実行" },
-                        new SelectListItem() { Value="oneTime", Text="1回のみ" },
-                        new SelectListItem() { Value="date", Text="日毎" },
-                        new SelectListItem() { Value="day", Text="曜日" },
-                        new SelectListItem() { Value="detail", Text="詳細設定" }
+                        new SelectListItem() { Value="none", Text=DocSearch.Resources.Message.SCHEDULE_EXEC_NOTHING },
+                        new SelectListItem() { Value="oneTime", Text=DocSearch.Resources.Message.SCHEDULE_EXEC_ONE_TIME },
+                        new SelectListItem() { Value="date", Text=DocSearch.Resources.Message.SCHEDULE_EXEC_DAILY },
+                        new SelectListItem() { Value="day", Text=DocSearch.Resources.Message.SCHEDULE_EXEC_WEEKLY },
+                        new SelectListItem() { Value="detail", Text=DocSearch.Resources.Message.SCHEDULE_EXEC_DETAIL }
                     },
                     new { id= "schedule-select", onchange = "ScheduleTypeChanged(this)" }
                )
@@ -115,27 +115,27 @@
                     <div class="row">
                         <div class="col-xs-3">
                             @Html.TextBoxFor(m => m.DayInterval, new { type = "text", id = "schedule-daily-interval" })
-                            <lable class="ds-label">日毎</lable>
+                            <lable class="ds-label">@DocSearch.Resources.Message.SCHEDULE_EXEC_DAILY</lable>
                         </div>
                         <div class="col-xs-9">
-                            <label class="ds-label">実行時間</label>
+                            <label class="ds-label">@DocSearch.Resources.Message.SCHEDULE_EXEC_TIME</label>
                             @Html.TextBoxFor(m => m.ExecTimeDaily, new { type = "time", id = "schedule-daily-time" })
                         </div>
                     </div>
                 </div>
                 <div id="schedule-day">
-                    @Html.CheckBoxFor(m => m.ExecMonday, new { value = "mon" })月
-                    @Html.CheckBoxFor(m => m.ExecTuesday, new { value = "tue", style = "margin-left: 10px" })火
-                    @Html.CheckBoxFor(m => m.ExecWendnesday, new { value = "wed", style = "margin-left: 10px" })水
-                    @Html.CheckBoxFor(m => m.ExecThursday, new { value = "thr", style = "margin-left: 10px" })木
-                    @Html.CheckBoxFor(m => m.ExecFriday, new { value = "fri", style = "margin-left: 10px" })金
-                    @Html.CheckBoxFor(m => m.ExecSurtarday, new { value = "sat", style = "margin-left: 10px" })土
-                    @Html.CheckBoxFor(m => m.ExecSunday, new { value = "sun", style = "margin-left: 10px" })日
-                    <label class="ds-label">実行時間</label>
+                    @Html.CheckBoxFor(m => m.ExecMonday, new { value = "mon" })@DocSearch.Resources.Message.MONDAY
+                    @Html.CheckBoxFor(m => m.ExecTuesday, new { value = "tue", style = "margin-left: 10px" })@DocSearch.Resources.Message.TUESDAY
+                    @Html.CheckBoxFor(m => m.ExecWendnesday, new { value = "wed", style = "margin-left: 10px" })@DocSearch.Resources.Message.WEDNESDAY
+                    @Html.CheckBoxFor(m => m.ExecThursday, new { value = "thr", style = "margin-left: 10px" })@DocSearch.Resources.Message.THURSDAY
+                    @Html.CheckBoxFor(m => m.ExecFriday, new { value = "fri", style = "margin-left: 10px" })@DocSearch.Resources.Message.FRIDAY
+                    @Html.CheckBoxFor(m => m.ExecSurtarday, new { value = "sat", style = "margin-left: 10px" })@DocSearch.Resources.Message.SATURDAY
+                    @Html.CheckBoxFor(m => m.ExecSunday, new { value = "sun", style = "margin-left: 10px" })@DocSearch.Resources.Message.SUNDAY
+                    <label class="ds-label">@DocSearch.Resources.Message.SCHEDULE_EXEC_TIME</label>
                     @Html.TextBoxFor(m => m.ExecTimeDay, new { type = "time", id = "schedule-day-time" })
                 </div>
                 <div id="schedule-detail">
-                    <label class="ds-label">crontab形式で指定して下さい。</label>
+                    <label class="ds-label">@DocSearch.Resources.Message.SCHEDULE_DETAIL_SETUP_EXPLAIN</label>
                     @Html.TextBoxFor(m => m.CronString, new { type = "text", id = "schedule-cron", style = "width:300px" })
                 </div>
             </div>
@@ -143,10 +143,10 @@
         <br />
         <div class="row">
             <div class="col-md-1">
-                <input type="button" id="setSchedule" class="btn btn-default" onclick="SaveScheduling()" value="設定" />
+                <input type="button" id="setSchedule" class="btn btn-default" onclick="SaveScheduling()" value="@DocSearch.Resources.Message.APPLY" />
             </div>
             <div class="col-md-1">
-                <input type="button" id="revertSchedule" class="btn btn-default" onclick="RevertScheduling()" value="元に戻す" />
+                <input type="button" id="revertSchedule" class="btn btn-default" onclick="RevertScheduling()" value="@DocSearch.Resources.Message.REVERT" />
             </div>
         </div>
     </div>
@@ -348,9 +348,9 @@
     }
     // 取得した履歴データの表示
     function ShowHistoryDialog(historyKind, historyData) {
-        var title = "クロール履歴";
+        var title = "@DocSearch.Resources.Message.HISTORY_CRAWL";
         if (historyKind == "word2vec") {
-            title = "機械学習履歴"
+            title = "@DocSearch.Resources.Message.HISTORY_WORD2VEC"
         }
         $('#history-form').dialog('option', 'title', title);
 
@@ -377,10 +377,10 @@
     function GenerateHeader(historyKind) {
         var header;
         if (historyKind == "Crawl") {
-            header = "<tr><th>日時</th><th>クロールファイル数</th><th>Insertファイル数</th><th>キャンセル</th></tr>";
+            header = "<tr><th>@DocSearch.Resources.Message.DATETIME</th><th>@DocSearch.Resources.Message.CRAWL_FILE_NUM</th><th>@DocSearch.Resources.Message.INSERT_FILE_NUM</th><th>@DocSearch.Resources.Message.CANCEL</th></tr>";
         }
         else if (historyKind == "word2vec") {
-            header = "<tr><th>日時</th><th>キャンセル</th></tr>";
+            header = "<tr><th>@DocSearch.Resources.Message.DATETIME</th><th>@DocSearch.Resources.Message.CANCEL</th></tr>";
         }
         return header;
     }
@@ -435,7 +435,7 @@
         // UIの活性・非活性の変更とプログレスバーへの処理準備中表示をするのみ。
         if (machineLearning == 1) {
             DisableControls(true, "#machineLearningProgressBar");
-            UpdateProgress("処理開始の準備中です。", -3, "#machineLearningProgressBar");
+            UpdateProgress("@DocSearch.Resources.Message.PREPAREING", -3, "#machineLearningProgressBar");
             return true;
         }
 
@@ -446,7 +446,7 @@
     function StartCrawl() {
         DisableControls(true, "#crawlProgressBar");
 
-        UpdateProgress("処理開始の準備中です。", -3, "#crawlProgressBar")
+        UpdateProgress("@DocSearch.Resources.Message.PREPAREING", -3, "#crawlProgressBar")
 
         // クロール後に機械学習を実行するかどうか。
         var machineLearning = $("#execMachineLearningOption").val();
@@ -467,7 +467,7 @@
     function StartMachineLearning() {
         DisableControls(true, "#machineLearningProgressBar");
 
-        UpdateProgress("処理開始の準備中です。", -3, "#machineLearningProgressBar");
+        UpdateProgress("@DocSearch.Resources.Message.PREPAREING", -3, "#machineLearningProgressBar");
 
         var args = ["#machineLearningProgressBar"];
 
@@ -512,5 +512,4 @@
         $("#schedule-select").prop('disabled', enabled);
     }
     // ******* クロールと機械学習 *******
-
 </script>

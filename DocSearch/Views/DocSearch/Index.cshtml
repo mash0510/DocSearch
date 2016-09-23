@@ -11,7 +11,7 @@
         {
             <div class="form-group input-group">
                 @Html.TextBoxFor(m => m.InputKeywords, new { id = "keywordTextBox", @class="form-control", placeholder = DocSearch.Resources.Message.PLACEHOLDER_KEYWORD })
-                @Html.HiddenFor(m => m.Page, new { @Value = "1" })
+                @Html.HiddenFor(m => m.Page, new { @Value = DocSearch.Resources.Constants.DEFAULT_PAGE_NO })
                 <span class="input-group-btn">
                     <button class="btn btn-default" type="submit">@DocSearch.Resources.Message.BUTTON_SEARCH</button>
                 </span>
@@ -82,7 +82,7 @@
             {
                 <h5>@keyword</h5>
                 <ul>
-                        @foreach (var relatedWord in Model.RelatedWordList(keyword, 10))
+                        @foreach (var relatedWord in Model.RelatedWordList(keyword, Model.RelatedWordDispNum))
                         {
                             <li><label><input type="checkbox" value="@relatedWord" onclick="wordSelect(this)" />@relatedWord</label></li>
                         }

@@ -1,0 +1,205 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ARGKEY_EXEC_MACHINE_LEARNING" xml:space="preserve">
+    <value>execMachineLearning</value>
+  </data>
+  <data name="DEFAULT_PAGE_NO" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="EXECUTE" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="HISTORY_KIND_CRAWL" xml:space="preserve">
+    <value>Crawl</value>
+  </data>
+  <data name="HISTORY_KIND_WORD2VEC" xml:space="preserve">
+    <value>word2vec</value>
+  </data>
+  <data name="NOT_EXECUTE" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="PROCESS_CANCEL_CRAWL" xml:space="preserve">
+    <value>CancelCrawl</value>
+  </data>
+  <data name="PROCESS_CANCEL_MACHINE_LEARNING" xml:space="preserve">
+    <value>CancelMachineLearning</value>
+  </data>
+  <data name="PROCESS_GET_HISTORY_DATA" xml:space="preserve">
+    <value>GetHistoryData</value>
+  </data>
+  <data name="PROCESS_IS_CRAWL_EXECUTED" xml:space="preserve">
+    <value>IsCrawlExecuted</value>
+  </data>
+  <data name="PROCESS_IS_WORD2VEC_LEARNED" xml:space="preserve">
+    <value>IsWord2VecLearned</value>
+  </data>
+  <data name="PROCESS_SAVE_SCHEDULING" xml:space="preserve">
+    <value>SaveScheduling</value>
+  </data>
+  <data name="PROCESS_SETUP_CRAWL_FOLDER" xml:space="preserve">
+    <value>SetupCrawlFolders</value>
+  </data>
+  <data name="PROCESS_START_CRAWL" xml:space="preserve">
+    <value>StartCrawl</value>
+  </data>
+  <data name="PROCESS_START_MACHINE_LEARNING" xml:space="preserve">
+    <value>StartMachineLearning</value>
+  </data>
+  <data name="PROGRESS_RATE_CANCELED" xml:space="preserve">
+    <value>-2</value>
+    <comment>キャンセル時に表示する進捗率。わざと-2にしている。-2という値をブラウザに送り込むことで、プロブレスバーの表示を0%、進捗率表示部分に、任意のメッセージを表示することができるようにJavaScriptを書いている。</comment>
+  </data>
+  <data name="PROGRESS_RATE_COMPLETED" xml:space="preserve">
+    <value>101</value>
+  </data>
+  <data name="SCHEDULE_DAILY" xml:space="preserve">
+    <value>date</value>
+  </data>
+  <data name="SCHEDULE_DETAIL" xml:space="preserve">
+    <value>detail</value>
+  </data>
+  <data name="SCHEDULE_NONE" xml:space="preserve">
+    <value>none</value>
+  </data>
+  <data name="SCHEDULE_ONETIME" xml:space="preserve">
+    <value>oneTime</value>
+  </data>
+  <data name="SCHEDULE_WEEKLY" xml:space="preserve">
+    <value>day</value>
+  </data>
+  <data name="SESSION_SEARCH_FOLDER" xml:space="preserve">
+    <value>searchFolder</value>
+  </data>
+  <data name="SNIP" xml:space="preserve">
+    <value>........</value>
+  </data>
+  <data name="TYPE_HISTORY" xml:space="preserve">
+    <value>HISTORY</value>
+  </data>
+  <data name="TYPE_PROGRESS_BAR" xml:space="preserve">
+    <value>PROGRESS_BAR</value>
+  </data>
+  <data name="TYPE_SCHEDULING" xml:space="preserve">
+    <value>SCHEDULING</value>
+  </data>
+  <data name="TYPE_SETUP_CRAWL_FOLDER" xml:space="preserve">
+    <value>SETUP_CRAWL_FOLDER</value>
+  </data>
+</root>

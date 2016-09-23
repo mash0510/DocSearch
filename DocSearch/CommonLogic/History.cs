@@ -1,4 +1,5 @@
 ﻿using DocSearch.hubs;
+using DocSearch.Resources;
 using FolderCrawler.History;
 using System;
 using System.Collections.Generic;
@@ -12,10 +13,6 @@ namespace DocSearch.CommonLogic
     /// </summary>
     public static class History
     {
-        public static string TYPE = "HISTORY";
-        public static string HISTORY_CRAWL = "Crawl";
-        public static string HISTORY_WORD2VEC = "word2vec";
-
         private static HistoryCrawl _crawlHistory = new HistoryCrawl();
         private static HistoryWord2Vec _word2vecHistory = new HistoryWord2Vec();
 
@@ -44,13 +41,13 @@ namespace DocSearch.CommonLogic
         /// <param name="connectionID"></param>
         public static void SendHistory(string historyKind, string connectionID)
         {
-            if (historyKind == HISTORY_CRAWL)
+            if (historyKind == Constants.HISTORY_KIND_CRAWL)
             {
-                ComHub.SendMessageToTargetClient(TYPE, historyKind, History.CrawlHistory.HistoryDataArray, connectionID);
+                ComHub.SendMessageToTargetClient(Constants.TYPE_HISTORY, historyKind, History.CrawlHistory.HistoryDataArray, connectionID);
             }
-            else if (historyKind == HISTORY_WORD2VEC)
+            else if (historyKind == Constants.HISTORY_KIND_WORD2VEC)
             {
-                ComHub.SendMessageToTargetClient(TYPE, historyKind, History.Word2VecHistory.HistoryDataArray, connectionID);
+                ComHub.SendMessageToTargetClient(Constants.TYPE_HISTORY, historyKind, History.Word2VecHistory.HistoryDataArray, connectionID);
             }
         }
     }

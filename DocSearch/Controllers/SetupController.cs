@@ -19,11 +19,6 @@ namespace DocSearch.Controllers
         /// </summary>
         private char[] delimiter = { ',' };
 
-        /// <summary>
-        /// 「機械学習をする」を示す値
-        /// </summary>
-        internal const string EXEC_MACHINE_LEARNING = "1";
-
         SendProgressRate _crawlProgress = new ProgressRateCrawl();
         SendProgressRate _machineLearningProgress = new ProgressRateMachineLearning();
 
@@ -63,37 +58,43 @@ namespace DocSearch.Controllers
         /// <param name="connectionID"></param>
         private void ProgressHub_CatchBrowserMessage(string type, string msg, string[] args, string connectionID)
         {
-            if (type == SendProgressRate.TYPE || type == History.TYPE || type == Scheduling.TYPE || type == Settings.TYPE)
+            if (type == Constants.TYPE_PROGRESS_BAR || type == Constants.TYPE_HISTORY || type == Constants.TYPE_SCHEDULING || type == Constants.TYPE_SETUP_CRAWL_FOLDER)
             {
-                switch (msg)
+                if (msg == Constants.PROCESS_SETUP_CRAWL_FOLDER)
                 {
-                    case "SetupCrawlFolders":
-                        SetupCrawlFolder(args[0], connectionID);
-                        break;
-                    case "CancelCrawl":
-                        CrawlerManager.GetInstance().Stop();
-                        break;
-                    case "StartCrawl":
-                        StartCrawl(args[0], args[1], args[2]);
-                        break;
-                    case "StartMachineLearning":
-                        StartMachineLearning(args[0]);
-                        break;
-                    case "CancelMachineLearning":
-                        MachineLearningManager.GetInstance().KillMachineLearningProcess();
-                        break;
-                    case "IsCrawlExecuted":
-                        CheckCrawlExecuted(args[0]);
-                        break;
-                    case "IsWord2VecLearned":
-                        CheckWord2VecExecuted(args[0]);
-                        break;
-                    case "GetHistoryData":
-                        GetHistory(args[0], connectionID);
-                        break;
-                    case "SaveScheduling":
-                        SaveSchedule(args, connectionID);
-                        break;
+                    SetupCrawlFolder(args[0], connectionID);
+                }
+                else if (msg == Constants.PROCESS_CANCEL_CRAWL)
+                {
+                    CrawlerManager.GetInstance().Stop();
+                }
+                else if (msg == Constants.PROCESS_START_CRAWL)
+                {
+                    StartCrawl(args[0], args[1], args[2]);
+                }
+                else if (msg == Constants.PROCESS_START_MACHINE_LEARNING)
+                {
+                    StartMachineLearning(args[0]);
+                }
+                else if (msg == Constants.PROCESS_CANCEL_MACHINE_LEARNING)
+                {
+                    MachineLearningManager.GetInstance().KillMachineLearningProcess();
+                }
+                else if (msg == Constants.PROCESS_IS_CRAWL_EXECUTED)
+                {
+                    CheckCrawlExecuted(args[0]);
+                }
+                else if (msg == Constants.PROCESS_IS_WORD2VEC_LEARNED)
+                {
+                    CheckWord2VecExecuted(args[0]);
+                }
+                else if (msg == Constants.PROCESS_GET_HISTORY_DATA)
+                {
+                    GetHistory(args[0], connectionID);
+                }
+                else if (msg == Constants.PROCESS_SAVE_SCHEDULING)
+                {
+                    SaveSchedule(args, connectionID);
                 }
             }
         }
@@ -136,7 +137,7 @@ namespace DocSearch.Controllers
 
             Settings.GetInstance().SaveSettings();
 
-            ComHub.SendMessageToTargetClient(Settings.TYPE, Message.SAVED, new string[0], connectionID);
+            ComHub.SendMessageToTargetClient(Constants.TYPE_SETUP_CRAWL_FOLDER, Message.SAVED, new string[0], connectionID);
         }
         #endregion
 
@@ -176,7 +177,7 @@ namespace DocSearch.Controllers
         /// <param name="args"></param>
         private void SetupController_ExecJob(System.Collections.Generic.Dictionary<string, object> args)
         {
-            string arg = args[Scheduling.KEY_EXEC_MACHINE_LEARNING].ToString();
+            string arg = args[Constants.ARGKEY_EXEC_MACHINE_LEARNING].ToString();
 
             StartCrawl("#crawlProgressBar", "#machineLearningProgressBar", arg);
         }
@@ -195,7 +196,7 @@ namespace DocSearch.Controllers
             if (History.CrawlHistory.HistoryData.Count > 0)
             {
                 message = Message.CRAWL_FINISHED;
-                rate = SendProgressRate.PROGRESS_COMPLETED;
+                rate = Convert.ToInt32(Constants.PROGRESS_RATE_COMPLETED);
             }
 
             _crawlProgress.ProgressBarID = progressBarID;
@@ -214,7 +215,7 @@ namespace DocSearch.Controllers
             if (History.CrawlHistory.HistoryData.Count > 0)
             {
                 message = Message.LEARNING_FINISHED;
-                rate = SendProgressRate.PROGRESS_COMPLETED;
+                rate = Convert.ToInt32(Constants.PROGRESS_RATE_COMPLETED);
             }
 
             _machineLearningProgress.ProgressBarID = progressBarID;
@@ -248,11 +249,11 @@ namespace DocSearch.Controllers
 
             CrawlerManager.DocCrawlDelegate handler = (sender, fileCount, isCanceled) =>
             {
-                int rate = SendProgressRate.PROGRESS_COMPLETED;
+                int rate = Convert.ToInt32(Constants.PROGRESS_RATE_COMPLETED);
                 string message = Message.CRAWL_FINISHED;
                 if (isCanceled)
                 {
-                    rate = SendProgressRate.PROGRESS_RATE_CANCELED;
+                    rate = Convert.ToInt32(Constants.PROGRESS_RATE_CANCELED);
                     message = Message.CRAWL_CANCELED;
                 }
 
@@ -267,7 +268,7 @@ namespace DocSearch.Controllers
                 History.CrawlHistory.Add(history);
                 History.CrawlHistory.Save();
 
-                if (!isCanceled && execMachineLearning == EXEC_MACHINE_LEARNING)
+                if (!isCanceled && execMachineLearning == Constants.EXECUTE)
                 {
                     // 機械学習を続けて実行する場合は、機械学習実行。
                     StartMachineLearning(machineLearningProgressBarID);
@@ -296,12 +297,12 @@ namespace DocSearch.Controllers
 
             MachineLearningManager.MachineLearningFinishedDelegate handler = (isCanceled) =>
             {
-                int rate = SendProgressRate.PROGRESS_COMPLETED;
+                int rate = Convert.ToInt32(Constants.PROGRESS_RATE_COMPLETED);
                 string message = Message.LEARNING_FINISHED;
 
                 if (isCanceled)
                 {
-                    rate = SendProgressRate.PROGRESS_RATE_CANCELED;
+                    rate = Convert.ToInt32(Constants.PROGRESS_RATE_CANCELED);
                     message = Message.LEARNING_CANCELED;
                 }
 

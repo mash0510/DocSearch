@@ -146,6 +146,28 @@ namespace DocSearch.CommonLogic
         }
 
         /// <summary>
+        /// 関連語の表示数
+        /// </summary>
+        public static int RelatedWordDispNum
+        {
+            get
+            {
+                return Convert.ToInt32(ConfigurationManager.AppSettings["RelatedWordDispNum"]);
+            }
+        }
+
+        /// <summary>
+        /// 入力されたキーワードの前後何文字を検索画面中に表示するか
+        /// </summary>
+        public static int LettersAroundKeyword
+        {
+            get
+            {
+                return Convert.ToInt32(ConfigurationManager.AppSettings["LettersAroundKeyword"]);
+            }
+        }
+
+        /// <summary>
         /// int型への変換
         /// </summary>
         /// <param name="val"></param>

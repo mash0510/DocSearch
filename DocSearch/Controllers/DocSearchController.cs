@@ -11,6 +11,7 @@ using Word2Vec.Net;
 using System.Text;
 using DocSearch.CommonLogic;
 using System.IO;
+using DocSearch.Resources;
 
 namespace DocSearch.Controllers
 {
@@ -37,34 +38,24 @@ namespace DocSearch.Controllers
         private Pagination _pagination = new Pagination();
 
         /// <summary>
-        /// 検索先フォルダのセッションキー
-        /// </summary>
-        private const string SESSION_SEARCH_FOLDER = "searchFolder";
-        /// <summary>
         /// 検索フォルダの設定と取得
         /// </summary>
         public string SearchFolder
         {
             set
             {
-                Session[SESSION_SEARCH_FOLDER] = value;
+                Session[Constants.SESSION_SEARCH_FOLDER] = value;
             }
             get
             {
-                if (Session == null || Session[SESSION_SEARCH_FOLDER] == null)
+                if (Session == null || Session[Constants.SESSION_SEARCH_FOLDER] == null)
                     return string.Empty;
 
-                string folder = Session[SESSION_SEARCH_FOLDER].ToString();
+                string folder = Session[Constants.SESSION_SEARCH_FOLDER].ToString();
 
                 return folder;
             }
         }
-
-
-        /// <summary>
-        /// サマリー表示の文字数。入力されたキーワードの前後何文字を検索画面中に表示するか。
-        /// </summary>
-        private const int LETTERS_AROUND_KEYWORD = 50;
 
         // GET: DocSearch
         [HttpGet]
@@ -190,7 +181,7 @@ namespace DocSearch.Controllers
                 dispData.UpdatedDate = docInfo.UpdatedDate;
                 dispData.FileFullPath = docInfo.FileFullPath;
                 dispData.Extention = docInfo.Extention;
-                dispData.DocSummary = GetTextAroundKeyword(docInfo.DocContent, keywords, LETTERS_AROUND_KEYWORD);
+                dispData.DocSummary = GetTextAroundKeyword(docInfo.DocContent, keywords, ReadSettings.LettersAroundKeyword);
 
                 docSearchModel.SearchedDocument.Add(dispData);
             }
@@ -230,7 +221,7 @@ namespace DocSearch.Controllers
                 retval.Append(substr);
 
                 if (i < keywords.Length - 1)
-                    retval.Append("........");
+                    retval.Append(Constants.SNIP);
             }
 
             return retval.ToString();
@@ -285,12 +276,10 @@ namespace DocSearch.Controllers
         {
             List<FileTreeViewModel> files = new List<FileTreeViewModel>();
 
-            char[] delimiter = new char[] { ',' };
-
             List<string> rootList = rootFolders.Select(folder => Server.UrlDecode(folder).Replace("/", "\\")).ToList<string>();
 
             dir = Server.UrlDecode(dir);
-            List<string> dirList = dir.Replace("/", "\\").Split(delimiter).ToList<string>();
+            List<string> dirList = dir.Replace("/", "\\").Split(_folderDelimiter).ToList<string>();
 
             foreach (string realDir in dirList)
             {

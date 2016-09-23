@@ -17,38 +17,10 @@ namespace DocSearch.CommonLogic
     /// </summary>
     public class Scheduling
     {
-        public const string TYPE = "SCHEDULING";
-
-        /// <summary>
-        /// Key情報 - 機械学習をクロール後に実行するかどうか
-        /// </summary>
-        public const string KEY_EXEC_MACHINE_LEARNING = "execMachineLearning";
-
         /// <summary>
         /// スケジューラーオブジェクト
         /// </summary>
         IScheduler scheduler;
-
-        /// <summary>
-        /// 非実行
-        /// </summary>
-        private const string NONE = "none";
-        /// <summary>
-        /// １回のみ
-        /// </summary>
-        private const string ONE_TIME = "oneTime";
-        /// <summary>
-        /// 日毎
-        /// </summary>
-        private const string DATE = "date";
-        /// <summary>
-        /// 曜日指定
-        /// </summary>
-        private const string DAY = "day";
-        /// <summary>
-        /// 詳細設定
-        /// </summary>
-        private const string DETAIL = "detail";
 
         /// <summary>
         /// cronフォーマット 秒 分 時 日 月 曜日 年
@@ -133,7 +105,7 @@ namespace DocSearch.CommonLogic
         /// <param name="connectionID"></param>
         public void SendMessage(string message, string connectionID)
         {
-            ComHub.SendMessageToTargetClient(TYPE, message, new string[0], connectionID);
+            ComHub.SendMessageToTargetClient(Constants.TYPE_SCHEDULING, message, new string[0], connectionID);
         }
 
         /// <summary>
@@ -182,7 +154,7 @@ namespace DocSearch.CommonLogic
             if (scheduler == null)
                 return;
 
-            if (ScheduleSettings.GetInstance().ScheduleType == NONE)
+            if (ScheduleSettings.GetInstance().ScheduleType == Constants.SCHEDULE_NONE)
             {
                 scheduler.Clear();
                 return;
@@ -223,11 +195,11 @@ namespace DocSearch.CommonLogic
         {
             string retval = string.Empty;
 
-            if (ScheduleSettings.GetInstance().ScheduleType == DETAIL)
+            if (ScheduleSettings.GetInstance().ScheduleType == Constants.SCHEDULE_DETAIL)
             {
                 retval = ScheduleSettings.GetInstance().CronString;
             }
-            else if (ScheduleSettings.GetInstance().ScheduleType == ONE_TIME)
+            else if (ScheduleSettings.GetInstance().ScheduleType == Constants.SCHEDULE_ONETIME)
             {
                 DateTime oneTime = Convert.ToDateTime(ScheduleSettings.GetInstance().OneTimeDateTime);
 
@@ -240,7 +212,7 @@ namespace DocSearch.CommonLogic
 
                 retval = string.Format(CRON_FORMAT, second, minute, hour, date, month, "?", year);
             }
-            else if (ScheduleSettings.GetInstance().ScheduleType == DATE)
+            else if (ScheduleSettings.GetInstance().ScheduleType == Constants.SCHEDULE_DAILY)
             {
                 DateTime time = Convert.ToDateTime(ScheduleSettings.GetInstance().ExecTimeDaily);
 
@@ -253,7 +225,7 @@ namespace DocSearch.CommonLogic
 
                 retval = string.Format(CRON_FORMAT, second, minute, hour, date, "*", "?", "").Trim();
             }
-            else if (ScheduleSettings.GetInstance().ScheduleType == DAY)
+            else if (ScheduleSettings.GetInstance().ScheduleType == Constants.SCHEDULE_WEEKLY)
             {
                 string week = string.Empty;
                 week += ScheduleSettings.GetInstance().ExecMonday ? "MON," : "";
@@ -286,7 +258,7 @@ namespace DocSearch.CommonLogic
             public void Execute(IJobExecutionContext context)
             {
                 Dictionary<string, object> args = new Dictionary<string, object>();
-                args[KEY_EXEC_MACHINE_LEARNING] = SetupController.EXEC_MACHINE_LEARNING;
+                args[Constants.ARGKEY_EXEC_MACHINE_LEARNING] = Constants.EXECUTE;
 
                 Scheduling.GetInstance().ExecJob(args);
             }

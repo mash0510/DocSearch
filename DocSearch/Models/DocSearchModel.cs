@@ -1,4 +1,5 @@
-﻿using FolderCrawler;
+﻿using DocSearch.CommonLogic;
+using FolderCrawler;
 using FolderCrawler.Setting;
 using System;
 using System.Collections.Generic;
@@ -169,5 +170,16 @@ namespace DocSearch.Models
         /// フォルダツリービューのモデル
         /// </summary>
         public FileTreeViewModel FileTreeViewModel { get; set; }
+
+        /// <summary>
+        /// 関連語の表示数
+        /// </summary>
+        public int RelatedWordDispNum
+        {
+            get
+            {
+                return ReadSettings.RelatedWordDispNum;
+            }
+        }
     }
 }

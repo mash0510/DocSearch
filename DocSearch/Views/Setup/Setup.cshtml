@@ -26,8 +26,8 @@
         <div class="col-md-2">
             @Html.DropDownListFor(m => m.ExecMachineLearning,
                 new SelectListItem[] {
-                new SelectListItem() { Value="0", Text=DocSearch.Resources.Message.NOT_EXECUTE },
-                new SelectListItem() { Value="1", Text=DocSearch.Resources.Message.EXECUTE }
+                new SelectListItem() { Value=DocSearch.Resources.Constants.NOT_EXECUTE, Text=DocSearch.Resources.Message.NOT_EXECUTE },
+                new SelectListItem() { Value=DocSearch.Resources.Constants.EXECUTE, Text=DocSearch.Resources.Message.EXECUTE }
                 },
                 new { @class="form-control", id="execMachineLearningOption" })
         </div>
@@ -38,7 +38,7 @@
             <button type="button" id="crawlCancelButton" class="btn btn-default" onclick="CancelCrawl()">@DocSearch.Resources.Message.CANCEL</button>
         </div>
         <div class="col-md-1 text-center">
-            <button type="button" id="crawlHistoryButton" class="btn btn-default" onclick="GetHistoryData('Crawl')">@DocSearch.Resources.Message.HISTORY</button>
+            <button type="button" id="crawlHistoryButton" class="btn btn-default" onclick="GetHistoryData('@DocSearch.Resources.Constants.HISTORY_KIND_CRAWL')">@DocSearch.Resources.Message.HISTORY</button>
         </div>
     </div>
     <br />
@@ -70,7 +70,7 @@
             <button type="button" id="machineLearningCancelButton" class="btn btn-default" onclick="CancelMachineLearning()">@DocSearch.Resources.Message.CANCEL</button>
         </div>
         <div class="col-md-1 text-center">
-            <button type="button" id="crawlHistoryButton" class="btn btn-default" onclick="GetHistoryData('word2vec')">@DocSearch.Resources.Message.HISTORY</button>
+            <button type="button" id="crawlHistoryButton" class="btn btn-default" onclick="GetHistoryData('@DocSearch.Resources.Constants.HISTORY_KIND_WORD2VEC')">@DocSearch.Resources.Message.HISTORY</button>
         </div>
     </div>
     <br />
@@ -98,11 +98,11 @@
                 @Html.DropDownListFor(m => m.ScheduleType,
                     new SelectListItem[]
                     {
-                        new SelectListItem() { Value="none", Text=DocSearch.Resources.Message.SCHEDULE_EXEC_NOTHING },
-                        new SelectListItem() { Value="oneTime", Text=DocSearch.Resources.Message.SCHEDULE_EXEC_ONE_TIME },
-                        new SelectListItem() { Value="date", Text=DocSearch.Resources.Message.SCHEDULE_EXEC_DAILY },
-                        new SelectListItem() { Value="day", Text=DocSearch.Resources.Message.SCHEDULE_EXEC_WEEKLY },
-                        new SelectListItem() { Value="detail", Text=DocSearch.Resources.Message.SCHEDULE_EXEC_DETAIL }
+                        new SelectListItem() { Value=DocSearch.Resources.Constants.SCHEDULE_NONE, Text=DocSearch.Resources.Message.SCHEDULE_EXEC_NOTHING },
+                        new SelectListItem() { Value=DocSearch.Resources.Constants.SCHEDULE_ONETIME, Text=DocSearch.Resources.Message.SCHEDULE_EXEC_ONE_TIME },
+                        new SelectListItem() { Value=DocSearch.Resources.Constants.SCHEDULE_DAILY, Text=DocSearch.Resources.Message.SCHEDULE_EXEC_DAILY },
+                        new SelectListItem() { Value=DocSearch.Resources.Constants.SCHEDULE_WEEKLY, Text=DocSearch.Resources.Message.SCHEDULE_EXEC_WEEKLY },
+                        new SelectListItem() { Value=DocSearch.Resources.Constants.SCHEDULE_DETAIL, Text=DocSearch.Resources.Message.SCHEDULE_EXEC_DETAIL }
                     },
                     new { id= "schedule-select", onchange = "ScheduleTypeChanged(this)" }
                )
@@ -186,18 +186,18 @@
 
         // サーバー側からのメッセージを受信する部分
         comNotifier.client.sendMessage = function (type, message, args) {
-            if (type == "PROGRESS_BAR") {
+            if (type == "@DocSearch.Resources.Constants.TYPE_PROGRESS_BAR") {
                 var rate = parseInt(args[0]);
                 var id = args[1];
                 UpdateProgress(message, rate, id);
             }
-            else if (type == "HISTORY") {
+            else if (type == "@DocSearch.Resources.Constants.TYPE_HISTORY") {
                 ShowHistoryDialog(message, args);
             }
-            else if (type == "SCHEDULING") {
+            else if (type == "@DocSearch.Resources.Constants.TYPE_SCHEDULING") {
                 SetScheduleFinished(message);
             }
-            else if (type == "SETUP_CRAWL_FOLDER") {
+            else if (type == "@DocSearch.Resources.Constants.TYPE_SETUP_CRAWL_FOLDER") {
                 ShowMessage(message);
             }
         };
@@ -244,7 +244,7 @@
     function SetupCrawlFolders() {
         var crawlFolders = $("#crawlFoldersTextBox").val();
         var args = [crawlFolders];
-        SendMessageToServer("SETUP_CRAWL_FOLDER", "SetupCrawlFolders", args);
+        SendMessageToServer("@DocSearch.Resources.Constants.TYPE_SETUP_CRAWL_FOLDER", "@DocSearch.Resources.Constants.PROCESS_SETUP_CRAWL_FOLDER", args);
     }
     // ******* クロール先のフォルダ指定 *******
 
@@ -327,7 +327,7 @@
 
         var schArgs = [scheData.type, scheData.schOneTime, scheData.schDailyInterval, scheData.schDailyTime, scheData.schMon, scheData.schTue, scheData.schWed, scheData.schThr, scheData.schFri, scheData.schSat, scheData.schSun, scheData.schDayTime, scheData.schCron];
 
-        SendMessageToServer("SCHEDULING", "SaveScheduling", schArgs);
+        SendMessageToServer("@DocSearch.Resources.Constants.TYPE_SCHEDULING", "@DocSearch.Resources.Constants.PROCESS_SAVE_SCHEDULING", schArgs);
     }
     // スケジュール設定を元に戻す
     function RevertScheduling() {
@@ -344,12 +344,12 @@
     // ******* 履歴 *******
     // 履歴データの取得
     function GetHistoryData(historyKind) {
-        SendMessageToServer("HISTORY", "GetHistoryData", [historyKind]);
+        SendMessageToServer("@DocSearch.Resources.Constants.TYPE_HISTORY", "@DocSearch.Resources.Constants.PROCESS_GET_HISTORY_DATA", [historyKind]);
     }
     // 取得した履歴データの表示
     function ShowHistoryDialog(historyKind, historyData) {
         var title = "@DocSearch.Resources.Message.HISTORY_CRAWL";
-        if (historyKind == "word2vec") {
+        if (historyKind == "@DocSearch.Resources.Constants.HISTORY_KIND_WORD2VEC") {
             title = "@DocSearch.Resources.Message.HISTORY_WORD2VEC"
         }
         $('#history-form').dialog('option', 'title', title);
@@ -388,35 +388,45 @@
 
     // ******* クロールと機械学習 *******
     // プログレスバーの更新
-    function UpdateProgress(message, count, id) {
+    function UpdateProgress(message, count, id)
+    {
         // クロール・機械学習実行の途中で設定画面を表示したときでも
         // 画面を非活性状態にするために、常にこれを実行しておく。
         DisableControls(true, id);
 
-        if (count < 0 || count > 100) {
+        if (count < 0 || count > 100)
+        {
             var dispRate = 100;
-            if (count < 0) {
+            if (count < 0)
+            {
                 dispRate = 0;
             }
 
             $(id).find(".progress-bar").css({ 'width': dispRate + '%' });
             $(id).find(".progress-rate").html(message);
 
+            var complete = @DocSearch.Resources.Constants.PROGRESS_RATE_COMPLETED;
+            var canceled = @DocSearch.Resources.Constants.PROGRESS_RATE_CANCELED;
+
             // 処理が完了したら、プログレスバーの表示をアニメーション → 固定表示に切り替える
             // 100ではなく、101が処理終了を表すコード。-2はキャンセルされたことを示すコード。
-            if (count == 101 || count == -2) {
+            if (count == complete || count == canceled)
+            {
                 $(id).find("#progressType").removeClass("progress-striped active");
 
                 var result = JdugeStartMachineLearning(id);
                 if (!result)
+                {
                     DisableControls(false);
+                }
             }
 
             return;
         }
 
         // プログレスバーの表示をストライプ＆アニメーションに変更する。
-        if (!$(id).find("#progressType").hasClass("progress-striped active")) {
+        if (!$(id).find("#progressType").hasClass("progress-striped active"))
+        {
             $(id).find("#progressType").addClass("progress-striped active");
         }
 
@@ -453,14 +463,14 @@
         // サーバーへ渡すパラメータの生成
         var args = ["#crawlProgressBar", "#machineLearningProgressBar", machineLearning];
 
-        SendMessageToServer("PROGRESS_BAR", "StartCrawl", args);
+        SendMessageToServer("@DocSearch.Resources.Constants.TYPE_PROGRESS_BAR", "@DocSearch.Resources.Constants.PROCESS_START_CRAWL", args);
     }
 
     // クロールキャンセル
     function CancelCrawl() {
         DisableControls(false);
 
-        SendMessageToServer("PROGRESS_BAR", "CancelCrawl", [""]);
+        SendMessageToServer("@DocSearch.Resources.Constants.TYPE_PROGRESS_BAR", "@DocSearch.Resources.Constants.PROCESS_CANCEL_CRAWL", [""]);
     }
 
     // 機械学習開始
@@ -471,14 +481,14 @@
 
         var args = ["#machineLearningProgressBar"];
 
-        SendMessageToServer("PROGRESS_BAR", "StartMachineLearning", args);
+        SendMessageToServer("@DocSearch.Resources.Constants.TYPE_PROGRESS_BAR", "@DocSearch.Resources.Constants.PROCESS_START_MACHINE_LEARNING", args);
     }
 
     // 機械学習キャンセル
     function CancelMachineLearning() {
         DisableControls(false);
 
-        SendMessageToServer("PROGRESS_BAR", "CancelMachineLearning", [""]);
+        SendMessageToServer("@DocSearch.Resources.Constants.TYPE_PROGRESS_BAR", "@DocSearch.Resources.Constants.PROCESS_CANCEL_MACHINE_LEARNING", [""]);
     }
 
     // UIの活性・非活性制御

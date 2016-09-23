@@ -1,4 +1,5 @@
 ﻿using DocSearch.hubs;
+using DocSearch.Resources;
 using FolderCrawler;
 using System;
 using System.Collections.Generic;
@@ -13,30 +14,9 @@ namespace DocSearch.CommonLogic
     public class SendProgressRate
     {
         /// <summary>
-        /// タイプ
-        /// </summary>
-        public const string TYPE = "PROGRESS_BAR";
-
-        /// <summary>
         /// 進捗率取得のインターバル時間（ms）
         /// </summary>
         private const int PROGRESS_INTERVAL = 500;
-
-        /// <summary>
-        /// 完了時の進捗率
-        /// </summary>
-        public const int PROGRESS_COMPLETED = 101;
-
-        /// <summary>
-        /// キャンセル時に表示する進捗率。わざと-2にしている。
-        /// -2という値をブラウザに送り込むことで、プロブレスバーの表示を0%、進捗率表示部分に、任意のメッセージを表示することができるようにJavaScriptを書いている。
-        /// </summary>
-        public const int PROGRESS_RATE_CANCELED = -2;
-
-        /// <summary>
-        /// 処理開始ボタン押下～実際のプロセス開始までの間であることを示す値
-        /// </summary>
-        public const int PROGRESS_RATE_STARTING = -3;
 
         /// <summary>
         /// 進捗率取得タイマー
@@ -117,7 +97,7 @@ namespace DocSearch.CommonLogic
         {
             string[] args = { rate.ToString(), ProgressBarID };
 
-            ComHub.SendMessageToAll(TYPE, message, args);
+            ComHub.SendMessageToAll(Constants.TYPE_PROGRESS_BAR, message, args);
             Stop();
         }
 
@@ -149,7 +129,7 @@ namespace DocSearch.CommonLogic
             {
                 mes = MessageNoProgressRate;
             }
-            else if (rate == PROGRESS_COMPLETED)
+            else if (rate == Convert.ToInt32(Constants.PROGRESS_RATE_COMPLETED))
             {
                 mes = MessageFinished;
             }
@@ -157,7 +137,7 @@ namespace DocSearch.CommonLogic
             string[] args = { rate.ToString(), ProgressBarID };
 
             // ブラウザ側に進捗率を通知する
-            ComHub.SendMessageToAll(TYPE, mes, args);
+            ComHub.SendMessageToAll(Constants.TYPE_PROGRESS_BAR, mes, args);
         }
     }
 }

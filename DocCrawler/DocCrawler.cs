@@ -155,6 +155,10 @@ namespace FolderCrawler
             StopProcessing = false;
             _crawledDocCount = 0;
 
+            // 実行前にキューの中をクリアする。
+            // 前回実行時に、クロール途中でキャンセルされ、キュー内にデータが残っている場合があるので、一旦キューの中身をクリアしてから使う。
+            QueueManager.GetInstance().FileInfoQueue.Clear();
+
             DirectoryInfo di = new DirectoryInfo(this.CrawlRoot);
             CrawlRecursive(di);
 

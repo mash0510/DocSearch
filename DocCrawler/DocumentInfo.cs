@@ -39,6 +39,7 @@ namespace FolderCrawler
         /// <summary>
         /// ドキュメント文書内容。テキスト抽出したドキュメントの全文をここに入れる。
         /// </summary>
+        [String(TermVector = TermVectorOption.WithPositionsOffsetsPayloads)]
         public string DocContent { get; set; }
     }
 }

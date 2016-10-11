@@ -106,6 +106,78 @@ namespace DocSearch.Resources {
         }
         
         /// <summary>
+        ///   docContent に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string JSON_RES_DOC_CONTENT {
+            get {
+                return ResourceManager.GetString("JSON_RES_DOC_CONTENT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   extention に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string JSON_RES_EXTENTION {
+            get {
+                return ResourceManager.GetString("JSON_RES_EXTENTION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   fileFullPath に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string JSON_RES_FILE_FULL_PATH {
+            get {
+                return ResourceManager.GetString("JSON_RES_FILE_FULL_PATH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   fileName に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string JSON_RES_FILENAME {
+            get {
+                return ResourceManager.GetString("JSON_RES_FILENAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   folderPath に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string JSON_RES_FOLDER_PATH {
+            get {
+                return ResourceManager.GetString("JSON_RES_FOLDER_PATH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   _score に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string JSON_RES_SCORE {
+            get {
+                return ResourceManager.GetString("JSON_RES_SCORE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   updatedDate に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string JSON_RES_UPDATED_DATE {
+            get {
+                return ResourceManager.GetString("JSON_RES_UPDATED_DATE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   -2 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string NO_SCORE {
+            get {
+                return ResourceManager.GetString("NO_SCORE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   0 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string NOT_EXECUTE {

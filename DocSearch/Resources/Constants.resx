@@ -132,8 +132,33 @@
   <data name="HISTORY_KIND_WORD2VEC" xml:space="preserve">
     <value>word2vec</value>
   </data>
+  <data name="JSON_RES_DOC_CONTENT" xml:space="preserve">
+    <value>docContent</value>
+  </data>
+  <data name="JSON_RES_EXTENTION" xml:space="preserve">
+    <value>extention</value>
+  </data>
+  <data name="JSON_RES_FILENAME" xml:space="preserve">
+    <value>fileName</value>
+  </data>
+  <data name="JSON_RES_FILE_FULL_PATH" xml:space="preserve">
+    <value>fileFullPath</value>
+  </data>
+  <data name="JSON_RES_FOLDER_PATH" xml:space="preserve">
+    <value>folderPath</value>
+  </data>
+  <data name="JSON_RES_SCORE" xml:space="preserve">
+    <value>_score</value>
+  </data>
+  <data name="JSON_RES_UPDATED_DATE" xml:space="preserve">
+    <value>updatedDate</value>
+  </data>
   <data name="NOT_EXECUTE" xml:space="preserve">
     <value>0</value>
+  </data>
+  <data name="NO_SCORE" xml:space="preserve">
+    <value>-2</value>
+    <comment>スコア表示をしない場合のScoreプロパティに与える値</comment>
   </data>
   <data name="PROCESS_CANCEL_CRAWL" xml:space="preserve">
     <value>CancelCrawl</value>

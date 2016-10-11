@@ -12,6 +12,8 @@ using System.Text;
 using DocSearch.CommonLogic;
 using System.IO;
 using DocSearch.Resources;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace DocSearch.Controllers
 {
@@ -79,6 +81,19 @@ namespace DocSearch.Controllers
             docSearchModel.SearchFolder = SearchFolder;
 
             return View(docSearchModel);
+        }
+
+        // GET: DocSearch
+        [HttpGet]
+        public ActionResult SameKindDoc(DocSearchModel docSearchModel, string docID)
+        {
+            docSearchModel.SearchExecuted = true;
+
+            SearchSameKindDoc(docSearchModel, docID);
+
+            docSearchModel.SearchFolder = SearchFolder;
+
+            return View("Index", docSearchModel);
         }
 
         /// <summary>
@@ -161,6 +176,18 @@ namespace DocSearch.Controllers
         }
 
         /// <summary>
+        /// 検索文書の初期化
+        /// </summary>
+        /// <param name="docSearchModel"></param>
+        private void InitSearchedDocument(DocSearchModel docSearchModel)
+        {
+            if (docSearchModel.SearchedDocument == null)
+                docSearchModel.SearchedDocument = new List<DocData>();
+            else
+                docSearchModel.SearchedDocument.Clear();
+        }
+
+        /// <summary>
         /// 検索結果をModelに変換
         /// </summary>
         /// <param name="documents"></param>
@@ -169,19 +196,63 @@ namespace DocSearch.Controllers
         /// <returns></returns>
         private void ConvertToDocSearchModel(IEnumerable<DocumentInfo> documents, DocSearchModel docSearchModel, string[] keywords)
         {
-            if (docSearchModel.SearchedDocument == null)
-                docSearchModel.SearchedDocument = new List<DocData>();
-            else
-                docSearchModel.SearchedDocument.Clear();
+            InitSearchedDocument(docSearchModel);
 
             foreach (DocumentInfo docInfo in documents)
             {
                 DocData dispData = new DocData();
+                dispData.Score = Convert.ToDouble(Constants.NO_SCORE);
+                dispData.DocID = IDDictionary.GetInstanse().GetElasticsearchID(docInfo.FileFullPath);
                 dispData.FileName = docInfo.FileName;
                 dispData.UpdatedDate = docInfo.UpdatedDate;
                 dispData.FileFullPath = docInfo.FileFullPath;
                 dispData.Extention = docInfo.Extention;
                 dispData.DocSummary = GetTextAroundKeyword(docInfo.DocContent, keywords, ReadSettings.LettersAroundKeyword);
+
+                docSearchModel.SearchedDocument.Add(dispData);
+            }
+        }
+
+        /// <summary>
+        /// 類似文書の検索
+        /// </summary>
+        /// <param name="docSearchModel"></param>
+        /// <param name="docID"></param>
+        private void SearchSameKindDoc(DocSearchModel docSearchModel, string docID)
+        {
+            string[] keywords = docSearchModel.InputKeywords.Split(_keywordDelimiter);
+            docSearchModel.RelatedWords = GetRelatedWords(keywords);
+            ListConvert(docSearchModel);
+
+            SearchEngineConnection.InitConnectClient();
+            ElasticClient client = SearchEngineConnection.Client;
+
+            // LINQ形式のmore_like_this検索では、検索結果が違った。正しくない検索結果が返される。
+            // なので、ここではJSON形式のmore_like_thisクエリを、LowLevelクラスで送信して結果を得るようにする。
+            string json = @"{""query"":{""more_like_this"":{""like"":[{""_id"": """ +  docID + @""" }]}}}";
+
+            var res = client.LowLevel.Search<string>("docinfoindex", "documentinfo", json);
+            JToken resJson = JsonConvert.DeserializeObject(res.Body) as JToken;
+
+            InitSearchedDocument(docSearchModel);
+
+            foreach (JObject obj in resJson.Last.Last.Last.Last)
+            {
+                double score = obj.GetValue(Constants.JSON_RES_SCORE).Value<double>();
+                string fileName = obj.Last.Last[Constants.JSON_RES_FILENAME].Value<string>();
+                string updatedDate = obj.Last.Last[Constants.JSON_RES_UPDATED_DATE].Value<string>();
+                string fileFullPath = obj.Last.Last[Constants.JSON_RES_FILE_FULL_PATH].Value<string>();
+                string extention = obj.Last.Last[Constants.JSON_RES_EXTENTION].Value<string>();
+                string docContent = obj.Last.Last[Constants.JSON_RES_DOC_CONTENT].Value<string>();
+
+                DocData dispData = new DocData();
+                dispData.Score = score;
+                dispData.DocID = IDDictionary.GetInstanse().GetElasticsearchID(fileFullPath);
+                dispData.FileName = fileName;
+                dispData.UpdatedDate = FolderCrawler.CommonLogic.SafeConvertDateTime(updatedDate);
+                dispData.FileFullPath = fileFullPath;
+                dispData.Extention = extention;
+                dispData.DocSummary = GetTextFromHead(docContent, ReadSettings.LettersFromHead);
 
                 docSearchModel.SearchedDocument.Add(dispData);
             }
@@ -225,6 +296,19 @@ namespace DocSearch.Controllers
             }
 
             return retval.ToString();
+        }
+
+        /// <summary>
+        /// 画面に表示する文書内容の取得。先頭からWeb.Config中の"LettersFromHead"で指定した文字数分だけ取得
+        /// </summary>
+        /// <param name="docContent"></param>
+        /// <param name="letters"></param>
+        /// <returns></returns>
+        private string GetTextFromHead(string docContent, int letters)
+        {
+            string retval = docContent.Substring(0, letters);
+
+            return retval;
         }
 
         /// <summary>

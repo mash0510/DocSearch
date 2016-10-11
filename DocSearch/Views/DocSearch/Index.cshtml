@@ -61,12 +61,17 @@
             <ul>
                 @foreach(var result in Model.SearchedDocument)
                 {
-                    <li>
+                    <li class="ds-searcheditem">
                         <a href="@result.FileFullPath" target="_blank">@result.FileName</a>
+                        @if(result.Score.ToString() != DocSearch.Resources.Constants.NO_SCORE)
+                        {
+                            <label class="ds-similarity">@DocSearch.Resources.Message.SIMILARITY_SCORE : @result.Score</label>
+                        }
                         <div class="ds-updateddate">@DocSearch.Resources.Message.UPDATE_DATE @DocSearch.Resources.Message.COLON @result.UpdatedDate</div>
                         <p class="ds-docsummary">
                             @result.DocSummary
                         </p>
+                        @Html.ActionLink(DocSearch.Resources.Message.SEARCH_SAME_KIND_DOC, "SameKindDoc", "DocSearch", new { InputKeywords = @Model.InputKeywords, docID = result.DocID }, null)
                     </li>
                 }
             </ul>
@@ -94,7 +99,7 @@
 
 <div class="row">
     <div class="col-md-10 col-md-offset-1">
-        @if (Model.SearchExecuted)
+        @if (Model.SearchExecuted && Model.PageList != null)
         {
             <ul class="pagination">
                 @foreach (var pageNo in Model.PageList)

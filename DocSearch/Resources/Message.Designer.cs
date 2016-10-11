@@ -493,11 +493,29 @@ namespace DocSearch.Resources {
         }
         
         /// <summary>
+        ///   類似文書検索 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SEARCH_SAME_KIND_DOC {
+            get {
+                return ResourceManager.GetString("SEARCH_SAME_KIND_DOC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   管理 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string SETUP_PAGE {
             get {
                 return ResourceManager.GetString("SETUP_PAGE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   類似スコア に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SIMILARITY_SCORE {
+            get {
+                return ResourceManager.GetString("SIMILARITY_SCORE", resourceCulture);
             }
         }
         

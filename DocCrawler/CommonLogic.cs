@@ -57,5 +57,19 @@ namespace FolderCrawler
                 // 後ほどログ出力をする
             }
         }
+
+        /// <summary>
+        /// 文字列→日付型への変換
+        /// </summary>
+        /// <param name="dateTime"></param>
+        /// <returns></returns>
+        public static DateTime SafeConvertDateTime(string dateTime)
+        {
+            DateTime retval = DateTime.MinValue;
+
+            DateTime.TryParse(dateTime, out retval);
+
+            return retval;
+        }
     }
 }

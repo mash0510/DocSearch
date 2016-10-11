@@ -33,8 +33,11 @@ textarea {
 }
 
 .ds-docsummary {
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding-bottom: 7px;
+}
+
+.ds-searcheditem {
+    padding-bottom: 10px;
 }
 
 .ds-container {
@@ -52,4 +55,9 @@ textarea {
 
 .ds-checkbox {
   margin-left: 10px;
+}
+
+.ds-similarity {
+    font-size: small;
+    margin-left: 15px;
 }

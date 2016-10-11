@@ -17,6 +17,10 @@ namespace DocSearch.Models
         private string _fileFullPath = string.Empty;
 
         /// <summary>
+        /// Elasticsearchへのindexing時に割り振ったID
+        /// </summary>
+        public string DocID { get; set; }
+        /// <summary>
         /// ファイル名
         /// </summary>
         public string FileName { get; set; }
@@ -52,7 +56,11 @@ namespace DocSearch.Models
         /// <summary>
         /// ドキュメント文書内容。キーワードの周辺の文書データを入れる
         /// </summary>
-        public string DocSummary{ get; set; }
+        public string DocSummary { get; set; }
+        /// <summary>
+        /// マッチの度合いを示すスコア
+        /// </summary>
+        public double Score { get; set; }
     }
 
     /// <summary>

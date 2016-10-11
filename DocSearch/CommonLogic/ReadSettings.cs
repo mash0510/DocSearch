@@ -168,6 +168,17 @@ namespace DocSearch.CommonLogic
         }
 
         /// <summary>
+        /// サマリー表示の文字数。類似文書検索時において、先頭から何文字を表示するか
+        /// </summary>
+        public static int LettersFromHead
+        {
+            get
+            {
+                return Convert.ToInt32(ConfigurationManager.AppSettings["LettersFromHead"]);
+            }
+        }
+
+        /// <summary>
         /// int型への変換
         /// </summary>
         /// <param name="val"></param>

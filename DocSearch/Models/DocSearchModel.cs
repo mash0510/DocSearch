@@ -189,5 +189,11 @@ namespace DocSearch.Models
                 return ReadSettings.RelatedWordDispNum;
             }
         }
+
+        /// <summary>
+        /// 類似文書検索かどうか（true : 類似文書検索 / false：通常のキーワード検索）
+        /// 
+        /// </summary>
+        public bool IsSimilarDocSearch { get; set; }
     }
 }

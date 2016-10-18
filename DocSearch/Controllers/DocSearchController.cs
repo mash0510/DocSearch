@@ -59,10 +59,40 @@ namespace DocSearch.Controllers
             }
         }
 
+        /// <summary>
+        /// 類似文書検索の検索元文書IDの設定と取得
+        /// </summary>
+        private string SimilarDocSearchID
+        {
+            set
+            {
+                Session[Constants.SIMILER_DOCSEARCH_ID] = value;
+            }
+            get
+            {
+                if (Session == null || Session[Constants.SIMILER_DOCSEARCH_ID] == null)
+                    return string.Empty;
+
+                string docID = Session[Constants.SIMILER_DOCSEARCH_ID].ToString();
+
+                return docID;
+            }
+        }
+
         // GET: DocSearch
         [HttpGet]
-        public ActionResult Index(DocSearchModel docSearchModel, int? page)
+        public ActionResult Index(DocSearchModel docSearchModel, int? page, bool? searchSimilarDoc)
         {
+            if (searchSimilarDoc != null && searchSimilarDoc == true)
+            {
+                ActionResult ar = SameKindDoc(docSearchModel, SimilarDocSearchID, page);
+                return ar;
+            }
+            else
+            {
+                docSearchModel.IsSimilarDocSearch = false;
+            }
+
             // 検索キーワードが何も入力されていなかったら、検索処理はしない。
             if (docSearchModel.InputKeywords == null ||
                 docSearchModel.InputKeywords == string.Empty)
@@ -85,13 +115,19 @@ namespace DocSearch.Controllers
 
         // GET: DocSearch
         [HttpGet]
-        public ActionResult SameKindDoc(DocSearchModel docSearchModel, string docID)
+        public ActionResult SameKindDoc(DocSearchModel docSearchModel, string docID, int? page)
         {
             docSearchModel.SearchExecuted = true;
 
-            SearchSameKindDoc(docSearchModel, docID);
+            SimilarDocSearchID = docID;
+
+            int pageNo = page ?? 1;
+            if (pageNo <= 0) pageNo = 1;
+
+            SearchSameKindDoc(docSearchModel, docID, pageNo);
 
             docSearchModel.SearchFolder = SearchFolder;
+            docSearchModel.IsSimilarDocSearch = true;
 
             return View("Index", docSearchModel);
         }
@@ -218,7 +254,7 @@ namespace DocSearch.Controllers
         /// </summary>
         /// <param name="docSearchModel"></param>
         /// <param name="docID"></param>
-        private void SearchSameKindDoc(DocSearchModel docSearchModel, string docID)
+        private void SearchSameKindDoc(DocSearchModel docSearchModel, string docID, int page)
         {
             string[] keywords = docSearchModel.InputKeywords.Split(_keywordDelimiter);
             docSearchModel.RelatedWords = GetRelatedWords(keywords);
@@ -227,16 +263,26 @@ namespace DocSearch.Controllers
             SearchEngineConnection.InitConnectClient();
             ElasticClient client = SearchEngineConnection.Client;
 
+            _pagination.PageSize = docSearchModel.PageSize;
+            Pagination.DataRange dataRange = _pagination.GetDataRange(page);
+
             // LINQ形式のmore_like_this検索では、検索結果が違った。正しくない検索結果が返される。
             // なので、ここではJSON形式のmore_like_thisクエリを、LowLevelクラスで送信して結果を得るようにする。
-            string json = @"{""query"":{""more_like_this"":{""like"":[{""_id"": """ +  docID + @""" }]}}}";
+            string json = @"{""from"":" + dataRange.Start + @", ""size"":" + _pagination.PageSize + @", ""query"":{""more_like_this"":{""like"":[{""_id"": """ +  docID + @""" }]}}}";
 
             var res = client.LowLevel.Search<string>("docinfoindex", "documentinfo", json);
             JToken resJson = JsonConvert.DeserializeObject(res.Body) as JToken;
 
             InitSearchedDocument(docSearchModel);
 
-            foreach (JObject obj in resJson.Last.Last.Last.Last)
+            if (resJson == null || 
+                resJson.SelectToken("hits.total") == null ||
+                resJson.SelectToken("hits.hits") == null)
+                return;
+
+            int total = resJson.SelectToken("hits.total").Value<int>();
+
+            foreach (JObject obj in resJson.SelectToken("hits.hits"))
             {
                 double score = obj.GetValue(Constants.JSON_RES_SCORE).Value<double>();
                 string fileName = obj.Last.Last[Constants.JSON_RES_FILENAME].Value<string>();
@@ -256,6 +302,12 @@ namespace DocSearch.Controllers
 
                 docSearchModel.SearchedDocument.Add(dispData);
             }
+
+            _pagination.TotalDataNum = total;
+
+            docSearchModel.Total = _pagination.TotalDataNum;
+            docSearchModel.PageList = _pagination.GetPageList();
+            docSearchModel.Page = page;
         }
 
         /// <summary>

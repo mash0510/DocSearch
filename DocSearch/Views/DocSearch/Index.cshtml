@@ -106,11 +106,11 @@
                 {
                     if (pageNo == Model.Page)
                     {
-                        <li class="active">@Html.ActionLink(pageNo.ToString(), "Index", "DocSearch", new { InputKeywords = @Model.InputKeywords, page = pageNo.ToString() }, null)</li>
+                        <li class="active">@Html.ActionLink(pageNo.ToString(), "Index", "DocSearch", new { InputKeywords = @Model.InputKeywords, page = pageNo.ToString(), searchSimilarDoc = Model.IsSimilarDocSearch }, null)</li>
                     }
                     else
                     {
-                        <li>@Html.ActionLink(pageNo.ToString(), "Index", "DocSearch", new { InputKeywords = @Model.InputKeywords, page = pageNo.ToString() }, null)</li>
+                        <li>@Html.ActionLink(pageNo.ToString(), "Index", "DocSearch", new { InputKeywords = @Model.InputKeywords, page = pageNo.ToString(), searchSimilarDoc = Model.IsSimilarDocSearch }, null)</li>
                     }
                 }
             </ul>

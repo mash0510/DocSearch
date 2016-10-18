@@ -212,6 +212,10 @@
   <data name="SESSION_SEARCH_FOLDER" xml:space="preserve">
     <value>searchFolder</value>
   </data>
+  <data name="SIMILER_DOCSEARCH_ID" xml:space="preserve">
+    <value>SimilerDocSearchID</value>
+    <comment>類似文書検索の検索元文書IDを保持させるSessionキー</comment>
+  </data>
   <data name="SNIP" xml:space="preserve">
     <value>........</value>
   </data>

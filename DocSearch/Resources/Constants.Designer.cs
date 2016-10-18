@@ -340,6 +340,15 @@ namespace DocSearch.Resources {
         }
         
         /// <summary>
+        ///   SimilerDocSearchID に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string SIMILER_DOCSEARCH_ID {
+            get {
+                return ResourceManager.GetString("SIMILER_DOCSEARCH_ID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   ........ に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string SNIP {

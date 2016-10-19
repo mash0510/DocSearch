@@ -114,6 +114,10 @@ namespace DocSearch.Models
         /// </summary>
         public int Page { get; set; }
 
+        /// <summary>
+        /// 全体のページ数
+        /// </summary>
+        public int TotalPage { get; set; }
 
         private int _pageSize = 10;
         /// <summary>

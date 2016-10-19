@@ -78,16 +78,31 @@ namespace DocSearch.CommonLogic
         /// <summary>
         /// ページ番号のリストを取得
         /// </summary>
+        /// <param name="pageNo"></param>
         /// <returns></returns>
-        public List<int> GetPageList()
+        public List<int> GetPageList(int pageNo)
         {
-            int pageNum = GetTotalPageNum();
+            int pageListMaxNum = ReadSettings.PageListMaxNum;
+            int totalPageNum = GetTotalPageNum();
 
             List<int> pageList = new List<int>();
 
-            for(int i = 1; i <= pageNum; i++)
+            int from = 0;
+            if (pageNo >= pageListMaxNum)
             {
-                pageList.Add(i);
+                from = pageNo - (pageListMaxNum / 2);
+                if (from < 0)
+                    from = 0;
+            }
+
+            for (int i = 1; i <= pageListMaxNum; i++)
+            {
+                int page = i + from;
+
+                if (page > totalPageNum)
+                    break;
+
+                pageList.Add(page);
             }
 
             return pageList;

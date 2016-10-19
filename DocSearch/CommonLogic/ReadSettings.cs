@@ -179,6 +179,17 @@ namespace DocSearch.CommonLogic
         }
 
         /// <summary>
+        /// ページ表示したときの最大表示ページ数
+        /// </summary>
+        public static int PageListMaxNum
+        {
+            get
+            {
+                return Convert.ToInt32(ConfigurationManager.AppSettings["PageListMaxNum"]);
+            }
+        }
+
+        /// <summary>
         /// int型への変換
         /// </summary>
         /// <param name="val"></param>

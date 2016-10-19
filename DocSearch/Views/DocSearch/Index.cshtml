@@ -102,16 +102,17 @@
         @if (Model.SearchExecuted && Model.PageList != null)
         {
             <ul class="pagination">
+                @if (Model.Page != 1)
+                {
+                    <li id="page_prev">@Html.ActionLink("«", "Index", "DocSearch", new { InputKeywords = @Model.InputKeywords, page = (Model.Page - 1).ToString(), searchSimilarDoc = Model.IsSimilarDocSearch }, null)</li>
+                }
                 @foreach (var pageNo in Model.PageList)
                 {
-                    if (pageNo == Model.Page)
-                    {
-                        <li class="active">@Html.ActionLink(pageNo.ToString(), "Index", "DocSearch", new { InputKeywords = @Model.InputKeywords, page = pageNo.ToString(), searchSimilarDoc = Model.IsSimilarDocSearch }, null)</li>
-                    }
-                    else
-                    {
-                        <li>@Html.ActionLink(pageNo.ToString(), "Index", "DocSearch", new { InputKeywords = @Model.InputKeywords, page = pageNo.ToString(), searchSimilarDoc = Model.IsSimilarDocSearch }, null)</li>
-                    }
+                    <li class=@(pageNo == Model.Page ? "active" : "")>@Html.ActionLink(pageNo.ToString(), "Index", "DocSearch", new { InputKeywords = @Model.InputKeywords, page = pageNo.ToString(), searchSimilarDoc = Model.IsSimilarDocSearch }, null)</li>
+                }
+                @if (Model.Page != Model.TotalPage)
+                {
+                    <li id="page_next">@Html.ActionLink("»", "Index", "DocSearch", new { InputKeywords = @Model.InputKeywords, page = (Model.Page + 1).ToString(), searchSimilarDoc = Model.IsSimilarDocSearch }, null)</li>
                 }
             </ul>
         }

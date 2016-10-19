@@ -188,8 +188,9 @@ namespace DocSearch.Controllers
             _pagination.TotalDataNum = (int)response.Total - 1; // 1つ大きい値が入るので -1 する。
 
             docSearchModel.Total = _pagination.TotalDataNum;
-            docSearchModel.PageList = _pagination.GetPageList();
+            docSearchModel.PageList = _pagination.GetPageList(page);
             docSearchModel.Page = page;
+            docSearchModel.TotalPage = _pagination.GetTotalPageNum();
 
             ConvertToDocSearchModel(response.Documents, docSearchModel, keywords);
         }
@@ -306,8 +307,9 @@ namespace DocSearch.Controllers
             _pagination.TotalDataNum = total;
 
             docSearchModel.Total = _pagination.TotalDataNum;
-            docSearchModel.PageList = _pagination.GetPageList();
+            docSearchModel.PageList = _pagination.GetPageList(page);
             docSearchModel.Page = page;
+            docSearchModel.TotalPage = _pagination.GetTotalPageNum();
         }
 
         /// <summary>
